@@ -105,7 +105,7 @@ export const Route = createFileRoute("/creators/")({
     const siteUrl = getClawHubSiteUrl();
     const title = `Creators · ${SITE_NAME}`;
     const description =
-      "Discover the people and organizations publishing skills, plugins, packages, and ecosystem tooling on ClawHub.";
+      "Discover the people and organizations publishing skills on CoralNest.";
 
     return {
       links: [

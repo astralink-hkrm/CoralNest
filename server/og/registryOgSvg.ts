@@ -213,7 +213,7 @@ function installCommand(command: RegistryOgCommand | null | undefined, contentX:
 
 export function buildRegistryOgSvg(params: RegistryOgSvgParams) {
   const contentX = 72;
-  const rawTitle = params.title.trim() || "ClawHub";
+  const rawTitle = params.title.trim() || "CoralNest";
   const rawDescription = params.description.trim() || "Published on ClawHub.";
   const avatar = params.avatarDataUrl || params.markDataUrl;
   const watermark = params.watermarkDataUrl || params.markDataUrl;
@@ -241,7 +241,7 @@ export function buildRegistryOgSvg(params: RegistryOgSvgParams) {
   const stats =
     params.stats && params.stats.length > 0
       ? params.stats
-      : [{ value: "ClawHub", label: "Registry" }];
+      : [{ value: "CoralNest", label: "Registry" }];
 
   const titleTspans = titleLines
     .map(

@@ -56,10 +56,6 @@ vi.mock("../components/HomePopularPublishersSection", () => ({
   HomePopularPublishersSection: () => <section data-testid="home-publishers-stub" />,
 }));
 
-vi.mock("../components/HomeAppsSection", () => ({
-  HomeAppsSection: () => <section data-testid="home-apps-stub" />,
-}));
-
 vi.mock("../components/HomeBringSkillsSection", () => ({
   HomeBringSkillsSection: () => <section data-testid="home-bring-skills-stub" />,
 }));
@@ -114,7 +110,6 @@ describe("home route", () => {
 
     expect(screen.getByTestId("home-listing-stub").tagName).toBe("SECTION");
     expect(screen.getByTestId("home-publishers-stub").tagName).toBe("SECTION");
-    expect(screen.getByTestId("home-apps-stub").tagName).toBe("SECTION");
     expect(screen.getByTestId("home-bring-skills-stub").tagName).toBe("SECTION");
     expect(screen.queryByPlaceholderText("What are you looking for?")).toBeNull();
     expect(screen.queryByText("Featured skills")).toBeNull();

@@ -8,7 +8,7 @@ import { AuthFlowSkeleton } from "../../components/skeletons/ProtectedPageSkelet
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { buildDocsAuthCallbackUrl, normalizeDocsReturnTo } from "../../lib/docsAuth";
-import { getClawHubSiteUrl, normalizeClawHubSiteOrigin } from "../../lib/site";
+import { getClawHubSiteUrl, normalizeCoralNestSiteOrigin } from "../../lib/site";
 import { useAuthError } from "../../lib/useAuthError";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 
@@ -34,7 +34,7 @@ export function DocsAuth({ autoSubmit = true }: DocsAuthProps = {}) {
     : undefined;
   const registry = useMemo(() => {
     if (typeof window !== "undefined") {
-      return normalizeClawHubSiteOrigin(window.location.origin) ?? getClawHubSiteUrl();
+      return normalizeCoralNestSiteOrigin(window.location.origin) ?? getClawHubSiteUrl();
     }
     return getClawHubSiteUrl();
   }, []);
@@ -67,7 +67,7 @@ export function DocsAuth({ autoSubmit = true }: DocsAuthProps = {}) {
     return (
       <SignInPrompt
         title="Verify with GitHub"
-        description="Sign in to ClawHub with GitHub to unlock Ask Molty on the OpenClaw docs."
+        description="Sign in with GitHub to get started."
         error={authError}
         onDismissError={clearAuthError}
         action={
@@ -82,7 +82,7 @@ export function DocsAuth({ autoSubmit = true }: DocsAuthProps = {}) {
   if (!authToken) {
     return (
       <AuthFrame title="Connecting docs">
-        <p className="text-sm text-[color:var(--ink-soft)]">Preparing your ClawHub session.</p>
+        <p className="text-sm text-[color:var(--ink-soft)]">Preparing your session.</p>
       </AuthFrame>
     );
   }
@@ -90,7 +90,7 @@ export function DocsAuth({ autoSubmit = true }: DocsAuthProps = {}) {
   return (
     <AuthFrame title="Connecting docs">
       <p className="text-sm text-[color:var(--ink-soft)]">
-        Returning to the OpenClaw docs with your ClawHub login.
+        Returning to CoralNest.
       </p>
       <form ref={formRef} method="post" action={callbackUrl ?? undefined}>
         <input type="hidden" name="token" value={authToken} />

@@ -1,7 +1,6 @@
 import {
   CATALOG_CATEGORY_LIMIT,
   INTERNAL_UNCATEGORIZED_CATEGORY,
-  PLUGIN_CATEGORY_DEFINITIONS,
   SKILL_CATEGORY_DEFINITIONS,
 } from "clawhub-schema";
 import { ChevronDown, Sparkles } from "lucide-react";
@@ -39,7 +38,7 @@ export function CatalogMetadataFields({
   onCategoriesChange,
   onTopicsChange,
 }: CatalogMetadataFieldsProps) {
-  const categories = kind === "skill" ? SKILL_CATEGORY_DEFINITIONS : PLUGIN_CATEGORY_DEFINITIONS;
+  const categories = kind === "skill" ? SKILL_CATEGORY_DEFINITIONS : [];
   const prefix = kind === "skill" ? "skill" : "plugin";
   const fieldIdPrefix = idPrefix ?? prefix;
   const selected = new Set(selectedCategories);

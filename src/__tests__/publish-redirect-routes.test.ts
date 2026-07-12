@@ -24,26 +24,6 @@ describe("legacy publish redirects", () => {
     redirectMock.mockClear();
   });
 
-  it("redirects legacy plugin publish links to /plugins/publish", async () => {
-    const route = await loadRoute("../routes/publish-plugin");
-    const search = route.__config.validateSearch({
-      displayName: "Dronzer",
-      family: "code-plugin",
-      name: "@openclaw/dronzer",
-      nextVersion: "1.0.1",
-      ownerHandle: "vintageayu",
-      sourceRepo: "VintageAyu/dronzer",
-      ignored: "drop-me",
-    });
-
-    expect(route.__path).toBe("/publish-plugin");
-    expect(() => route.__config.beforeLoad({ search })).toThrow();
-    expect(redirectMock).toHaveBeenCalledWith({
-      to: "/plugins/publish",
-      search,
-    });
-  });
-
   it("redirects legacy skill publish links to /skills/publish", async () => {
     const route = await loadRoute("../routes/publish-skill");
     const search = route.__config.validateSearch({

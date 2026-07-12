@@ -5,7 +5,7 @@ import { useState } from "react";
 import { InstallCopyButton } from "./InstallCopyButton";
 
 const BYOS_ASCII = [
-  "....:: clawhub/openclaw ::....  skills plugins publishers trust signals",
+  "....:: coralnest ::....  skills publishers trust signals",
   ">>> install scan publish verify    @@ gateway @@ registry @@ agents @@",
   "  30 skills 12 plugins    /api/v1/skills   /owners   /audit   /ship",
   ":::: signed manifests ::::: moderated releases ::::: version history ::::",
@@ -58,7 +58,7 @@ type PromptTab = {
 type AudienceTab = TerminalTab | PromptTab;
 
 const AGENT_PROMPT =
-  "Read docs.openclaw.ai/clawhub, verify my skills are publish-ready, then publish them to ClawHub and report the published URLs.";
+  "Read the docs, verify my skills are publish-ready, then publish them and report the published URLs.";
 
 const TABS: AudienceTab[] = [
   {
@@ -72,7 +72,7 @@ const TABS: AudienceTab[] = [
     id: "humans",
     label: "For humans",
     mode: "terminal",
-    termLabel: "clawhub — publish & sync",
+    termLabel: "publish & sync",
     lines: [
       { text: "npm i -g clawhub" },
       { text: "clawhub login" },
@@ -186,12 +186,12 @@ export function HomeBringSkillsSection() {
       <ByosRevealBackdrop />
       <div className="home-v2-byos-content">
         <header className="home-v2-byos-head oc-section-heading">
-          <span className="home-v2-byos-eyebrow oc-eyebrow">ClawHub CLI</span>
+          <span className="home-v2-byos-eyebrow oc-eyebrow">CLI</span>
           <h2 id="home-v2-byos-title" className="home-v2-byos-title oc-section-title">
-            Bring your skills to ClawHub
+            Bring your skills to CoralNest
           </h2>
           <p className="home-v2-byos-lede oc-section-copy">
-            Publish and sync your skills to ClawHub, your way.
+            Publish and sync your skills to CoralNest, your way.
           </p>
         </header>
 

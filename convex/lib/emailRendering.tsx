@@ -8,9 +8,6 @@ import AccountSuspendedEmail, {
 } from "../../emails/account-suspended";
 import AdminOneOffEmail, { type AdminOneOffEmailProps } from "../../emails/admin-one-off";
 import BlockedVersionEmail, { type BlockedVersionEmailProps } from "../../emails/blocked-version";
-import PluginInspectorFindingsEmail, {
-  type PluginInspectorFindingsEmailProps,
-} from "../../emails/plugin-inspector-findings";
 import SecretBlockedPublishEmail, {
   type SecretBlockedPublishEmailProps,
 } from "../../emails/secret-blocked-publish";
@@ -25,10 +22,6 @@ export async function renderAccountReinstatedEmail(props: AccountReinstatedEmail
 
 export async function renderBlockedVersionEmail(props: BlockedVersionEmailProps) {
   return await renderEmail(<BlockedVersionEmail {...props} />);
-}
-
-export async function renderPluginInspectorFindingsEmail(props: PluginInspectorFindingsEmailProps) {
-  return await renderEmail(<PluginInspectorFindingsEmail {...props} />);
 }
 
 export async function renderSecretBlockedPublishEmail(props: SecretBlockedPublishEmailProps) {

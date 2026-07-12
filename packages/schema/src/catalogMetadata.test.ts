@@ -5,11 +5,8 @@ import {
   getCatalogTopicSlugs,
   inferSkillCategories,
   normalizeCatalogTopics,
-  normalizePluginCategories,
   normalizeSkillCategories,
-  PLUGIN_CATEGORY_DEFINITIONS,
   resolveCatalogTopics,
-  resolvePluginCategories,
   resolveSkillCategories,
   resolveStoredSkillCategories,
   SKILL_CATEGORY_DEFINITIONS,
@@ -17,20 +14,6 @@ import {
 
 describe("catalog metadata", () => {
   it("publishes separate controlled slug registries with an Other fallback", () => {
-    expect(PLUGIN_CATEGORY_DEFINITIONS.map((category) => category.slug)).toEqual([
-      "channels",
-      "models",
-      "memory",
-      "context",
-      "voice",
-      "media",
-      "web",
-      "tools",
-      "runtime",
-      "gateway",
-      "security",
-      "other",
-    ]);
     expect(SKILL_CATEGORY_DEFINITIONS.map((category) => category.slug)).toEqual([
       "integrations",
       "automation",
@@ -50,18 +33,6 @@ describe("catalog metadata", () => {
   });
 
   it("accepts only declared category slugs and preserves author order", () => {
-    expect(normalizePluginCategories(["models", "voice", "models", "media"])).toEqual([
-      "models",
-      "voice",
-      "media",
-    ]);
-
-    expect(() => normalizePluginCategories(["model provider"])).toThrow(
-      'Unknown plugin category slug "model provider"',
-    );
-    expect(() => normalizePluginCategories(["mcp-tooling"])).toThrow(
-      'Unknown plugin category slug "mcp-tooling"',
-    );
     expect(() => normalizeSkillCategories(["web"])).toThrow('Unknown skill category slug "web"');
   });
 
@@ -73,19 +44,10 @@ describe("catalog metadata", () => {
   });
 
   it("keeps the Other fallback mutually exclusive with specific categories", () => {
-    expect(normalizePluginCategories(["other", "models"])).toEqual(["models"]);
     expect(normalizeSkillCategories(["development", "other"])).toEqual(["development"]);
   });
 
   it("uses inferred registry slugs only when declarations are omitted", () => {
-    expect(
-      resolvePluginCategories({
-        declared: ["voice"],
-        inferred: ["models"],
-      }),
-    ).toEqual(["voice"]);
-    expect(resolvePluginCategories({ inferred: ["models"] })).toEqual(["models"]);
-    expect(resolvePluginCategories({ declared: [], inferred: ["models"] })).toEqual(["other"]);
     expect(resolveSkillCategories({})).toEqual(["other"]);
   });
 

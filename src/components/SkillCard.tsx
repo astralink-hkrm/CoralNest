@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { BrowseCategoryIcon } from "../lib/browseCategoryIcons";
+import { getCategoryIconComponent, UNRESOLVED_SKILL_CATEGORY_ICON } from "../lib/categoryIcons";
 import { getSkillCategoryForSkill } from "../lib/categories";
 import type { PublicPublisher, PublicSkill } from "../lib/publicUser";
 import { truncateText } from "../lib/truncateText";
@@ -74,11 +74,10 @@ export function SkillCard({
         <div className="skill-card-tags">
           {primaryCategory ? (
             <span className="skill-card-tag-category">
-              <BrowseCategoryIcon
-                slug={primaryCategory.slug}
-                icon={primaryCategory.icon}
-                size={13}
-              />
+              {(() => {
+                const CI = getCategoryIconComponent(primaryCategory.icon) ?? UNRESOLVED_SKILL_CATEGORY_ICON;
+                return <CI size={13} strokeWidth={1.8} />;
+              })()}
               {primaryCategory.label}
             </span>
           ) : null}

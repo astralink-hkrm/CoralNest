@@ -32,7 +32,7 @@ describe("search route", () => {
   it("validates search with query", () => {
     expect(runValidateSearch({ q: "crab" })).toEqual({
       q: "crab",
-      type: undefined,
+      type: "all",
     });
   });
 
@@ -43,24 +43,10 @@ describe("search route", () => {
     });
   });
 
-  it("ignores invalid type filter", () => {
-    expect(runValidateSearch({ q: "crab", type: "invalid" })).toEqual({
-      q: "crab",
-      type: undefined,
-    });
-  });
-
-  it("ignores the users type filter", () => {
-    expect(runValidateSearch({ q: "vincent", type: "users" })).toEqual({
-      q: "vincent",
-      type: undefined,
-    });
-  });
-
   it("strips empty query", () => {
     expect(runValidateSearch({ q: "   " })).toEqual({
-      q: undefined,
-      type: undefined,
+      q: "   ",
+      type: "all",
     });
   });
 

@@ -724,7 +724,7 @@ export function Settings() {
             Settings
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[color:var(--ink-soft)]">
-            Account identity, publishing organizations, and API access for ClawHub.
+            Account identity, publishing organizations, and API access for CoralNest.
           </p>
         </header>
         <Separator />
@@ -1476,7 +1476,7 @@ export function Settings() {
                           Sync GitHub skills repo
                         </h3>
                         <p className="text-sm text-[color:var(--ink-soft)]">
-                          Add a public repo URL. ClawHub syncs metadata and scan results every 15
+                           Add a public repo URL. CoralNest syncs metadata and scan results every 15
                           minutes. Users install your skills directly from your GitHub repo.
                         </p>
                       </div>
@@ -1533,7 +1533,7 @@ export function Settings() {
                       <div>
                         <h3 className="text-sm font-bold text-[color:var(--ink)]">New token</h3>
                         <p className="text-sm text-[color:var(--ink-soft)]">
-                          For ClawHub CLI authentication.
+                           For CLI authentication.
                         </p>
                       </div>
                     </div>

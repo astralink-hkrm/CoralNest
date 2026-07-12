@@ -36,19 +36,6 @@ const baseSkill = {
   updatedAt: Date.now(),
 };
 
-const basePlugin = {
-  _id: "packages:test",
-  kind: "plugin" as const,
-  displayName: "Test Plugin",
-  summary: "A test plugin",
-  href: "/plugins/test-plugin",
-  downloads: 10,
-  installs: 6,
-  stars: 2,
-  isOfficial: false,
-  updatedAt: Date.now(),
-};
-
 describe("PublishedItemCard", () => {
   it("renders downloads", () => {
     render(<PublishedItemCard item={{ ...baseSkill, icon: null }} />);
@@ -76,24 +63,6 @@ describe("PublishedItemCard", () => {
   it("renders Slash when skill category data is missing", () => {
     render(<PublishedItemCard item={{ ...baseSkill, categories: undefined, icon: null }} />);
     expect(document.querySelector("svg")?.classList.contains("lucide-slash")).toBe(true);
-  });
-
-  it("always uses the default kind icon for plugins regardless of icon field (F7)", () => {
-    render(<PublishedItemCard item={{ ...basePlugin, icon: null }} />);
-    expect(document.querySelector(".marketplace-icon-glyph")).toBeTruthy();
-  });
-
-  it("renders plugin manifest icons for publisher plugin rows", () => {
-    render(
-      <PublishedItemCard
-        item={{ ...basePlugin, icon: "https://cdn.example.test/icons/plugin.svg" }}
-      />,
-    );
-
-    const image = document.querySelector<HTMLImageElement>(".marketplace-icon-image");
-    expect(image).toBeTruthy();
-    expect(image?.getAttribute("src")).toBe("https://cdn.example.test/icons/plugin.svg");
-    expect(document.querySelector(".marketplace-icon-glyph")).toBeNull();
   });
 
   it("renders the compact official mark for official published rows", () => {
@@ -125,30 +94,6 @@ describe("PublishedItemCard", () => {
     expect(screen.getByText("Test Skill")).toBeTruthy();
   });
 
-  it("does not render plugin artifact-kind prefixes as owner handles", () => {
-    render(<PublishedItemCard item={{ ...basePlugin, icon: null }} />);
-
-    expect(screen.queryByText("@plugin")).toBeNull();
-    expect(screen.queryByText("/")).toBeNull();
-    expect(screen.getByText("Test Plugin")).toBeTruthy();
-  });
-
-  it("keeps publisher-scoped plugin detail links from catalog hrefs", () => {
-    render(
-      <PublishedItemCard
-        item={{
-          ...basePlugin,
-          icon: null,
-          href: "/expediagroup/plugins/travel-gateway",
-          displayName: "Travel Gateway",
-        }}
-      />,
-    );
-
-    const link = screen.getByRole("link", { name: /travel gateway/i });
-    expect(link.getAttribute("href")).toBe("/expediagroup/plugins/travel-gateway");
-    expect(screen.getByText("@expediagroup")).toBeTruthy();
-  });
 });
 
 describe("PublishedCatalogSections", () => {

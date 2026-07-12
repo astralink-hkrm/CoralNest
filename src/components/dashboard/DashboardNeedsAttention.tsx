@@ -4,8 +4,10 @@ import { ChevronRight, EyeOff, Hammer, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { buildSkillDetailHref } from "../../lib/ownerRoute";
-import { formatValidationFindingMessage } from "../../lib/pluginValidationFormat";
 import { timeAgo } from "../../lib/timeAgo";
+
+const formatValidationFindingMessage = (message: string) => message ?? "";
+
 import { InstallCopyButton } from "../InstallCopyButton";
 import { SkillSpectorAuditPanel } from "../SecurityAuditPage";
 import type { SkillSpectorAnalysis } from "../SkillSecurityScanResults";

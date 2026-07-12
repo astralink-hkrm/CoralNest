@@ -10,13 +10,14 @@ import {
   type LlmAnalysis,
   type VtAnalysis,
 } from "../components/SkillSecurityScanResults";
+import { Shapes, Package } from "lucide-react";
+import type { ComponentType } from "react";
 import { convexHttp } from "../convex/client";
-import {
-  PLUGIN_NAV_ICON,
-  SKILL_NAV_ICON,
-  type MarketplaceIconComponent,
-} from "../lib/marketplaceIcons";
 import { formatCompactStat } from "../lib/numberFormat";
+
+type MarketplaceIconComponent = ComponentType<{ size?: number; className?: string }>;
+const SKILL_NAV_ICON = Shapes;
+const PLUGIN_NAV_ICON = Package;
 
 type AuditTarget = "skills" | "plugins";
 type AuditFeedStatus = "loading" | "idle" | "loadingMore" | "done";

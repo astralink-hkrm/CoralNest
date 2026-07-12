@@ -21,80 +21,6 @@ export const RESERVED_CATALOG_TOPIC_SLUGS = [
     "verified",
 ];
 const CATALOG_TOPIC_FORMAT_CONTROL_RE = /\p{Cf}/u;
-export const PLUGIN_CATEGORY_DEFINITIONS = [
-    {
-        slug: "channels",
-        label: "Channels",
-        icon: "message-circle",
-        description: "Messaging and collaboration channel integrations.",
-    },
-    {
-        slug: "models",
-        label: "Models",
-        icon: "brain",
-        description: "Model providers, inference backends, and model routing.",
-    },
-    {
-        slug: "memory",
-        label: "Memory",
-        icon: "database",
-        description: "Memory providers, embeddings, and retrieval.",
-    },
-    {
-        slug: "context",
-        label: "Context",
-        icon: "book-open",
-        description: "Context engines and context management.",
-    },
-    {
-        slug: "voice",
-        label: "Voice",
-        icon: "message-square",
-        description: "Speech synthesis, transcription, voice calls, and audio interaction.",
-    },
-    {
-        slug: "media",
-        label: "Media",
-        icon: "palette",
-        description: "Image, video, audio, and other media understanding or generation.",
-    },
-    {
-        slug: "web",
-        label: "Web",
-        icon: "globe",
-        description: "Web search, browsing, fetching, research, and information retrieval.",
-    },
-    {
-        slug: "tools",
-        label: "Tools",
-        icon: "wrench",
-        description: "Agent tools, workflows, scheduled work, and service automation.",
-    },
-    {
-        slug: "runtime",
-        label: "Runtime",
-        icon: "git-branch",
-        description: "Developer tooling, agent runtimes, coding, testing, and execution backends.",
-    },
-    {
-        slug: "gateway",
-        label: "Gateway",
-        icon: "activity",
-        description: "Gateway extensions, deployment, observability, and operational tooling.",
-    },
-    {
-        slug: "security",
-        label: "Security",
-        icon: "shield",
-        description: "Authentication, authorization, security controls, and policy enforcement.",
-    },
-    {
-        slug: "other",
-        label: "Other",
-        icon: "package",
-        description: "Plugins that do not yet fit another browse category.",
-    },
-];
 export const SKILL_CATEGORY_DEFINITIONS = [
     {
         slug: "integrations",
@@ -212,13 +138,8 @@ export const SKILL_CATEGORY_DEFINITIONS = [
         keywords: [],
     },
 ];
-export const PLUGIN_CATEGORY_SLUGS = PLUGIN_CATEGORY_DEFINITIONS.map((category) => category.slug);
 export const SKILL_CATEGORY_SLUGS = SKILL_CATEGORY_DEFINITIONS.map((category) => category.slug);
-const PLUGIN_CATEGORY_SLUG_SET = new Set(PLUGIN_CATEGORY_SLUGS);
 const SKILL_CATEGORY_SLUG_SET = new Set(SKILL_CATEGORY_SLUGS);
-export function isPluginCategorySlug(value) {
-    return Boolean(value && PLUGIN_CATEGORY_SLUG_SET.has(value));
-}
 export function isSkillCategorySlug(value) {
     return Boolean(value && SKILL_CATEGORY_SLUG_SET.has(value));
 }
@@ -242,9 +163,6 @@ function normalizeCategories(values, kind, isCategorySlug) {
     }
     return exclusiveCategories;
 }
-export function normalizePluginCategories(values) {
-    return normalizeCategories(values, "plugin", isPluginCategorySlug);
-}
 export function normalizeSkillCategories(values) {
     return normalizeCategories(values, "skill", isSkillCategorySlug);
 }
@@ -255,9 +173,6 @@ function resolveCategories({ declared, inferred, normalize, }) {
     }
     const inferredCategories = normalize(inferred);
     return inferredCategories.length > 0 ? inferredCategories : normalize(["other"]);
-}
-export function resolvePluginCategories(input) {
-    return resolveCategories({ ...input, normalize: normalizePluginCategories });
 }
 export function resolveSkillCategories(input) {
     return resolveCategories({ ...input, normalize: normalizeSkillCategories });

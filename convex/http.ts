@@ -17,20 +17,8 @@ import {
 } from "./httpApi";
 import {
   exportSkillsV1Http,
-  exportPluginsV1Http,
-  listBundlePluginsV1Http,
-  listCodePluginsV1Http,
-  listPackagesV1Http,
-  listPluginsV1Http,
   listSkillsV1Http,
-  mintPublishTokenV1Http,
-  npmMirrorGetHttp,
-  packagesDeleteRouterV1Http,
-  packagesGetRouterV1Http,
-  packagesPostRouterV1Http,
-  pluginsGetRouterV1Http,
   createPublisherV1Http,
-  publishPackageV1Http,
   publishSkillV1Http,
   resolveSkillVersionV1Http,
   searchSkillsV1Http,
@@ -46,13 +34,6 @@ import {
   starsPostRouterV1Http,
   transfersGetRouterV1Http,
   banAppealContextV1Http,
-  createPromotionV1Http,
-  listPromotionsV1Http,
-  promotionsGetRouterV1Http,
-  promotionsPostRouterV1Http,
-  catalogFeedV1Http,
-  catalogSkillsFeedV1Http,
-  promotionsFeedV1Http,
   usersGetRouterV1Http,
   usersListV1Http,
   usersPostRouterV1Http,
@@ -62,11 +43,6 @@ import {
 } from "./httpApiV1";
 import { preflightHandler } from "./httpPreflight";
 import { installRateLimitedRoutes } from "./lib/httpRouteRateLimit";
-import {
-  packageInspectorArtifactHttp,
-  packageInspectorClaimHttp,
-  packageInspectorResultsHttp,
-} from "./packageInspectorHttp";
 
 const http = installRateLimitedRoutes(httpRouter());
 
@@ -109,99 +85,9 @@ http.route({
 });
 
 http.route({
-  path: ApiRoutes.packages,
-  method: "GET",
-  handler: listPackagesV1Http,
-});
-
-http.route({
-  path: ApiRoutes.plugins,
-  method: "GET",
-  handler: listPluginsV1Http,
-});
-
-http.route({
-  path: ApiRoutes.pluginsExport,
-  method: "GET",
-  handler: exportPluginsV1Http,
-});
-
-http.route({
-  path: ApiRoutes.codePlugins,
-  method: "GET",
-  handler: listCodePluginsV1Http,
-});
-
-http.route({
-  path: ApiRoutes.bundlePlugins,
-  method: "GET",
-  handler: listBundlePluginsV1Http,
-});
-
-http.route({
-  path: ApiRoutes.promotions,
-  method: "GET",
-  handler: listPromotionsV1Http,
-});
-
-http.route({
-  pathPrefix: `${ApiRoutes.promotions}/`,
-  method: "GET",
-  handler: promotionsGetRouterV1Http,
-});
-
-http.route({
-  path: ApiRoutes.promotions,
-  method: "POST",
-  handler: createPromotionV1Http,
-});
-
-http.route({
-  pathPrefix: `${ApiRoutes.promotions}/`,
-  method: "POST",
-  handler: promotionsPostRouterV1Http,
-});
-
-http.route({
-  path: ApiRoutes.catalogFeed,
-  method: "GET",
-  handler: catalogFeedV1Http,
-});
-
-http.route({
-  path: ApiRoutes.catalogSkillsFeed,
-  method: "GET",
-  handler: catalogSkillsFeedV1Http,
-});
-
-http.route({
-  path: ApiRoutes.promotionsFeed,
-  method: "GET",
-  handler: promotionsFeedV1Http,
-});
-
-http.route({
   pathPrefix: `${ApiRoutes.skills}/`,
   method: "GET",
   handler: skillsGetRouterV1Http,
-});
-
-http.route({
-  pathPrefix: `${ApiRoutes.packages}/`,
-  method: "GET",
-  handler: packagesGetRouterV1Http,
-});
-
-http.route({
-  pathPrefix: "/api/npm/",
-  method: "GET",
-  handler: npmMirrorGetHttp,
-});
-
-http.route({
-  pathPrefix: `${ApiRoutes.plugins}/`,
-  method: "GET",
-  handler: pluginsGetRouterV1Http,
 });
 
 http.route({
@@ -226,48 +112,6 @@ http.route({
   path: `${ApiRoutes.skillScans}/batch/status`,
   method: "POST",
   handler: skillScanBatchStatusV1Http,
-});
-
-http.route({
-  path: ApiRoutes.packages,
-  method: "POST",
-  handler: publishPackageV1Http,
-});
-
-http.route({
-  path: ApiRoutes.publishTokenMint,
-  method: "POST",
-  handler: mintPublishTokenV1Http,
-});
-
-http.route({
-  path: "/api/v1/package-inspector/claim",
-  method: "POST",
-  handler: packageInspectorClaimHttp,
-});
-
-http.route({
-  path: "/api/v1/package-inspector/artifact",
-  method: "GET",
-  handler: packageInspectorArtifactHttp,
-});
-
-http.route({
-  path: "/api/v1/package-inspector/results",
-  method: "POST",
-  handler: packageInspectorResultsHttp,
-});
-
-http.route({
-  pathPrefix: `${ApiRoutes.packages}/`,
-  method: "POST",
-  handler: packagesPostRouterV1Http,
-});
-
-http.route({
-  pathPrefix: `${ApiRoutes.packages}/`,
-  method: "DELETE",
-  handler: packagesDeleteRouterV1Http,
 });
 
 http.route({

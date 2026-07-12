@@ -350,18 +350,18 @@ function clawHubReviewCheckResult(llmAnalysis: StoredLlmAnalysis): WorkerCheckRe
   const summary = publicText(
     llmAnalysis.summary ??
       llmAnalysis.findings ??
-      `ClawHub security review returned ${llmAnalysis.status}.`,
+      `CoralNest security review returned ${llmAnalysis.status}.`,
   );
   if (status === "clean" || normalizedVerdict === "benign") {
     return {
       status: "clean",
-      summary: summary || "ClawHub security review passed.",
+      summary: summary || "CoralNest security review passed.",
     };
   }
   if (normalizedVerdict === "suspicious") {
     return {
       status: "clean",
-      summary: summary || "ClawHub security review requires user attention.",
+      summary: summary || "CoralNest security review requires user attention.",
       redactedFindings: [
         publicText(`status=${llmAnalysis.status}; verdict=${llmAnalysis.verdict}`),
       ],
@@ -370,7 +370,7 @@ function clawHubReviewCheckResult(llmAnalysis: StoredLlmAnalysis): WorkerCheckRe
   if (normalizedVerdict !== "malicious") {
     return {
       status: "failed",
-      summary: summary || "ClawHub security review did not return a final verdict.",
+      summary: summary || "CoralNest security review did not return a final verdict.",
       redactedFindings: [
         publicText(`status=${llmAnalysis.status}; verdict=${llmAnalysis.verdict}`),
       ],
@@ -380,7 +380,7 @@ function clawHubReviewCheckResult(llmAnalysis: StoredLlmAnalysis): WorkerCheckRe
     status: "blocked",
     summary:
       summary ||
-      `ClawHub security review blocked the staged publish with status ${llmAnalysis.status}.`,
+      `CoralNest security review blocked the staged publish with status ${llmAnalysis.status}.`,
     redactedFindings: [publicText(`status=${llmAnalysis.status}; verdict=${llmAnalysis.verdict}`)],
   };
 }
@@ -430,7 +430,7 @@ export async function processPrePublicationAttempt(
         },
         {
           status: "clean",
-          summary: "Pre-publication ClawHub security review already passed.",
+          summary: "Pre-publication CoralNest security review already passed.",
         },
       );
       logger.info(
@@ -473,7 +473,7 @@ export async function processPrePublicationAttempt(
       completionStarted = true;
       const result = await completeAttempt(client, token, attempt, trufflehog, {
         status: "failed",
-        summary: "ClawHub security review skipped because TruffleHog blocked the artifact.",
+        summary: "CoralNest security review skipped because TruffleHog blocked the artifact.",
       });
       logger.info(
         {
@@ -491,7 +491,7 @@ export async function processPrePublicationAttempt(
       completionStarted = true;
       const result = await completeAttempt(client, token, attempt, trufflehog, {
         status: "failed",
-        summary: "ClawHub security review skipped because TruffleHog failed.",
+        summary: "CoralNest security review skipped because TruffleHog failed.",
       });
       return { completed: false, result };
     }

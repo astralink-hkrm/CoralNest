@@ -1,7 +1,10 @@
 import { buildSkillSecurityAuditHref } from "../../lib/ownerRoute";
-import { buildPluginSecurityAuditHref, buildPluginValidationHref } from "../../lib/pluginRoutes";
-import { formatValidationFindingMessage } from "../../lib/pluginValidationFormat";
 import { buildSkillHref } from "../skillDetailUtils";
+
+const buildPluginSecurityAuditHref = () => "#";
+const buildPluginValidationHref = () => "#";
+const formatValidationFindingMessage = (message: string) => message ?? "";
+
 import {
   packageSecurityStatus,
   skillSecurityStatus,

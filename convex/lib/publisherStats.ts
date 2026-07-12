@@ -5,7 +5,6 @@ import { readCanonicalStat } from "./skillStats";
 
 export type PublisherStatsContribution = {
   publishedSkills: number;
-  publishedPackages: number;
   totalInstalls: number;
   totalDownloads: number;
   totalStars: number;
@@ -17,7 +16,6 @@ export type PublisherStatsContribution = {
 export function emptyPublisherStatsContribution(): PublisherStatsContribution {
   return {
     publishedSkills: 0,
-    publishedPackages: 0,
     totalInstalls: 0,
     totalDownloads: 0,
     totalStars: 0,
@@ -34,7 +32,6 @@ export function getSkillPublisherContribution(skill: Doc<"skills">): PublisherSt
   const totalStars = readCanonicalStat(skill, "stars");
   return {
     publishedSkills: 1,
-    publishedPackages: 0,
     totalInstalls,
     totalDownloads,
     totalStars,
@@ -44,23 +41,8 @@ export function getSkillPublisherContribution(skill: Doc<"skills">): PublisherSt
   };
 }
 
-export function getPackagePublisherContribution(pkg: Doc<"packages">): PublisherStatsContribution {
-  if (pkg.softDeletedAt) return emptyPublisherStatsContribution();
-  return {
-    publishedSkills: 0,
-    publishedPackages: 1,
-    totalInstalls: pkg.stats.installs,
-    totalDownloads: pkg.stats.downloads,
-    totalStars: pkg.stats.stars,
-    skillTotalInstalls: 0,
-    skillTotalDownloads: 0,
-    skillTotalStars: 0,
-  };
-}
-
 type PublisherWithBaseStats = Doc<"publishers"> & {
   publishedSkills: number;
-  publishedPackages: number;
   totalInstalls: number;
   totalDownloads: number;
   totalStars: number;
@@ -75,7 +57,6 @@ type PublisherWithSkillTotalStats = Doc<"publishers"> & {
 function publisherHasBaseStats(publisher: Doc<"publishers">): publisher is PublisherWithBaseStats {
   return (
     typeof publisher.publishedSkills === "number" &&
-    typeof publisher.publishedPackages === "number" &&
     typeof publisher.totalInstalls === "number" &&
     typeof publisher.totalDownloads === "number" &&
     typeof publisher.totalStars === "number"
@@ -96,42 +77,31 @@ export async function recomputePublisherStats(
   ctx: Pick<MutationCtx, "db">,
   publisherId: Id<"publishers">,
 ): Promise<PublisherStatsContribution> {
-  const [skills, packages] = await Promise.all([
-    ctx.db
-      .query("skills")
-      .withIndex("by_owner_publisher_active_updated", (q) =>
-        q.eq("ownerPublisherId", publisherId).eq("softDeletedAt", undefined),
-      )
-      .collect(),
-    ctx.db
-      .query("packages")
-      .withIndex("by_owner_publisher_active_updated", (q) =>
-        q.eq("ownerPublisherId", publisherId).eq("softDeletedAt", undefined),
-      )
-      .collect(),
-  ]);
-  return [
-    ...skills.map(getSkillPublisherContribution),
-    ...packages.map(getPackagePublisherContribution),
-  ].reduce(
-    (total, contribution) => ({
-      publishedSkills: total.publishedSkills + contribution.publishedSkills,
-      publishedPackages: total.publishedPackages + contribution.publishedPackages,
-      totalInstalls: total.totalInstalls + contribution.totalInstalls,
-      totalDownloads: total.totalDownloads + contribution.totalDownloads,
-      totalStars: total.totalStars + contribution.totalStars,
-      skillTotalInstalls: total.skillTotalInstalls + contribution.skillTotalInstalls,
-      skillTotalDownloads: total.skillTotalDownloads + contribution.skillTotalDownloads,
-      skillTotalStars: total.skillTotalStars + contribution.skillTotalStars,
-    }),
-    emptyPublisherStatsContribution(),
-  );
+  const skills = await ctx.db
+    .query("skills")
+    .withIndex("by_owner_publisher_active_updated", (q) =>
+      q.eq("ownerPublisherId", publisherId).eq("softDeletedAt", undefined),
+    )
+    .collect();
+  return skills
+    .map(getSkillPublisherContribution)
+    .reduce(
+      (total, contribution) => ({
+        publishedSkills: total.publishedSkills + contribution.publishedSkills,
+        totalInstalls: total.totalInstalls + contribution.totalInstalls,
+        totalDownloads: total.totalDownloads + contribution.totalDownloads,
+        totalStars: total.totalStars + contribution.totalStars,
+        skillTotalInstalls: total.skillTotalInstalls + contribution.skillTotalInstalls,
+        skillTotalDownloads: total.skillTotalDownloads + contribution.skillTotalDownloads,
+        skillTotalStars: total.skillTotalStars + contribution.skillTotalStars,
+      }),
+      emptyPublisherStatsContribution(),
+    );
 }
 
 export function isZeroPublisherStatsContribution(delta: PublisherStatsContribution) {
   return (
     delta.publishedSkills === 0 &&
-    delta.publishedPackages === 0 &&
     delta.totalInstalls === 0 &&
     delta.totalDownloads === 0 &&
     delta.totalStars === 0 &&
@@ -158,7 +128,6 @@ async function patchPublisherStats(
 
   const patch: Partial<Doc<"publishers">> = {
     publishedSkills: Math.max(0, publisher.publishedSkills + delta.publishedSkills),
-    publishedPackages: Math.max(0, publisher.publishedPackages + delta.publishedPackages),
     totalInstalls: Math.max(0, publisher.totalInstalls + delta.totalInstalls),
     totalDownloads: Math.max(0, publisher.totalDownloads + delta.totalDownloads),
     totalStars: Math.max(0, publisher.totalStars + delta.totalStars),
@@ -180,7 +149,6 @@ function diffPublisherStats(
 ): PublisherStatsContribution {
   return {
     publishedSkills: (next?.publishedSkills ?? 0) - (previous?.publishedSkills ?? 0),
-    publishedPackages: (next?.publishedPackages ?? 0) - (previous?.publishedPackages ?? 0),
     totalInstalls: (next?.totalInstalls ?? 0) - (previous?.totalInstalls ?? 0),
     totalDownloads: (next?.totalDownloads ?? 0) - (previous?.totalDownloads ?? 0),
     totalStars: (next?.totalStars ?? 0) - (previous?.totalStars ?? 0),
@@ -221,35 +189,4 @@ export async function adjustPublisherStatsForSkillChange(
   }
 }
 
-export async function adjustPublisherStatsForPackageChange(
-  ctx: Pick<MutationCtx, "db">,
-  previousPackage: Doc<"packages"> | null | undefined,
-  nextPackage: Doc<"packages"> | null | undefined,
-) {
-  if (!previousPackage && !nextPackage) return;
 
-  const previousPublisherId = previousPackage?.ownerPublisherId ?? null;
-  const nextPublisherId = nextPackage?.ownerPublisherId ?? null;
-  const previousContribution = previousPackage
-    ? getPackagePublisherContribution(previousPackage)
-    : null;
-  const nextContribution = nextPackage ? getPackagePublisherContribution(nextPackage) : null;
-
-  if (previousPublisherId && previousPublisherId === nextPublisherId) {
-    await patchPublisherStats(ctx, previousPublisherId, {
-      ...diffPublisherStats(nextContribution, previousContribution),
-    });
-    return;
-  }
-
-  if (previousPublisherId) {
-    await patchPublisherStats(
-      ctx,
-      previousPublisherId,
-      diffPublisherStats(null, previousContribution),
-    );
-  }
-  if (nextPublisherId) {
-    await patchPublisherStats(ctx, nextPublisherId, diffPublisherStats(nextContribution, null));
-  }
-}

@@ -94,29 +94,6 @@ export type SecretBlockedPublishEmailArgs = {
   version?: string;
 };
 
-export type PackageInspectorEmailFinding = {
-  findingKind: "warning" | "error";
-  code: string;
-  issueClass?: string;
-  level?: string;
-  severity?: string;
-  message: string;
-  authorRemediation?: {
-    summary: string;
-    docsUrl?: string;
-  };
-  inspectorVersion?: string;
-  targetOpenClawVersion?: string;
-  scanSource?: "publish" | "nightly";
-};
-
-export type PackageInspectorFindingsEmailArgs = {
-  handle?: string;
-  packageName: string;
-  version: string;
-  findings: PackageInspectorEmailFinding[];
-};
-
 export type PublisherAbuseWarningScore = {
   modelVersion: string;
   publishedSkills: number;
@@ -192,8 +169,8 @@ function summarizeBanReason(args: BanNotificationEmailArgs): BanReasonSummary {
       };
     }
     return {
-      scannerLabel: "ClawHub security checks",
-      findingSummary: "ClawHub security checks classified the uploaded skill as malicious.",
+      scannerLabel: "CoralNest security checks",
+      findingSummary: "CoralNest security checks classified the uploaded skill as malicious.",
     };
   }
 
@@ -206,7 +183,7 @@ function summarizeBanReason(args: BanNotificationEmailArgs): BanReasonSummary {
 
   return {
     scannerLabel: null,
-    findingSummary: "ClawHub staff disabled the account after a security review.",
+    findingSummary: "CoralNest staff disabled the account after a security review.",
   };
 }
 
@@ -324,10 +301,6 @@ async function renderSecretBlockedPublishTemplate(args: {
   return rendered.html;
 }
 
-function buildPluginValidateCommand() {
-  return "clawhub package validate <path-to-plugin>";
-}
-
 function normalizeEmailFindingSummary(value: string | undefined) {
   const normalized = value?.replace(/\s+/g, " ").trim();
   if (!normalized) return undefined;
@@ -376,7 +349,7 @@ export async function buildBanNotificationEmail(
   );
   lines.push("", `Appeal: ${APPEALS_URL}`);
 
-  lines.push("", "ClawHub Security");
+  lines.push("", "CoralNest Security");
 
   const impactItems = [
     "Your ClawHub account cannot sign in.",
@@ -418,7 +391,7 @@ export async function buildRestoredAccountEmail(args: RestoredAccountEmailArgs) 
   if (listingLines.length > 0) {
     lines.push("", "Restored listings:", ...listingLines);
   }
-  lines.push("", "ClawHub Security");
+  lines.push("", "CoralNest Security");
 
   const skillsRestored = Object.hasOwn(args, "skillsRestored")
     ? args.skillsRestored
@@ -451,12 +424,12 @@ export async function buildMaliciousArtifactEmail(args: MaliciousArtifactEmailAr
       : args.trigger?.includes("virustotal") === true || args.trigger?.includes("vt_") === true
         ? "VirusTotal telemetry contributed to a malicious upload finding."
         : "ClawScan classified the uploaded artifact as malicious.");
-  const subject = `ClawHub blocked a ${artifactKind} version`;
+  const subject = `CoralNest blocked a ${artifactKind} version`;
 
   const lines = [
     greeting(args.handle),
     "",
-    `ClawHub blocked a ${artifactKind} version after a security scan.`,
+    `CoralNest blocked a ${artifactKind} version after a security scan.`,
     `Reason: ${findingSummary}`,
     artifactLabelText,
   ];
@@ -474,7 +447,7 @@ export async function buildMaliciousArtifactEmail(args: MaliciousArtifactEmailAr
     `Docs: ${MODERATION_GUIDELINES_URL}`,
     `Increment the version number before uploading the fixed ${artifactKind}.`,
     "",
-    "ClawHub Security",
+    "CoralNest Security",
   );
 
   const { renderBlockedVersionEmail } = await import("./emailRendering");
@@ -485,7 +458,7 @@ export async function buildMaliciousArtifactEmail(args: MaliciousArtifactEmailAr
     findingSummary,
     validateCommand: scanDownloadCommand,
     docsUrl: MODERATION_GUIDELINES_URL,
-    preheader: `${artifactLabelText} was blocked by ClawHub security scans.`,
+    preheader: `${artifactLabelText} was blocked by CoralNest security scans.`,
   });
 
   return {
@@ -499,17 +472,17 @@ export async function buildSecretBlockedPublishEmail(args: SecretBlockedPublishE
   const artifactKind = args.artifact.kind === "skill" ? "skill" : "plugin";
   const artifactLabelText = artifactLabel(args.artifact);
   const version = args.version?.trim() || "<version>";
-  const subject = `ClawHub blocked a ${artifactKind} publish`;
+  const subject = `CoralNest blocked a ${artifactKind} publish`;
   const lines = [
     greeting(args.handle),
     "",
-    `ClawHub blocked a ${artifactKind} publish because TruffleHog found a secret-looking value in the uploaded files.`,
+    `CoralNest blocked a ${artifactKind} publish because TruffleHog found a secret-looking value in the uploaded files.`,
     artifactLabelText,
     `Version: ${version}`,
     "",
     "What changed:",
     "- This version was not made public.",
-    "- Uploaded files for this attempt were deleted from ClawHub storage.",
+    "- Uploaded files for this attempt were deleted from CoralNest storage.",
     "- Your account can still sign in.",
     "",
     "What to do next:",
@@ -517,7 +490,7 @@ export async function buildSecretBlockedPublishEmail(args: SecretBlockedPublishE
     `- Remove it from the ${artifactKind}.`,
     "- Upload a new version.",
     "",
-    "ClawHub Security",
+    "CoralNest Security",
   ];
   const html = await renderSecretBlockedPublishTemplate({
     artifactKind,
@@ -530,65 +503,6 @@ export async function buildSecretBlockedPublishEmail(args: SecretBlockedPublishE
     subject,
     text: lines.join("\n"),
     html,
-  };
-}
-
-export async function buildPackageInspectorFindingsEmail(args: PackageInspectorFindingsEmailArgs) {
-  const targetOpenClawVersion = args.findings.find(
-    (finding) => finding.targetOpenClawVersion,
-  )?.targetOpenClawVersion;
-  const validateCommand = buildPluginValidateCommand();
-  const subject = `Plugin Inspector findings for ${args.packageName}@${args.version}`;
-  const findingCount = args.findings.length;
-  const intro = `We found ${findingCount} ${findingCount === 1 ? "issue" : "issues"} with version ${args.version} of ${args.packageName}.`;
-  const nextSteps = [
-    "Address the findings below in your plugin package.",
-    "Run the validation command locally against your changes.",
-    "When validation passes, upload a new version.",
-  ];
-  const findingLines = formatPackageInspectorFindingsText(args.findings);
-  const metadataLines = [
-    `Plugin: ${args.packageName}@${args.version}`,
-    targetOpenClawVersion ? `OpenClaw Version: ${targetOpenClawVersion}` : null,
-  ].filter((line): line is string => line !== null);
-  const lines = [
-    greeting(args.handle),
-    "",
-    intro,
-    "",
-    ...metadataLines,
-    "",
-    "Next steps:",
-    ...nextSteps.map((item) => `- ${item}`),
-    "",
-    "Findings:",
-    ...findingLines,
-    "",
-    "Validate a local fix:",
-    validateCommand,
-  ];
-
-  const { renderPluginInspectorFindingsEmail } = await import("./emailRendering");
-  const rendered = await renderPluginInspectorFindingsEmail({
-    packageName: args.packageName,
-    version: args.version,
-    ...(targetOpenClawVersion ? { openClawVersion: targetOpenClawVersion } : {}),
-    findings: args.findings.map((finding) => ({
-      code: finding.code,
-      kind: finding.findingKind,
-      meta: [finding.code, finding.issueClass, finding.severity].filter(Boolean).join(" · "),
-      message: finding.message,
-      ...(finding.authorRemediation?.summary ? { fix: finding.authorRemediation.summary } : {}),
-      ...(finding.authorRemediation?.docsUrl ? { docsUrl: finding.authorRemediation.docsUrl } : {}),
-    })),
-    validateCommand,
-    preheader: intro,
-  });
-
-  return {
-    subject,
-    text: lines.join("\n"),
-    html: rendered.html,
   };
 }
 
@@ -642,7 +556,7 @@ export async function buildPublisherAbuseWarningEmail(args: PublisherAbuseWarnin
       "",
       `Open ClawHub dashboard: ${CLAWHUB_DASHBOARD_URL}`,
       "",
-      "ClawHub Security",
+      "CoralNest Security",
     ].join("\n"),
     html,
   };
@@ -654,7 +568,7 @@ export async function buildAdminOneOffEmail(args: AdminOneOffEmailArgs) {
   if (args.primaryActionLabel?.trim() && args.primaryActionUrl?.trim()) {
     lines.push("", `${args.primaryActionLabel.trim()}: ${args.primaryActionUrl.trim()}`);
   }
-  lines.push("", "ClawHub Team");
+  lines.push("", "CoralNest Team");
 
   const html = await renderGenericOneOffTemplate(args);
 
@@ -665,26 +579,4 @@ export async function buildAdminOneOffEmail(args: AdminOneOffEmailArgs) {
   };
 }
 
-function formatPackageInspectorFindingsText(findings: PackageInspectorEmailFinding[]) {
-  if (findings.length === 0) return ["- No findings were included."];
-  return findings.flatMap((finding) => {
-    const lines = [
-      `- **${finding.findingKind.toUpperCase()}** \`${finding.code}\`${formatFindingMetaText(finding)}`,
-      `  ${finding.message}`,
-    ];
-    if (finding.authorRemediation?.summary) {
-      lines.push("  Fix:");
-      lines.push(`  ${finding.authorRemediation.summary}`);
-      if (finding.authorRemediation.docsUrl) {
-        lines.push("  Docs:");
-        lines.push(`  ${finding.authorRemediation.docsUrl}`);
-      }
-    }
-    return lines;
-  });
-}
 
-function formatFindingMetaText(finding: PackageInspectorEmailFinding) {
-  const meta = [finding.issueClass, finding.severity].filter(Boolean).join(", ");
-  return meta ? ` (${meta})` : "";
-}

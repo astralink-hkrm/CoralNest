@@ -13,25 +13,6 @@ import {
 } from "./cli/commands/delete.js";
 import { cmdInspect, cmdVerifySkill } from "./cli/commands/inspect.js";
 import { cmdMergeSkill, cmdRenameSkill } from "./cli/commands/ownership.js";
-import {
-  cmdDeletePackage,
-  cmdDeletePackageTrustedPublisher,
-  cmdDownloadPackage,
-  cmdExplorePackages,
-  cmdGetPackageTrustedPublisher,
-  cmdInspectPackage,
-  cmdPackageModerationStatus,
-  cmdPackageMigrationStatus,
-  cmdPackageReadiness,
-  cmdPackPackage,
-  cmdPublishPackage,
-  cmdReportPackage,
-  cmdSetPackageTrustedPublisher,
-  cmdTransferPackage,
-  cmdUndeletePackage,
-  cmdValidatePackage,
-  cmdVerifyPackage,
-} from "./cli/commands/packages.js";
 import { cmdPublish } from "./cli/commands/publish.js";
 import { cmdCreatePublisher } from "./cli/commands/publishers.js";
 import { cmdScan, cmdScanDownload } from "./cli/commands/scan.js";
@@ -415,10 +396,9 @@ const scanCmd = registerCommand(program, ["scan"])
   });
 
 registerCommand(scanCmd, ["scan", "download"])
-  .description("Download stored scan results for a submitted skill or plugin version")
-  .argument("<name>", "Skill slug or plugin package name")
+  .description("Download stored scan results for a submitted skill version")
+  .argument("<name>", "Skill slug")
   .option("--version <version>", "Submitted version to download scan results for")
-  .option("--kind <kind>", "Artifact kind: skill or plugin", "skill")
   .option("-o, --output <path>", "Output ZIP file")
   .action(async (name, options) => {
     const opts = await resolveGlobalOpts();
@@ -531,248 +511,7 @@ registerCommand(publisherCmd, ["publisher", "create"])
     await cmdCreatePublisher(opts, handle, options);
   });
 
-const packageCmd = registerCommandGroup(program, ["package"]).description(
-  "Browse and publish OpenClaw packages",
-);
 
-registerCommand(packageCmd, ["package", "explore"])
-  .description("Browse published packages and plugins")
-  .argument("[query...]", "Optional search query")
-  .option("--family <family>", "skill|code-plugin|bundle-plugin")
-  .option("--official", "Only official packages")
-  .option("--executes-code", "Only packages that execute code")
-  .option("--target <target>", "Filter by host target, e.g. darwin-arm64")
-  .option("--os <os>", "Filter by host OS, e.g. darwin, linux, win32")
-  .option("--arch <arch>", "Filter by host architecture, e.g. arm64 or x64")
-  .option("--libc <libc>", "Filter by libc, e.g. glibc or musl")
-  .option("--requires-browser", "Only packages that require a browser")
-  .option("--requires-desktop", "Only packages that require local desktop access")
-  .option("--requires-native-deps", "Only packages with native dependency requirements")
-  .option("--requires-external-service", "Only packages that require an external service")
-  .option("--external-service <name>", "Filter by named external service")
-  .option("--binary <name>", "Filter by required local binary")
-  .option("--os-permission <name>", "Filter by required OS permission")
-  .option("--artifact-kind <kind>", "legacy-zip|npm-pack")
-  .option("--npm-mirror", "Only packages available through the npm mirror")
-  .option(
-    "--limit <n>",
-    "Number of packages to show (max 100)",
-    (value) => Number.parseInt(value, 10),
-    25,
-  )
-  .option("--json", "Output JSON")
-  .action(async (queryParts, options) => {
-    const opts = await resolveGlobalOpts();
-    const query = Array.isArray(queryParts) ? queryParts.join(" ").trim() : "";
-    await cmdExplorePackages(opts, query, options);
-  });
-
-registerCommand(packageCmd, ["package", "inspect"])
-  .description("Fetch package metadata and files without installing")
-  .argument("<name>", "Package name")
-  .option("--version <version>", "Version to inspect")
-  .option("--tag <tag>", "Tag to inspect (default: latest)")
-  .option("--versions", "List version history (first page)")
-  .option("--limit <n>", "Max versions to list (1-100)", (value) => Number.parseInt(value, 10))
-  .option("--files", "List files for the selected version")
-  .option("--file <path>", "Fetch raw file content (text only)")
-  .option("--json", "Output JSON")
-  .action(async (name, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdInspectPackage(opts, name, options);
-  });
-
-registerCommand(packageCmd, ["package", "download"])
-  .description("Download a package artifact and verify its published digests")
-  .argument("<name>", "Package name")
-  .option("--version <version>", "Version to download")
-  .option("--tag <tag>", "Tag to download (default: latest)")
-  .option("-o, --output <path>", "Output file or directory")
-  .option("--force", "Overwrite existing output file")
-  .option("--json", "Output JSON")
-  .action(async (name, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdDownloadPackage(opts, name, options);
-  });
-
-registerCommand(packageCmd, ["package", "verify"])
-  .description("Verify a local package artifact against ClawHub or expected digests")
-  .argument("<file>", "Artifact file")
-  .option("--package <name>", "Package name to resolve expected artifact metadata")
-  .option("--version <version>", "Package version to resolve")
-  .option("--tag <tag>", "Package tag to resolve")
-  .option("--sha256 <hex>", "Expected ClawHub SHA-256")
-  .option("--npm-integrity <sri>", "Expected npm sha512 integrity")
-  .option("--npm-shasum <sha1>", "Expected npm shasum")
-  .option("--json", "Output JSON")
-  .action(async (file, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdVerifyPackage(opts, file, {
-      ...options,
-      packageName: options.package,
-    });
-  });
-
-registerCommand(packageCmd, ["package", "validate"])
-  .description("Validate a local plugin package with the bundled Plugin Inspector")
-  .argument("<source>", "Package folder path")
-  .option("--out <dir>", "Directory for Plugin Inspector reports", "reports")
-  .option("--openclaw <path>", "Optional local OpenClaw checkout to inspect against")
-  .option("--runtime", "Enable runtime capture; imports plugin code")
-  .option("--allow-execute", "Allow runtime capture in an isolated workspace")
-  .option("--no-mock-sdk", "Disable mocked OpenClaw SDK during runtime capture")
-  .option("--json", "Output JSON")
-  .action(async (source, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdValidatePackage(opts, source, options);
-  });
-
-registerCommand(packageCmd, ["package", "delete"])
-  .description("Soft-delete a package or permanently delete one version")
-  .argument("<name>", "Package name")
-  .option(
-    "--version <version>",
-    "Permanently delete one version; cannot be restored or republished; publish a replacement first if deleting the current latest version",
-  )
-  .option("--yes", "Skip confirmation")
-  .option("--json", "Output JSON")
-  .action(async (name, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdDeletePackage(opts, name, options, isInputAllowed());
-  });
-
-registerCommand(packageCmd, ["package", "undelete"])
-  .description("Restore a soft-deleted package and releases")
-  .argument("<name>", "Package name")
-  .option("--yes", "Skip confirmation")
-  .option("--json", "Output JSON")
-  .action(async (name, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdUndeletePackage(opts, name, options, isInputAllowed());
-  });
-
-registerCommand(packageCmd, ["package", "transfer"])
-  .description("Transfer a plugin package to another publisher")
-  .argument("<name>", "Package name")
-  .requiredOption("--to <owner>", "Destination publisher handle")
-  .option("--reason <text>", "Audit reason")
-  .option("--json", "Output JSON")
-  .action(async (name, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdTransferPackage(opts, name, options);
-  });
-
-registerCommand(packageCmd, ["package", "report"])
-  .description("Report a package for moderator review")
-  .argument("<name>", "Package name")
-  .option("--version <version>", "Package version")
-  .requiredOption("--reason <text>", "Report reason")
-  .option("--json", "Output JSON")
-  .action(async (name, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdReportPackage(opts, name, options);
-  });
-
-registerCommand(packageCmd, ["package", "moderation-status"])
-  .description("Show package moderation status")
-  .argument("<name>", "Package name")
-  .option("--json", "Output JSON")
-  .action(async (name, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdPackageModerationStatus(opts, name, options);
-  });
-
-registerCommand(packageCmd, ["package", "readiness"])
-  .description("Check package readiness for future OpenClaw consumption")
-  .argument("<name>", "Package name")
-  .option("--json", "Output JSON")
-  .action(async (name, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdPackageReadiness(opts, name, options);
-  });
-
-registerCommand(packageCmd, ["package", "migration-status"])
-  .description("Show package migration status for future OpenClaw consumption")
-  .argument("<name>", "Package name")
-  .option("--json", "Output JSON")
-  .action(async (name, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdPackageMigrationStatus(opts, name, options);
-  });
-
-registerCommand(packageCmd, ["package", "pack"])
-  .description("Create a ClawPack npm tarball from a plugin package folder")
-  .argument("<source>", "Package folder path")
-  .option("--pack-destination <dir>", "Directory for the generated .tgz (default: workdir)")
-  .option("--json", "Output JSON")
-  .action(async (source, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdPackPackage(opts, source, options);
-  });
-
-registerCommand(packageCmd, ["package", "publish"])
-  .description("Publish a code plugin or bundle plugin from a folder or GitHub source")
-  .argument("<source>", "Package folder path, GitHub repo (owner/repo[@ref]), or URL")
-  .option("--family <family>", "code-plugin|bundle-plugin")
-  .option("--name <name>", "Package name")
-  .option("--display-name <name>", "Display name")
-  .option("--owner <handle>", "Publish under this owner/publisher handle")
-  .option("--version <version>", "Version")
-  .option("--changelog <text>", "Changelog text")
-  .option(
-    "--manual-override-reason <reason>",
-    "Required for manual publish when trusted publisher config exists",
-  )
-  .option("--tags <tags>", "Comma-separated tags", "latest")
-  .option("--categories <slugs>", "Comma-separated category slugs")
-  .option("--topics <topics>", "Comma-separated topics")
-  .option("--bundle-format <format>", "Bundle format")
-  .option("--host-targets <targets>", "Comma-separated bundle host targets")
-  .option("--source-repo <repo>", "GitHub repo (owner/repo or URL)")
-  .option("--source-commit <sha>", "Git commit SHA")
-  .option("--source-ref <ref>", "Git ref/tag/branch")
-  .option("--source-path <path>", "Repo subpath")
-  .option("--dry-run", "Preview what would be published without uploading")
-  .option("--json", "Output JSON (for CI pipelines)")
-  .action(async (source, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdPublishPackage(opts, source, options);
-  });
-
-const trustedPublisherCmd = registerCommandGroup(packageCmd, [
-  "package",
-  "trusted-publisher",
-]).description("Manage package trusted publisher config");
-
-registerCommand(trustedPublisherCmd, ["package", "trusted-publisher", "get"])
-  .description("Show trusted publisher config for a package")
-  .argument("<name>", "Package name")
-  .option("--json", "Output JSON")
-  .action(async (name, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdGetPackageTrustedPublisher(opts, name, options);
-  });
-
-registerCommand(trustedPublisherCmd, ["package", "trusted-publisher", "set"])
-  .description("Set trusted publisher config for a package")
-  .argument("<name>", "Package name")
-  .requiredOption("--repository <repo>", "GitHub repository, for example openclaw/openclaw")
-  .requiredOption("--workflow-filename <file>", "GitHub Actions workflow filename")
-  .option("--environment <name>", "GitHub Actions environment name")
-  .option("--json", "Output JSON")
-  .action(async (name, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdSetPackageTrustedPublisher(opts, name, options);
-  });
-
-registerCommand(trustedPublisherCmd, ["package", "trusted-publisher", "delete"])
-  .description("Delete trusted publisher config for a package")
-  .argument("<name>", "Package name")
-  .option("--json", "Output JSON")
-  .action(async (name, options) => {
-    const opts = await resolveGlobalOpts();
-    await cmdDeletePackageTrustedPublisher(opts, name, options);
-  });
 
 registerCommand(skill, ["skill", "rename"])
   .description("Rename a published skill and keep the old slug as a redirect")
@@ -926,30 +665,12 @@ applyCommandHelpGroups(program, {
   sync: "Publishing:",
   skill: "Publishing:",
   publisher: "Publishing:",
-  package: "Packages:",
   delete: "Moderation:",
   hide: "Moderation:",
   undelete: "Moderation:",
   unhide: "Moderation:",
   transfer: "Moderation:",
   help: "Help:",
-});
-
-applyCommandHelpGroups(packageCmd, {
-  explore: "Discovery:",
-  inspect: "Discovery:",
-  download: "Artifacts:",
-  verify: "Artifacts:",
-  pack: "Publishing:",
-  publish: "Publishing:",
-  "trusted-publisher": "Publishing:",
-  delete: "Moderation:",
-  undelete: "Moderation:",
-  transfer: "Moderation:",
-  report: "Moderation:",
-  "moderation-status": "Moderation:",
-  readiness: "Operations:",
-  "migration-status": "Operations:",
 });
 
 program.action(() => {

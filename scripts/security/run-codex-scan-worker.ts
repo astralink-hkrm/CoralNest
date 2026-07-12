@@ -817,7 +817,7 @@ export function buildPrompt(
   const trusted = Boolean(job.target.trustedOpenClawPlugin);
   return `${SKILL_SECURITY_EVALUATOR_SYSTEM_PROMPT}
 
-Additional ClawHub policy for this Codex run:
+Additional CoralNest policy for this Codex run:
 - Do your own security research before deciding. Use SkillSpector, VirusTotal, static scan
   findings, metadata, artifact evidence, and publisher context as inputs.
 - Inspect workspace files when needed to verify scanner claims, resolve uncertainty, or build
@@ -1368,7 +1368,7 @@ export async function runClawScanShadow(
   if (!llmAnalysis) {
     return {
       status: "skipped",
-      error: "authoritative ClawHub scan did not produce llmAnalysis",
+      error: "authoritative CoralNest scan did not produce llmAnalysis",
     };
   }
 

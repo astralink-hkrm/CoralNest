@@ -28,14 +28,14 @@ export default function BlockedVersionEmail({
   docsUrl,
   preheader,
 }: BlockedVersionEmailProps) {
-  const title = `ClawHub blocked a ${artifactKind} version`;
+  const title = `CoralNest blocked a ${artifactKind} version`;
   const railLabel = artifactKind === "plugin" ? "Plugin Review" : "Skill Review";
   return (
     <ClawHubEmailLayout preview={preheader} railLabel={railLabel}>
       <Badge>1 issue found</Badge>
       <EmailHeading>{title}</EmailHeading>
       <Paragraph>
-        {artifactName} was blocked by ClawHub security scans. This version was not made public.
+        {artifactName} was blocked by CoralNest security scans. This version was not made public.
       </Paragraph>
       <DetailTable
         rows={[
@@ -84,5 +84,5 @@ BlockedVersionEmail.PreviewProps = {
   findingSummary: "Attempts to exfiltrate credentials.",
   validateCommand: "clawhub scan download @scope/demo-plugin --version 1.2.3 --kind plugin",
   docsUrl: "https://docs.openclaw.ai/clawhub/moderation",
-  preheader: "ClawHub blocked @scope/demo-plugin@1.2.3 after a security scan.",
+  preheader: "CoralNest blocked a version after a security scan.",
 } satisfies BlockedVersionEmailProps;

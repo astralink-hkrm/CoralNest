@@ -215,9 +215,9 @@ export function formatOpenClawPrompt({
   }
 
   const lines = [
-    "Before installing anything, inspect the ClawHub skill metadata and setup requirements.",
+    "Before installing anything, inspect the skill metadata and setup requirements.",
     "If the skill asks you to install a third-party package or CLI, verify its source, maintainer, and package contents before running the install command.",
-    `Install the skill "${displayName}" (${target}) from ClawHub only after those checks pass.`,
+    `Install the skill "${displayName}" (${target}) only after those checks pass.`,
   ];
 
   if (pageUrl) {

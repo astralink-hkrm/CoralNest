@@ -11,7 +11,7 @@ vi.mock("../convex/client", () => ({
   convexHttp: { query: (...args: unknown[]) => queryMock(...args) },
 }));
 
-import { resolveOpenClawPluginSlug, resolveTopLevelSlugRoute } from "./slugRoute";
+import { resolveTopLevelSlugRoute } from "./slugRoute";
 
 describe("slug route resolution", () => {
   beforeEach(() => {
@@ -24,34 +24,6 @@ describe("slug route resolution", () => {
 
     await expect(resolveTopLevelSlugRoute("codex")).resolves.toBeNull();
     expect(fetchSkillPageDataMock).not.toHaveBeenCalled();
-  });
-
-  it("resolves extension slugs to their configured npm package names for legacy owner routes", async () => {
-    await expect(resolveOpenClawPluginSlug("kimi-coding", "openclaw")).resolves.toEqual({
-      kind: "plugin",
-      name: "@openclaw/kimi-provider",
-      href: "/openclaw/plugins/kimi-provider",
-    });
-
-    await expect(resolveOpenClawPluginSlug("diffs-language-pack", "openclaw")).resolves.toEqual({
-      kind: "plugin",
-      name: "@openclaw/diffs-language-pack",
-      href: "/openclaw/plugins/diffs-language-pack",
-    });
-
-    expect(fetchSkillPageDataMock).not.toHaveBeenCalled();
-  });
-
-  it("resolves npm-style OpenClaw scope aliases", async () => {
-    await expect(resolveOpenClawPluginSlug("codex", "@openclaw")).resolves.toEqual({
-      kind: "plugin",
-      name: "@openclaw/codex",
-      href: "/openclaw/plugins/codex",
-    });
-  });
-
-  it("does not resolve non-OpenClaw owner paths as OpenClaw plugins", async () => {
-    await expect(resolveOpenClawPluginSlug("codex", "ivangdavila")).resolves.toBeNull();
   });
 
   it("does not fall back to skill slug resolution when no publisher exists", async () => {

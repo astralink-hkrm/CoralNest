@@ -9,7 +9,7 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
-import { BrowseCategoryIcon } from "../lib/browseCategoryIcons";
+import { getCategoryIconComponent, UNRESOLVED_SKILL_CATEGORY_ICON } from "../lib/categoryIcons";
 import type { BrowseCategory } from "../lib/categories";
 
 type BrowseChoice = {
@@ -456,6 +456,11 @@ export function BrowseCategorySelect({ categories, value, onChange }: BrowseCate
     close();
   };
 
+  const renderCategoryIcon = (icon: string | null | undefined, size: number, className: string) => {
+    const I = icon ? getCategoryIconComponent(icon) ?? UNRESOLVED_SKILL_CATEGORY_ICON : UNRESOLVED_SKILL_CATEGORY_ICON;
+    return <I size={size} className={className} strokeWidth={1.8} />;
+  };
+
   return (
     <div className="browse-category-select" ref={rootRef}>
       <button
@@ -469,12 +474,7 @@ export function BrowseCategorySelect({ categories, value, onChange }: BrowseCate
         onClick={() => setOpen((current) => !current)}
       >
         <span className="browse-category-trigger-main">
-          <BrowseCategoryIcon
-            slug={selected?.slug ?? null}
-            icon={selected?.icon}
-            size={16}
-            className="browse-category-icon"
-          />
+          {renderCategoryIcon(selected?.icon, 16, "browse-category-icon")}
           <span className="browse-category-label">{selected?.label ?? "All categories"}</span>
         </span>
         <ChevronDown
@@ -517,11 +517,7 @@ export function BrowseCategorySelect({ categories, value, onChange }: BrowseCate
                   <span className="browse-category-option-mark" aria-hidden="true">
                     {!value ? <span className="browse-category-option-dot" /> : null}
                   </span>
-                  <BrowseCategoryIcon
-                    slug={null}
-                    size={16}
-                    className="browse-category-option-icon"
-                  />
+                  {renderCategoryIcon(null, 16, "browse-category-option-icon")}
                   <span className="browse-category-option-label">All categories</span>
                 </button>
               </li>
@@ -540,12 +536,7 @@ export function BrowseCategorySelect({ categories, value, onChange }: BrowseCate
                     <span className="browse-category-option-mark" aria-hidden="true">
                       {active ? <span className="browse-category-option-dot" /> : null}
                     </span>
-                    <BrowseCategoryIcon
-                      slug={category.slug}
-                      icon={category.icon}
-                      size={16}
-                      className="browse-category-option-icon"
-                    />
+                    {renderCategoryIcon(category.icon, 16, "browse-category-option-icon")}
                     <span className="browse-category-option-label">{category.label}</span>
                   </button>
                 </li>

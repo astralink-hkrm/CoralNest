@@ -1,7 +1,7 @@
 /* @vitest-environment node */
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { getClawHubSiteUrl, normalizeClawHubSiteOrigin } from "./site";
+import { getClawHubSiteUrl, normalizeCoralNestSiteOrigin } from "./site";
 
 function withServerEnv<T>(values: Record<string, string | undefined>, run: () => T): T {
   const previous = new Map<string, string | undefined>();
@@ -33,22 +33,19 @@ afterEach(() => {
 });
 
 describe("site helpers", () => {
-  it("normalizes origins and maps legacy clawdhub hosts to clawhub.ai", () => {
-    expect(normalizeClawHubSiteOrigin("https://example.com/some/path")).toBe("https://example.com");
-    expect(normalizeClawHubSiteOrigin("https://clawdhub.com")).toBe("https://clawhub.ai");
-    expect(normalizeClawHubSiteOrigin("https://www.clawdhub.com")).toBe("https://clawhub.ai");
-    expect(normalizeClawHubSiteOrigin("https://auth.clawdhub.com")).toBe("https://clawhub.ai");
+  it("normalizes origins", () => {
+    expect(normalizeCoralNestSiteOrigin("https://example.com/some/path")).toBe("https://example.com");
   });
 
   it("returns null for missing or invalid origins", () => {
-    expect(normalizeClawHubSiteOrigin(null)).toBeNull();
-    expect(normalizeClawHubSiteOrigin(undefined)).toBeNull();
-    expect(normalizeClawHubSiteOrigin("")).toBeNull();
-    expect(normalizeClawHubSiteOrigin("not a url")).toBeNull();
+    expect(normalizeCoralNestSiteOrigin(null)).toBeNull();
+    expect(normalizeCoralNestSiteOrigin(undefined)).toBeNull();
+    expect(normalizeCoralNestSiteOrigin("")).toBeNull();
+    expect(normalizeCoralNestSiteOrigin("not a url")).toBeNull();
   });
 
   it("returns default and env configured site URLs", () => {
-    expect(getClawHubSiteUrl()).toBe("https://clawhub.ai");
+    expect(getClawHubSiteUrl()).toBe("https://coralnest.ai");
     withServerEnv({ VITE_SITE_URL: "https://example.com" }, () => {
       expect(getClawHubSiteUrl()).toBe("https://example.com");
     });

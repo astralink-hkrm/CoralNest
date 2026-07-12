@@ -5,7 +5,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const navigateMock = vi.fn();
 const convexQueryMock = vi.fn();
-const fetchPluginCatalogMock = vi.fn();
 
 vi.mock("@tanstack/react-router", () => ({
   Link: ({
@@ -45,10 +44,6 @@ vi.mock("../../convex/_generated/api", () => ({
   },
 }));
 
-vi.mock("../lib/packageApi", () => ({
-  fetchPluginCatalog: (...args: unknown[]) => fetchPluginCatalogMock(...args),
-}));
-
 import { HomeListingSection } from "../components/HomeListingSection";
 
 describe("HomeListingSection", () => {
@@ -56,7 +51,6 @@ describe("HomeListingSection", () => {
     navigateMock.mockReset();
     convexQueryMock.mockReset();
     convexActionMock.mockReset();
-    fetchPluginCatalogMock.mockReset();
     convexQueryMock.mockResolvedValue({
       page: [
         {
@@ -70,33 +64,6 @@ describe("HomeListingSection", () => {
           ownerHandle: "builder",
         },
       ],
-    });
-    fetchPluginCatalogMock.mockResolvedValue({
-      items: [
-        {
-          name: "demo-plugin",
-          displayName: "Demo Plugin",
-          family: "code-plugin",
-          channel: "community",
-          isOfficial: false,
-          summary: "Runs workflows.",
-          createdAt: 1,
-          updatedAt: 2,
-          latestVersion: "1.0.0",
-          stats: { stars: 8, downloads: 120, installs: 120, versions: 1 },
-        },
-      ],
-      nextCursor: null,
-    });
-  });
-
-  it("renders the listing toolbar and skill cards by default", async () => {
-    render(<HomeListingSection />);
-
-    expect(screen.getByRole("group", { name: "Content type" })).toBeTruthy();
-    expect(screen.getByRole("tab", { name: "Trending" })).toBeTruthy();
-    await waitFor(() => {
-      expect(screen.getByText("Demo Skill")).toBeTruthy();
     });
   });
 
@@ -136,19 +103,6 @@ describe("HomeListingSection", () => {
     await waitFor(() => {
       expect(convexQueryMock).not.toHaveBeenCalled();
     });
-  });
-
-  it("switches to plugins and loads plugin cards", async () => {
-    render(<HomeListingSection />);
-
-    fireEvent.click(screen.getByRole("button", { name: "Plugins" }));
-    fireEvent.click(screen.getByRole("tab", { name: "Top" }));
-
-    await waitFor(() => {
-      expect(screen.getByText("Demo Plugin")).toBeTruthy();
-      expect(screen.getByText("120")).toBeTruthy();
-    });
-    expect(fetchPluginCatalogMock).toHaveBeenCalled();
   });
 
   it("opens listing search from the toolbar icon and with slash", async () => {
@@ -287,10 +241,6 @@ describe("HomeListingSection", () => {
       "Integrations",
     );
     expect(screen.getByRole("option", { name: "Security" }).textContent).toContain("Security");
-
-    fireEvent.click(screen.getByRole("button", { name: "Plugins" }));
-    expect(screen.getByRole("option", { name: "Channels" }).textContent).toContain("Channels");
-    expect(screen.getByRole("option", { name: "Runtime" }).textContent).toContain("Runtime");
   });
 
   it("expands the listing preview when see more is clicked", async () => {
@@ -503,21 +453,6 @@ describe("HomeListingSection", () => {
     expect(screen.queryByText("Moderated Suspicious Skill")).toBeNull();
   });
 
-  it("asks the plugin catalog to exclude pending and suspicious audits from New", async () => {
-    render(<HomeListingSection />);
-    fireEvent.click(screen.getByRole("button", { name: "Plugins" }));
-    fireEvent.click(screen.getByRole("tab", { name: "New" }));
-
-    await waitFor(() => {
-      expect(fetchPluginCatalogMock).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          excludedScanStatuses: ["pending", "suspicious"],
-          sort: "updated",
-        }),
-      );
-    });
-  });
-
   it("keeps pending and suspicious audits out of New search", async () => {
     convexActionMock.mockResolvedValue([
       {
@@ -561,100 +496,6 @@ describe("HomeListingSection", () => {
       expect(screen.getByText("Clean Search Skill")).toBeTruthy();
     });
     expect(screen.queryByText("Pending Search Skill")).toBeNull();
-
-    fireEvent.click(screen.getByRole("button", { name: "Plugins" }));
-    fireEvent.click(screen.getByRole("tab", { name: "New" }));
-    await waitFor(() =>
-      expect(fetchPluginCatalogMock).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          excludedScanStatuses: ["pending", "suspicious"],
-          q: "search",
-        }),
-      ),
-    );
-  });
-
-  it("requests official plugins from the catalog API", async () => {
-    fetchPluginCatalogMock.mockResolvedValue({
-      items: [
-        {
-          name: "community-plugin",
-          displayName: "Community Plugin",
-          family: "code-plugin",
-          channel: "community",
-          isOfficial: false,
-          createdAt: 1,
-          updatedAt: 2,
-          stats: { stars: 1, downloads: 2, installs: 0, versions: 1 },
-        },
-        {
-          name: "official-plugin",
-          displayName: "Official Plugin",
-          family: "code-plugin",
-          channel: "official",
-          isOfficial: true,
-          createdAt: 1,
-          updatedAt: 2,
-          stats: { stars: 4, downloads: 8, installs: 0, versions: 1 },
-        },
-      ],
-      nextCursor: null,
-    });
-
-    render(<HomeListingSection />);
-    fireEvent.click(screen.getByRole("button", { name: "Plugins" }));
-    fireEvent.click(screen.getByRole("tab", { name: "Verified" }));
-
-    await waitFor(() => {
-      expect(screen.getByText("Official Plugin").textContent).toBe("Official Plugin");
-    });
-    expect(screen.queryByText("Community Plugin")).toBeNull();
-    const latestRequest = fetchPluginCatalogMock.mock.calls.at(-1)?.[0] as Record<string, unknown>;
-    expect(latestRequest).toEqual(expect.objectContaining({ isOfficial: true, limit: 20 }));
-  });
-
-  it("reuses cached plugin tabs instead of refetching when switching back", async () => {
-    fetchPluginCatalogMock.mockImplementation((args: { isOfficial?: boolean }) =>
-      Promise.resolve({
-        items: [
-          {
-            name: args.isOfficial ? "official-plugin" : "top-plugin",
-            displayName: args.isOfficial ? "Official Plugin" : "Top Plugin",
-            family: "code-plugin",
-            channel: args.isOfficial ? "official" : "community",
-            isOfficial: Boolean(args.isOfficial),
-            summary: "Cached plugin.",
-            createdAt: 1,
-            updatedAt: 2,
-            latestVersion: "1.0.0",
-            stats: { stars: 1, downloads: 2, installs: args.isOfficial ? 50 : 75, versions: 1 },
-          },
-        ],
-        nextCursor: null,
-      }),
-    );
-
-    render(<HomeListingSection />);
-    fireEvent.click(screen.getByRole("button", { name: "Plugins" }));
-
-    await waitFor(() => {
-      expect(screen.getByText("Official Plugin")).toBeTruthy();
-    });
-    expect(fetchPluginCatalogMock).toHaveBeenCalledTimes(1);
-
-    fireEvent.click(screen.getByRole("tab", { name: "Top" }));
-
-    await waitFor(() => {
-      expect(screen.getByText("Top Plugin")).toBeTruthy();
-    });
-    expect(fetchPluginCatalogMock).toHaveBeenCalledTimes(2);
-
-    fireEvent.click(screen.getByRole("tab", { name: "Verified" }));
-
-    await waitFor(() => {
-      expect(screen.getByText("Official Plugin")).toBeTruthy();
-    });
-    expect(fetchPluginCatalogMock).toHaveBeenCalledTimes(2);
   });
 
   it("uses the skills cursor when loading beyond the first page", async () => {

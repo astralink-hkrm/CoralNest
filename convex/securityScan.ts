@@ -556,16 +556,6 @@ function incrementSkip(
   skippedByReason[reason] = (skippedByReason[reason] ?? 0) + 1;
 }
 
-function isOpenClawPluginPackage(
-  pkg: Doc<"packages"> | null | undefined,
-  ownerPublisher: Pick<Doc<"publishers">, "handle" | "deletedAt"> | null | undefined,
-) {
-  if (!pkg) return false;
-  if (pkg.family !== "code-plugin" && pkg.family !== "bundle-plugin") return false;
-  if (!pkg.normalizedName.startsWith("@openclaw/")) return false;
-  return ownerPublisher?.handle.trim().toLowerCase() === "openclaw" && !ownerPublisher.deletedAt;
-}
-
 export const enqueueSkillVersionScanInternal = internalMutation({
   args: {
     versionId: v.id("skillVersions"),
@@ -1011,7 +1001,7 @@ function skillScanReportFromRequest(request: Doc<"skillScanRequests">) {
 
 function storedScanReportFromArtifact(
   artifact: Pick<
-    Doc<"skillVersions"> | Doc<"packageReleases">,
+    Doc<"skillVersions">,
     "llmAnalysis" | "skillSpectorAnalysis" | "staticScan" | "vtAnalysis"
   >,
 ) {
@@ -1030,7 +1020,7 @@ function storedScanReportFromArtifact(
 
 function hasStoredScanReport(
   artifact: Pick<
-    Doc<"skillVersions"> | Doc<"packageReleases">,
+    Doc<"skillVersions">,
     "llmAnalysis" | "skillSpectorAnalysis" | "staticScan" | "vtAnalysis"
   >,
 ) {
@@ -1044,7 +1034,7 @@ function hasStoredScanReport(
 
 function completedAtFromStoredScanReport(
   artifact: Pick<
-    Doc<"skillVersions"> | Doc<"packageReleases">,
+    Doc<"skillVersions">,
     "llmAnalysis" | "skillSpectorAnalysis" | "staticScan" | "vtAnalysis"
   >,
 ) {
@@ -2645,7 +2635,6 @@ async function hydrateClaimedCodexScanJob(
 
   const scanRequest = target.scanRequest as Doc<"skillScanRequests"> | undefined;
   const version = target.version as Doc<"skillVersions"> | undefined;
-  const release = target.release as Doc<"packageReleases"> | undefined;
   let files: Array<{
     path: string;
     size: number;
@@ -2668,8 +2657,6 @@ async function hydrateClaimedCodexScanJob(
         .filter((entry) => entry.kind === "generated-bundle")
         .map((entry) => entry.fingerprint),
     });
-  } else if (release) {
-    files = release.files;
   }
   const fileUrls = [];
   for (const file of files) {

@@ -2,10 +2,9 @@ import { api } from "../../convex/_generated/api";
 import { convexHttp } from "../convex/client";
 import { isSkillOfficial } from "./badges";
 import { getSkillCategoriesForSkill } from "./categories";
-import { fetchPluginCatalog, type PackageListItem } from "./packageApi";
 import type { PublicSkill, PublicUser } from "./publicUser";
 
-export type HomeListingKind = "skills" | "plugins";
+export type HomeListingKind = "skills";
 export type HomeListingTab = "popular" | "trending" | "officials" | "new";
 
 export type HomeSkillListingEntry = {
@@ -14,9 +13,11 @@ export type HomeSkillListingEntry = {
   owner?: PublicUser | null;
 };
 
-export type HomeListingCacheEntry =
-  | { kind: "skills"; items: HomeSkillListingEntry[]; hasMore: boolean }
-  | { kind: "plugins"; items: PackageListItem[]; hasMore: boolean };
+export type HomeListingCacheEntry = {
+  kind: "skills";
+  items: HomeSkillListingEntry[];
+  hasMore: boolean;
+};
 
 export type HomeListingInitialData = {
   kind: "skills";
@@ -28,8 +29,6 @@ export type HomeListingInitialData = {
 };
 
 export const HOME_LISTING_PAGE_SIZE = 20;
-
-const PLUGIN_CATALOG_PAGE_LIMIT = 100;
 
 export function homeListingCacheKey({
   kind,
@@ -50,13 +49,6 @@ export function filterHomeSkillsByTab(entries: HomeSkillListingEntry[], tab: Hom
     return entries.filter((entry) => isSkillOfficial(entry.skill));
   }
   return entries;
-}
-
-export function filterHomePluginsByTab(items: PackageListItem[], tab: HomeListingTab) {
-  if (tab === "officials") {
-    return items.filter((item) => item.isOfficial);
-  }
-  return items;
 }
 
 export function isNewHomeSkillEligible(skill: PublicSkill) {
@@ -88,14 +80,6 @@ export function uniqueHomeSkillEntries(entries: HomeSkillListingEntry[]) {
     byId.set(String(entry.skill._id), entry);
   }
   return [...byId.values()];
-}
-
-export function uniqueHomePlugins(items: PackageListItem[]) {
-  const byName = new Map<string, PackageListItem>();
-  for (const item of items) {
-    byName.set(item.name, item);
-  }
-  return [...byName.values()];
 }
 
 export function sortHomeSkillEntries(entries: HomeSkillListingEntry[], tab: HomeListingTab) {
@@ -171,56 +155,6 @@ export async function fetchHomeSkillListing(
   const hasMore = sorted.length > numItems || results.some((result) => result.hasMore);
   const page = sorted.slice(0, numItems);
   return { page, hasMore };
-}
-
-export async function fetchHomePluginListing(
-  tab: HomeListingTab,
-  categorySlugs: readonly string[],
-  limit: number,
-  signal?: AbortSignal,
-) {
-  const openClawOfficials = tab === "officials";
-  const categoriesToFetch = categorySlugs.length > 0 ? categorySlugs : [null];
-  const results = await Promise.all(
-    categoriesToFetch.map(async (categorySlug) => {
-      const items: PackageListItem[] = [];
-      let cursor: string | null | undefined;
-      let hasMore = false;
-
-      while (items.length < limit) {
-        const result = await fetchPluginCatalog({
-          category: categorySlug ?? undefined,
-          cursor: cursor ?? undefined,
-          isOfficial: openClawOfficials ? true : undefined,
-          excludedScanStatuses: tab === "new" ? ["pending", "suspicious"] : undefined,
-          sort: tab === "new" ? "updated" : "downloads",
-          limit: Math.min(limit - items.length, PLUGIN_CATALOG_PAGE_LIMIT),
-          signal,
-        });
-        items.push(
-          ...result.items.filter((item) => itemMatchesAnyHomeCategory(item, categorySlugs)),
-        );
-
-        hasMore = result.nextCursor != null;
-        if (!result.nextCursor || result.nextCursor === cursor) break;
-        cursor = result.nextCursor;
-      }
-
-      return { items, hasMore };
-    }),
-  );
-  let items = uniqueHomePlugins(results.flatMap((result) => result.items));
-  items = filterHomePluginsByTab(items, tab);
-  if (tab === "new") {
-    items.sort((a, b) => b.updatedAt - a.updatedAt);
-  } else if (tab === "popular" || openClawOfficials) {
-    items.sort((a, b) => (b.stats?.downloads ?? 0) - (a.stats?.downloads ?? 0));
-  }
-  const page = items.slice(0, limit);
-  return {
-    items: page,
-    hasMore: items.length > limit || results.some((result) => result.hasMore),
-  };
 }
 
 export async function fetchInitialHomeListing(): Promise<HomeListingInitialData> {

@@ -14,7 +14,7 @@ import {
   prepareCatalogClassificationResult,
   type CatalogClassificationConfidence,
 } from "./lib/catalogClassification";
-import { classifyPlugin, classifySkill } from "./lib/catalogClassifier.mjs";
+import { classifySkill } from "./lib/catalogClassifier.mjs";
 
 const DEFAULT_MAX_BATCHES = 1;
 const MAX_MAX_BATCHES = 20;
@@ -23,22 +23,6 @@ const MAX_CLASSIFICATION_TEXT_LENGTH = 40_000;
 function clampMaxBatches(value: number | undefined) {
   const integer = Number.isFinite(value) ? Math.floor(value ?? 0) : DEFAULT_MAX_BATCHES;
   return Math.max(1, Math.min(MAX_MAX_BATCHES, integer));
-}
-
-function asRecord(value: unknown): Record<string, unknown> {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : {};
-}
-
-function stringValue(value: unknown) {
-  return typeof value === "string" ? value : "";
-}
-
-function stringArray(value: unknown) {
-  return Array.isArray(value)
-    ? value.filter((entry): entry is string => typeof entry === "string")
-    : [];
 }
 
 async function readTextFiles(ctx: Pick<ActionCtx, "storage">, files: Array<{ storageId: never }>) {
@@ -77,53 +61,6 @@ async function classifySkillItem(
   };
 }
 
-async function classifyPluginItem(
-  ctx: Pick<ActionCtx, "storage">,
-  item: Extract<CatalogClassificationPageItem, { kind: "plugin" }>,
-): Promise<StoredCatalogClassificationInput> {
-  const manifest = asRecord(item.pluginManifest);
-  const packageJson = asRecord(item.packageJson);
-  const bundleManifest = asRecord(item.bundleManifest);
-  const fileText = await readTextFiles(
-    ctx,
-    item.textFiles.map((file) => ({ storageId: file.storageId as never })),
-  );
-  const packageKeywords = stringArray(packageJson.keywords);
-  const primaryText = [
-    item.displayName,
-    item.summary,
-    stringValue(manifest.description),
-    stringValue(packageJson.description),
-    stringValue(bundleManifest.description),
-  ]
-    .filter(Boolean)
-    .join("\n");
-  const text = [item.name, primaryText, packageKeywords.join(" "), fileText]
-    .filter(Boolean)
-    .join("\n")
-    .slice(0, MAX_CLASSIFICATION_TEXT_LENGTH);
-  const topicText = [primaryText, fileText]
-    .filter(Boolean)
-    .join("\n")
-    .slice(0, MAX_CLASSIFICATION_TEXT_LENGTH);
-  return {
-    targetKind: "plugin",
-    packageId: item.packageId,
-    packageReleaseId: item.packageReleaseId,
-    ...prepareCatalogClassificationResult(
-      classifyPlugin({
-        manifest,
-        slug: item.name,
-        text,
-        topicText,
-        topicTags: packageKeywords,
-        explicitCategories: item.categories,
-        explicitTopics: item.topics,
-      }),
-    ),
-  };
-}
-
 function emptyConfidenceCounts(): Record<CatalogClassificationConfidence, number> {
   return { high: 0, medium: 0, low: 0 };
 }
@@ -131,7 +68,7 @@ function emptyConfidenceCounts(): Record<CatalogClassificationConfidence, number
 export async function classifyCatalogInternalHandler(
   ctx: ActionCtx,
   args: {
-    targetKind: "skill" | "plugin";
+    targetKind: "skill";
     cursor?: string;
     batchSize?: number;
     maxBatches?: number;
@@ -165,10 +102,7 @@ export async function classifyCatalogInternalHandler(
         continue;
       }
       try {
-        const result =
-          item.kind === "skill"
-            ? await classifySkillItem(ctx, item)
-            : await classifyPluginItem(ctx, item);
+        const result = await classifySkillItem(ctx, item);
         results.push(result);
         confidence[result.categoryConfidence] += 1;
         topicConfidence[result.topicConfidence] += 1;
@@ -219,7 +153,7 @@ export async function classifyCatalogInternalHandler(
 
 export const classifyCatalogInternal = internalAction({
   args: {
-    targetKind: v.union(v.literal("skill"), v.literal("plugin")),
+    targetKind: v.literal("skill"),
     cursor: v.optional(v.string()),
     batchSize: v.optional(v.number()),
     maxBatches: v.optional(v.number()),

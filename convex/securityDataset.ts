@@ -4,7 +4,6 @@ import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import type { ActionCtx, QueryCtx } from "./_generated/server";
 import { internalAction, internalQuery } from "./functions";
-import { getPackageReleaseArtifactSha256 } from "./lib/packageArtifacts";
 import { getOwnerPublisher } from "./lib/publishers";
 
 const MAX_EXPORT_PAGE_SIZE = 50;
@@ -13,7 +12,7 @@ const MAX_REDACTED_BUNDLE_FILE_BYTES = 192 * 1024;
 const MAX_REDACTED_BUNDLE_BYTES_PER_ARTIFACT = 256 * 1024;
 const MAX_REDACTED_BUNDLE_BYTES_PER_RESPONSE = 256 * 1024;
 const REDACTION_POLICY_VERSION = "public-signals-v2-bundle-files";
-const SOURCE_TABLES = ["skillVersions", "packageReleases"] as const;
+const SOURCE_TABLES = ["skillVersions"] as const;
 const SCANNER_SOURCES = [
   "static",
   "virustotal",
@@ -24,9 +23,7 @@ const SCANNER_SOURCES = [
 type StoredVtAnalysis = Doc<"skillVersions">["vtAnalysis"];
 type StoredSkillSpectorAnalysis = Doc<"skillVersions">["skillSpectorAnalysis"];
 type StoredLlmAnalysis = Doc<"skillVersions">["llmAnalysis"];
-type ArtifactExportRow =
-  | Awaited<ReturnType<typeof skillVersionPageToLatestExportRows>>[number]
-  | Awaited<ReturnType<typeof packageReleasePageToExportRows>>[number];
+type ArtifactExportRow = Awaited<ReturnType<typeof skillVersionPageToLatestExportRows>>[number];
 type ArtifactExportPage = {
   page: ArtifactExportRow[];
   isDone: boolean;
@@ -48,7 +45,7 @@ const SECRET_PATTERNS: RegExp[] = [
 
 export const listArtifactExportPageInternal = internalQuery({
   args: {
-    sourceKind: v.union(v.literal("skill"), v.literal("package")),
+    sourceKind: v.literal("skill"),
     mode: v.optional(v.literal("public")),
     createdAtGte: v.optional(v.number()),
     createdAtLt: v.optional(v.number()),
@@ -59,30 +56,8 @@ export const listArtifactExportPageInternal = internalQuery({
       cursor: args.paginationOpts.cursor,
       numItems: Math.min(args.paginationOpts.numItems, MAX_EXPORT_PAGE_SIZE),
     };
-    if (args.sourceKind === "skill") {
-      const page = await ctx.db
-        .query("skillVersions")
-        .withIndex("by_active_created", (q) => {
-          const range = q.eq("softDeletedAt", undefined);
-          if (args.createdAtGte !== undefined && args.createdAtLt !== undefined) {
-            return range.gte("createdAt", args.createdAtGte).lt("createdAt", args.createdAtLt);
-          }
-          if (args.createdAtGte !== undefined) return range.gte("createdAt", args.createdAtGte);
-          if (args.createdAtLt !== undefined) return range.lt("createdAt", args.createdAtLt);
-          return range;
-        })
-        .order("asc")
-        .paginate(paginationOpts);
-      return {
-        page: await skillVersionPageToLatestExportRows(ctx, page.page),
-        isDone: page.isDone,
-        continueCursor: page.continueCursor,
-        exportMode: args.mode ?? "public",
-      };
-    }
-
     const page = await ctx.db
-      .query("packageReleases")
+      .query("skillVersions")
       .withIndex("by_active_created", (q) => {
         const range = q.eq("softDeletedAt", undefined);
         if (args.createdAtGte !== undefined && args.createdAtLt !== undefined) {
@@ -95,7 +70,7 @@ export const listArtifactExportPageInternal = internalQuery({
       .order("asc")
       .paginate(paginationOpts);
     return {
-      page: await packageReleasePageToExportRows(ctx, page.page),
+      page: await skillVersionPageToLatestExportRows(ctx, page.page),
       isDone: page.isDone,
       continueCursor: page.continueCursor,
       exportMode: args.mode ?? "public",
@@ -105,7 +80,7 @@ export const listArtifactExportPageInternal = internalQuery({
 
 export const getArtifactExportBoundsInternal = internalQuery({
   args: {
-    sourceKind: v.union(v.literal("skill"), v.literal("package")),
+    sourceKind: v.literal("skill"),
   },
   handler: async (ctx, args) => {
     return await getActiveCreatedBounds(ctx, args.sourceKind);
@@ -114,7 +89,7 @@ export const getArtifactExportBoundsInternal = internalQuery({
 
 export const listArtifactExportBatchInternal = internalAction({
   args: {
-    sourceKind: v.union(v.literal("skill"), v.literal("package")),
+    sourceKind: v.literal("skill"),
     mode: v.optional(v.literal("public")),
     createdAtGte: v.optional(v.number()),
     createdAtLt: v.optional(v.number()),
@@ -161,7 +136,6 @@ export const getDatasetLineageInternal = internalQuery({
   handler: async (ctx, args) => {
     const sourceBounds = [
       await getActiveCreatedBounds(ctx, "skill"),
-      await getActiveCreatedBounds(ctx, "package"),
     ];
     return {
       exportMode: args.mode ?? "public",
@@ -176,32 +150,14 @@ export const getDatasetLineageInternal = internalQuery({
   },
 });
 
-async function getActiveCreatedBounds(ctx: QueryCtx, sourceKind: "skill" | "package") {
-  if (sourceKind === "skill") {
-    const first = await ctx.db
-      .query("skillVersions")
-      .withIndex("by_active_created", (q) => q.eq("softDeletedAt", undefined))
-      .order("asc")
-      .first();
-    const last = await ctx.db
-      .query("skillVersions")
-      .withIndex("by_active_created", (q) => q.eq("softDeletedAt", undefined))
-      .order("desc")
-      .first();
-    return {
-      sourceKind,
-      minCreatedAt: first?.createdAt ?? null,
-      maxCreatedAt: last?.createdAt ?? null,
-    };
-  }
-
+async function getActiveCreatedBounds(ctx: QueryCtx, sourceKind: "skill") {
   const first = await ctx.db
-    .query("packageReleases")
+    .query("skillVersions")
     .withIndex("by_active_created", (q) => q.eq("softDeletedAt", undefined))
     .order("asc")
     .first();
   const last = await ctx.db
-    .query("packageReleases")
+    .query("skillVersions")
     .withIndex("by_active_created", (q) => q.eq("softDeletedAt", undefined))
     .order("desc")
     .first();
@@ -235,7 +191,6 @@ export async function skillVersionPageToLatestExportRows(
       files: sanitizeFiles(version.files),
       packageFamily: null,
       packageChannel: null,
-      sourceRepoHost: null,
       vtAnalysis: normalizeVtAnalysis(version.vtAnalysis),
       skillSpectorAnalysis: normalizeSkillSpectorAnalysis(version.skillSpectorAnalysis),
       staticScan: version.staticScan ?? null,
@@ -250,40 +205,6 @@ export async function skillVersionPageToLatestExportRows(
               evaluatedAt: skill.moderationEvaluatedAt ?? null,
             }
           : null,
-    });
-  }
-  return rows;
-}
-
-async function packageReleasePageToExportRows(
-  ctx: QueryCtx,
-  releases: Array<Doc<"packageReleases">>,
-) {
-  const rows = [];
-  for (const release of releases) {
-    const pkg = await ctx.db.get(release.packageId);
-    if (!pkg || pkg.softDeletedAt || pkg.channel === "private") continue;
-    const publicOwnerHandle = await getPublicOwnerHandle(ctx, pkg);
-    rows.push({
-      sourceKind: "package" as const,
-      sourceDocId: release._id,
-      parentDocId: pkg._id,
-      publicName: pkg.displayName,
-      publicOwnerHandle,
-      publicSlug: pkg.name,
-      version: release.version,
-      artifactSha256: getPackageReleaseArtifactSha256(release),
-      createdAt: release.createdAt,
-      softDeletedAt: release.softDeletedAt ?? null,
-      files: sanitizeFiles(release.files),
-      packageFamily: pkg.family,
-      packageChannel: pkg.channel,
-      sourceRepoHost: sourceRepoHost(pkg.sourceRepo),
-      vtAnalysis: normalizeVtAnalysis(release.vtAnalysis),
-      skillSpectorAnalysis: normalizeSkillSpectorAnalysis(release.skillSpectorAnalysis),
-      staticScan: release.staticScan ?? null,
-      llmAnalysis: normalizeLlmAnalysis(release.llmAnalysis),
-      moderationConsensus: null,
     });
   }
   return rows;
@@ -466,7 +387,7 @@ function normalizeLlmAnalysis(analysis: StoredLlmAnalysis) {
 
 async function getPublicOwnerHandle(
   ctx: Pick<QueryCtx, "db">,
-  source: Pick<Doc<"skills"> | Doc<"packages">, "ownerPublisherId" | "ownerUserId">,
+  source: Pick<Doc<"skills">, "ownerPublisherId" | "ownerUserId">,
 ) {
   const owner = await getOwnerPublisher(ctx, {
     ownerPublisherId: source.ownerPublisherId,
@@ -475,12 +396,4 @@ async function getPublicOwnerHandle(
   return owner?.handle ?? null;
 }
 
-function sourceRepoHost(sourceRepo: string | undefined) {
-  if (!sourceRepo) return null;
-  try {
-    return new URL(sourceRepo).host.toLowerCase();
-  } catch {
-    const match = sourceRepo.match(/^[^/:]+[:/](?<owner>[^/]+)\/(?<repo>[^/]+)$/);
-    return match?.groups?.owner && match.groups.repo ? "github.com" : null;
-  }
-}
+

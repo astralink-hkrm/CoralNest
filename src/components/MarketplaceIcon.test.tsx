@@ -68,7 +68,7 @@ describe("MarketplaceIcon", () => {
     const { container } = render(<MarketplaceIcon kind="skill" label="Typeahead Skill" />);
 
     const glyph = container.querySelector("svg.marketplace-icon-glyph");
-    expect(glyph?.classList.contains("lucide-package")).toBe(true);
+    expect(glyph?.classList.contains("lucide-shapes")).toBe(true);
     expect(glyph?.classList.contains("lucide-slash")).toBe(false);
   });
 });

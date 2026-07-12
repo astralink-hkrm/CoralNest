@@ -2,10 +2,8 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import {
   getCatalogTopicSlugs,
-  isPluginCategorySlug,
   isSkillCategorySlug,
   normalizeCatalogTopic,
-  resolveStoredPluginCategories,
 } from "clawhub-schema";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import {
@@ -41,7 +39,6 @@ import { EmptyState } from "../../components/EmptyState";
 import { Container } from "../../components/layout/Container";
 import { MarketplaceIcon } from "../../components/MarketplaceIcon";
 import { OfficialBadge, OfficialTag } from "../../components/OfficialBadge";
-import { PluginListItem } from "../../components/PluginListItem";
 import { BrowseResultsSkeleton } from "../../components/skeletons/BrowseResultsSkeleton";
 import { SkillListItem } from "../../components/SkillListItem";
 import { SkillReportDialog } from "../../components/SkillReportDialog";
@@ -57,17 +54,13 @@ import { formatBrowseCount } from "../../lib/browseCount";
 import {
   getSkillCategoriesForSkill,
   getSkillCategoryForSkill,
-  PLUGIN_CATEGORIES,
-  resolvePluginBrowseCategorySlug,
   resolveSkillBrowseCategorySlug,
   SKILL_CATEGORIES,
   type BrowseCategory,
 } from "../../lib/categories";
 import { formatCompactStat } from "../../lib/numberFormat";
 import { buildPublisherMeta } from "../../lib/og";
-import { buildPublisherProfileHref, isLegacyPublisherProfileHandle } from "../../lib/ownerRoute";
-import type { PackageListItem } from "../../lib/packageApi";
-import { packageNameFromPublisherPluginRoute } from "../../lib/pluginRoutes";
+import { buildPublisherProfileHref } from "../../lib/ownerRoute";
 import type {
   PublicPublisher,
   PublicPublisherCatalogDisplay,
@@ -81,8 +74,6 @@ import { useAuthStatus } from "../../lib/useAuthStatus";
 
 export const Route = createFileRoute("/user/$handle")({
   beforeLoad: ({ params }) => {
-    if (isLegacyPublisherProfileHandle(params.handle)) return;
-
     throw redirect({
       href: buildPublisherProfileHref(params.handle),
       replace: true,
@@ -985,23 +976,11 @@ export function getPublisherCatalogItemCategorySlugs(item: PublicPublisherCatalo
     })) {
       slugs.add(category.slug);
     }
-  } else {
-    for (const slug of resolveStoredPluginCategories({
-      categories: item.categories,
-      inferredCategories: item.inferredCategories,
-      displayName: item.displayName,
-      summary: item.summary ?? undefined,
-    })) {
-      slugs.add(slug);
-    }
-    for (const raw of item.categories ?? []) {
-      const resolved = resolvePluginBrowseCategorySlug(raw);
-      if (resolved) slugs.add(resolved);
-    }
   }
-  const isCategorySlug = item.kind === "skill" ? isSkillCategorySlug : isPluginCategorySlug;
-  for (const topicSlug of getCatalogTopicSlugs(item.topics)) {
-    if (isCategorySlug(topicSlug)) slugs.add(topicSlug);
+  if (item.kind === "skill") {
+    for (const topicSlug of getCatalogTopicSlugs(item.topics)) {
+      if (isSkillCategorySlug(topicSlug)) slugs.add(topicSlug);
+    }
   }
   return [...slugs];
 }
@@ -1010,19 +989,16 @@ export function publisherCatalogItemMatchesCategory(
   item: PublicPublisherCatalogItem,
   categorySlug: string,
 ): boolean {
-  const resolved =
-    item.kind === "skill"
-      ? resolveSkillBrowseCategorySlug(categorySlug)
-      : resolvePluginBrowseCategorySlug(categorySlug);
+  const resolved = resolveSkillBrowseCategorySlug(categorySlug);
   if (!resolved) return false;
   return getPublisherCatalogItemCategorySlugs(item).includes(resolved);
 }
 
 export function buildPublisherCatalogCategoryOptions(
   items: readonly PublicPublisherCatalogItem[],
-  kind: "skill" | "plugin",
+  _kind: "skill" | "plugin",
 ): BrowseCategory[] {
-  const source = kind === "plugin" ? PLUGIN_CATEGORIES : SKILL_CATEGORIES;
+  const source = SKILL_CATEGORIES;
   const presentSlugs = new Set(items.flatMap((item) => getPublisherCatalogItemCategorySlugs(item)));
   return source.filter((category) => presentSlugs.has(category.slug));
 }
@@ -1260,39 +1236,6 @@ function parseCatalogItemSlug(item: PublicPublisherCatalogItem) {
   return segments[segments.length - 1] ?? item._id;
 }
 
-export function parsePluginCatalogRoute(item: PublicPublisherCatalogItem): {
-  name: string;
-  ownerHandle?: string;
-} {
-  const segments = item.href.split("/").filter(Boolean);
-  const pluginsIndex = segments.indexOf("plugins");
-  if (pluginsIndex < 0) {
-    return { name: parseCatalogItemSlug(item) };
-  }
-
-  const pluginSegment = segments[pluginsIndex + 1];
-  if (!pluginSegment) {
-    return { name: parseCatalogItemSlug(item) };
-  }
-
-  if (pluginsIndex > 0) {
-    const ownerHandle = decodeURIComponent(segments[pluginsIndex - 1]);
-    const pluginName = decodeURIComponent(pluginSegment);
-    return {
-      ownerHandle,
-      name: packageNameFromPublisherPluginRoute(ownerHandle, pluginName) ?? pluginName,
-    };
-  }
-
-  if (pluginSegment.startsWith("@") && segments[pluginsIndex + 2]) {
-    const scope = decodeURIComponent(pluginSegment);
-    const pluginName = decodeURIComponent(segments[pluginsIndex + 2]);
-    return { name: `${scope}/${pluginName}` };
-  }
-
-  return { name: decodeURIComponent(pluginSegment) };
-}
-
 export function catalogItemToPublicSkill(item: PublicPublisherCatalogItem): PublicSkill {
   return {
     _id: item._id as Id<"skills">,
@@ -1322,36 +1265,7 @@ export function catalogItemToPublicSkill(item: PublicPublisherCatalogItem): Publ
   };
 }
 
-function catalogItemToPackageListItem(item: PublicPublisherCatalogItem): PackageListItem {
-  const route = parsePluginCatalogRoute(item);
-  return {
-    name: route.name,
-    ownerHandle: route.ownerHandle,
-    displayName: item.displayName,
-    family: "code-plugin",
-    channel: item.isOfficial ? "official" : "community",
-    isOfficial: item.isOfficial,
-    summary: item.summary,
-    icon: item.icon,
-    createdAt: item.updatedAt,
-    updatedAt: item.updatedAt,
-    categories: item.categories,
-    topics: item.topics,
-    stats: {
-      downloads: readPublicDownloadCount(item),
-      installs: item.installs ?? 0,
-      stars: item.stars,
-      versions: 0,
-    },
-  };
-}
-
 export function PublishedItemCard({ item }: { item: PublicPublisherCatalogItem }) {
-  if (item.kind === "plugin") {
-    const plugin = catalogItemToPackageListItem(item);
-    return <PluginListItem item={plugin} variant="list" href={item.href} />;
-  }
-
   const skill = catalogItemToPublicSkill(item);
   return <SkillListItem skill={skill} href={item.href} />;
 }

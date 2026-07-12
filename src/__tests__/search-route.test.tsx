@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const navigateMock = vi.fn();
 let searchMock: {
   q?: string;
-  type?: "all" | "skills" | "plugins" | "creators";
+  type?: "all" | "skills" | "creators";
 } = {};
 let loaderDataMock: unknown = null;
 const useUnifiedSearchMock = vi.fn();
@@ -29,10 +29,6 @@ vi.mock("../convex/client", () => ({
 
 vi.mock("../lib/useUnifiedSearch", () => ({
   useUnifiedSearch: (...args: unknown[]) => useUnifiedSearchMock(...args),
-}));
-
-vi.mock("../components/PluginListItem", () => ({
-  PluginListItem: ({ item }: { item: { name: string } }) => <div>{item.name}</div>,
 }));
 
 vi.mock("../components/PublisherListItem", () => ({
@@ -81,13 +77,10 @@ describe("search route", () => {
     useUnifiedSearchMock.mockReturnValue({
       results: [],
       skillResults: [],
-      pluginResults: [],
       creatorResults: [],
       skillCount: 0,
-      pluginCount: 0,
       creatorCount: 0,
       skillHasMore: false,
-      pluginHasMore: false,
       creatorHasMore: false,
       isSearching: false,
     });
@@ -99,7 +92,7 @@ describe("search route", () => {
     const rendered = render(<Component />);
 
     const input = screen.getByPlaceholderText(
-      "Search skills, plugins, and creators...",
+      "Search skills and creators...",
     ) as HTMLInputElement;
     expect(input.value).toBe("first");
 
@@ -110,7 +103,7 @@ describe("search route", () => {
     rendered.rerender(<Component />);
 
     expect(
-      (screen.getByPlaceholderText("Search skills, plugins, and creators...") as HTMLInputElement)
+      (screen.getByPlaceholderText("Search skills and creators...") as HTMLInputElement)
         .value,
     ).toBe("second");
   });
@@ -128,10 +121,8 @@ describe("search route", () => {
     useUnifiedSearchMock.mockReturnValue({
       results: [],
       skillResults: [],
-      pluginResults: [],
       creatorResults: [],
       skillCount: 0,
-      pluginCount: 0,
       creatorCount: 0,
       isSearching: true,
     });
@@ -148,13 +139,10 @@ describe("search route", () => {
     useUnifiedSearchMock.mockReturnValue({
       results: [],
       skillResults: [],
-      pluginResults: [{ type: "plugin", plugin: { name: "github-plugin" } }],
       creatorResults: [],
       skillCount: 0,
-      pluginCount: 3,
-      creatorCount: 0,
+      creatorCount: 3,
       skillHasMore: false,
-      pluginHasMore: false,
       creatorHasMore: false,
       isSearching: false,
     });
@@ -165,10 +153,8 @@ describe("search route", () => {
 
     expect(screen.getByRole("button", { name: "All" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Skills" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Plugins" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Creators" })).toBeTruthy();
     expect(screen.queryByText("0")).toBeNull();
-    expect(screen.queryByText("3")).toBeNull();
   });
 
   it("clears the active search query from the input", async () => {
@@ -205,13 +191,10 @@ describe("search route", () => {
     useUnifiedSearchMock.mockReturnValue({
       results: skills,
       skillResults: skills,
-      pluginResults: [],
       creatorResults: [],
       skillCount: 25,
-      pluginCount: 0,
       creatorCount: 0,
       skillHasMore: true,
-      pluginHasMore: false,
       creatorHasMore: false,
       isSearching: false,
     });
@@ -221,13 +204,13 @@ describe("search route", () => {
     render(<Component />);
 
     expect(useUnifiedSearchMock).toHaveBeenCalledWith("weather", "all", {
-      limits: { skills: 25, plugins: 25, creators: 25 },
+      limits: { skills: 10, plugins: 10, creators: 10 },
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Load more" }));
 
     expect(useUnifiedSearchMock).toHaveBeenCalledWith("weather", "all", {
-      limits: { skills: 50, plugins: 50, creators: 50 },
+      limits: { skills: 20, plugins: 20, creators: 20 },
     });
   });
 
@@ -249,7 +232,21 @@ describe("search route", () => {
           ownerHandle: "clawhub",
           score: 1,
         },
-        { type: "plugin", plugin: { name: "weather-plugin" } },
+        {
+          type: "creator",
+          creator: {
+            _id: "publishers:weather",
+            _creationTime: 1,
+            kind: "org",
+            handle: "weather",
+            displayName: "Weather Creator",
+            image: undefined,
+            bio: "Weather creator",
+            official: true,
+            stats: { skills: 0, packages: 0, installs: 0, downloads: 0, stars: 0 },
+            publishedItems: [],
+          },
+        },
       ],
       skillResults: [
         {
@@ -267,7 +264,6 @@ describe("search route", () => {
           score: 1,
         },
       ],
-      pluginResults: [{ type: "plugin", plugin: { name: "weather-plugin" } }],
       creatorResults: [
         {
           type: "creator",
@@ -279,7 +275,6 @@ describe("search route", () => {
             displayName: "Weather Creator",
             image: undefined,
             bio: "Weather creator",
-            linkedUserId: undefined,
             official: true,
             stats: { skills: 0, packages: 0, installs: 0, downloads: 0, stars: 0 },
             publishedItems: [],
@@ -287,10 +282,8 @@ describe("search route", () => {
         },
       ],
       skillCount: 1,
-      pluginCount: 1,
       creatorCount: 1,
       skillHasMore: false,
-      pluginHasMore: false,
       creatorHasMore: false,
       isSearching: false,
     });
@@ -300,10 +293,8 @@ describe("search route", () => {
     render(<Component />);
 
     expect(screen.getByRole("button", { name: "All" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Plugins" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Creators" })).toBeTruthy();
     expect(screen.getByText("weather")).toBeTruthy();
-    expect(screen.queryByText("weather-plugin")).toBeNull();
     expect(screen.queryByText("Weather Creator @weather")).toBeNull();
   });
 
@@ -327,13 +318,10 @@ describe("search route", () => {
     useUnifiedSearchMock.mockReturnValue({
       results: [skill],
       skillResults: [skill],
-      pluginResults: [],
       creatorResults: [],
       skillCount: 1,
-      pluginCount: 0,
       creatorCount: 0,
       skillHasMore: false,
-      pluginHasMore: false,
       creatorHasMore: false,
       isSearching: false,
     });
@@ -349,13 +337,10 @@ describe("search route", () => {
     useUnifiedSearchMock.mockReturnValue({
       results: [],
       skillResults: [],
-      pluginResults: [{ type: "plugin", plugin: { name: "github-plugin" } }],
       creatorResults: [],
       skillCount: 0,
-      pluginCount: 25,
       creatorCount: 0,
       skillHasMore: false,
-      pluginHasMore: true,
       creatorHasMore: false,
       isSearching: false,
     });
@@ -365,7 +350,6 @@ describe("search route", () => {
     render(<Component />);
 
     expect(screen.getByRole("button", { name: "All" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Plugins" })).toBeTruthy();
     expect(screen.queryByText("25+")).toBeNull();
   });
 
@@ -387,13 +371,10 @@ describe("search route", () => {
         score: 1,
       })),
       skillResults: [],
-      pluginResults: [],
       creatorResults: [],
       skillCount: 25,
-      pluginCount: 0,
       creatorCount: 0,
       skillHasMore: false,
-      pluginHasMore: false,
       creatorHasMore: false,
       isSearching: false,
     });
@@ -439,15 +420,44 @@ describe("search route", () => {
   it("offers all-types recovery when the active type is empty but another type matched", async () => {
     searchMock = { q: "weather", type: "skills" };
     useUnifiedSearchMock.mockReturnValue({
-      results: [{ type: "plugin", plugin: { name: "weather-plugin" } }],
+      results: [
+        {
+          type: "creator",
+          creator: {
+            _id: "publishers:weather",
+            _creationTime: 1,
+            kind: "org",
+            handle: "weather",
+            displayName: "Weather Creator",
+            image: undefined,
+            bio: "Weather creator",
+            official: true,
+            stats: { skills: 0, packages: 0, installs: 0, downloads: 0, stars: 0 },
+            publishedItems: [],
+          },
+        },
+      ],
       skillResults: [],
-      pluginResults: [{ type: "plugin", plugin: { name: "weather-plugin" } }],
-      creatorResults: [],
+      creatorResults: [
+        {
+          type: "creator",
+          creator: {
+            _id: "publishers:weather",
+            _creationTime: 1,
+            kind: "org",
+            handle: "weather",
+            displayName: "Weather Creator",
+            image: undefined,
+            bio: "Weather creator",
+            official: true,
+            stats: { skills: 0, packages: 0, installs: 0, downloads: 0, stars: 0 },
+            publishedItems: [],
+          },
+        },
+      ],
       skillCount: 0,
-      pluginCount: 1,
-      creatorCount: 0,
+      creatorCount: 1,
       skillHasMore: false,
-      pluginHasMore: false,
       creatorHasMore: false,
       isSearching: false,
     });
@@ -474,7 +484,7 @@ describe("search route", () => {
     render(<Component />);
 
     expect(useUnifiedSearchMock).toHaveBeenLastCalledWith("hello", "all", {
-      limits: { skills: 25, plugins: 25, creators: 25 },
+      limits: { skills: 10, plugins: 10, creators: 10 },
     });
   });
 
@@ -483,7 +493,7 @@ describe("search route", () => {
     loaderDataMock = {
       query: "japanese-reading-grader",
       activeType: "all",
-      limits: { skills: 25, plugins: 25, creators: 25 },
+      limits: { skills: 10, plugins: 10, creators: 10 },
       skillResults: [
         {
           type: "skill",
@@ -500,10 +510,8 @@ describe("search route", () => {
           score: 1,
         },
       ],
-      pluginResults: [],
       creatorResults: [],
       skillHasMore: false,
-      pluginHasMore: false,
       creatorHasMore: false,
     };
     const route = await loadRoute();
@@ -513,7 +521,7 @@ describe("search route", () => {
 
     expect(useUnifiedSearchMock).toHaveBeenLastCalledWith("japanese-reading-grader", "all", {
       initialData: loaderDataMock,
-      limits: { skills: 25, plugins: 25, creators: 25 },
+      limits: { skills: 10, plugins: 10, creators: 10 },
     });
   });
 
@@ -539,7 +547,6 @@ describe("search route", () => {
         },
       ],
       skillResults: [],
-      pluginResults: [],
       creatorResults: [
         {
           type: "creator",
@@ -559,10 +566,8 @@ describe("search route", () => {
         },
       ],
       skillCount: 0,
-      pluginCount: 0,
       creatorCount: 1,
       skillHasMore: false,
-      pluginHasMore: false,
       creatorHasMore: false,
       isSearching: false,
     });
@@ -588,8 +593,8 @@ describe("search route", () => {
     expect(screen.getByText("Weather Creator @weather")).toBeTruthy();
   });
 
-  it("does not render a warning-filter chip on the plugins tab", async () => {
-    searchMock = { q: "hello", type: "plugins" };
+  it("does not render a warning-filter chip on the creators tab", async () => {
+    searchMock = { q: "hello", type: "creators" };
     const route = await loadRoute();
     const Component = route.__config.component as ComponentType;
 

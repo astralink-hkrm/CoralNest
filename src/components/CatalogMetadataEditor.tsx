@@ -1,7 +1,6 @@
 import {
   CATALOG_CATEGORY_LIMIT,
   INTERNAL_UNCATEGORIZED_CATEGORY,
-  isPluginCategorySlug,
   isSkillCategorySlug,
 } from "clawhub-schema";
 import { useEffect, useState } from "react";
@@ -22,12 +21,11 @@ type CatalogMetadataEditorProps = {
 };
 
 function sanitizeInitialCategories(
-  kind: CatalogMetadataEditorProps["kind"],
+  _kind: CatalogMetadataEditorProps["kind"],
   categories: string[] | null | undefined,
 ): string[] {
-  const isCategorySlug = kind === "skill" ? isSkillCategorySlug : isPluginCategorySlug;
   const validCategories = [
-    ...new Set((categories ?? []).filter((category) => isCategorySlug(category))),
+    ...new Set((categories ?? []).filter((category) => isSkillCategorySlug(category))),
   ];
   const specificCategories = validCategories.filter(
     (category) => category !== INTERNAL_UNCATEGORIZED_CATEGORY,

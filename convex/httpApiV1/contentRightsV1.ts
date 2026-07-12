@@ -34,7 +34,7 @@ export async function proxyHermitContentRightsRequest(
   dependencies: ProxyDependencies,
 ) {
   if (!dependencies.serviceToken) {
-    return text("ClawHub-Hermit service token is not configured", 503);
+    return text("CoralNest-Hermit service token is not configured", 503);
   }
   const segments = getPathSegments(request, `${ApiRoutes.contentRights}/`);
   const caseId = segments[0]?.trim().toUpperCase() ?? "";
@@ -64,7 +64,7 @@ export async function proxyHermitContentRightsRequest(
     }
     return text("Not found", 404);
   } catch (error) {
-    console.error("ClawHub content rights Hermit proxy failed", error);
+    console.error("CoralNest content rights Hermit proxy failed", error);
     return text("Hermit content rights service unavailable", 502);
   }
 }

@@ -221,13 +221,6 @@ const publishers = defineTable({
   linkedUserId: v.optional(v.id("users")),
   trustedPublisher: v.optional(v.boolean()),
   publishedSkills: v.optional(v.number()),
-  publishedPackages: v.optional(v.number()),
-  totalInstalls: v.optional(v.number()),
-  totalDownloads: v.optional(v.number()),
-  totalStars: v.optional(v.number()),
-  skillTotalInstalls: v.optional(v.number()),
-  skillTotalDownloads: v.optional(v.number()),
-  skillTotalStars: v.optional(v.number()),
   deactivatedAt: v.optional(v.number()),
   deletedAt: v.optional(v.number()),
   createdAt: v.number(),
@@ -236,23 +229,7 @@ const publishers = defineTable({
   .index("by_handle", ["handle"])
   .index("by_linked_user", ["linkedUserId"])
   .index("by_kind_handle", ["kind", "handle"])
-  .index("by_active_kind_handle", ["deletedAt", "deactivatedAt", "kind", "handle"])
-  .index("by_active_total_downloads", ["deletedAt", "deactivatedAt", "totalDownloads", "updatedAt"])
-  .index("by_active_kind_total_downloads", [
-    "deletedAt",
-    "deactivatedAt",
-    "kind",
-    "totalDownloads",
-    "updatedAt",
-  ])
-  .index("by_active_total_installs", ["deletedAt", "deactivatedAt", "totalInstalls", "updatedAt"])
-  .index("by_active_kind_total_installs", [
-    "deletedAt",
-    "deactivatedAt",
-    "kind",
-    "totalInstalls",
-    "updatedAt",
-  ]);
+  .index("by_active_kind_handle", ["deletedAt", "deactivatedAt", "kind", "handle"]);
 
 const publisherMembers = defineTable({
   publisherId: v.id("publishers"),
@@ -492,30 +469,6 @@ const githubSkillScans = defineTable({
   .index("by_skill_and_content_hash", ["skillId", "contentHash"])
   .index("by_github_source_and_updated_at", ["githubSourceId", "updatedAt"]);
 
-const packageFamilyValidator = v.union(
-  v.literal("skill"),
-  v.literal("code-plugin"),
-  v.literal("bundle-plugin"),
-);
-
-const packageChannelValidator = v.union(
-  v.literal("official"),
-  v.literal("community"),
-  v.literal("private"),
-);
-
-const packageVerificationTierValidator = v.union(
-  v.literal("structural"),
-  v.literal("source-linked"),
-  v.literal("provenance-verified"),
-  v.literal("rebuild-verified"),
-);
-
-const packageVerificationScopeValidator = v.union(
-  v.literal("artifact-only"),
-  v.literal("dependency-graph-aware"),
-);
-
 const publisherAbuseDryRunLabelValidator = v.union(
   v.literal("pass"),
   v.literal("review"),
@@ -550,139 +503,8 @@ const publisherAbuseModelConfigValidator = v.object({
   potentialBanCandidateZThreshold: v.number(),
 });
 
-const packageStatsValidator = v.object({
-  downloads: v.number(),
-  installs: v.number(),
-  stars: v.number(),
-  versions: v.number(),
-});
-
-const packageArtifactSummaryValidator = v.optional(
-  v.object({
-    kind: v.union(v.literal("legacy-zip"), v.literal("npm-pack")),
-    sha256: v.optional(v.string()),
-    size: v.optional(v.number()),
-    format: v.optional(v.string()),
-    npmIntegrity: v.optional(v.string()),
-    npmShasum: v.optional(v.string()),
-    npmTarballName: v.optional(v.string()),
-    npmUnpackedSize: v.optional(v.number()),
-    npmFileCount: v.optional(v.number()),
-  }),
-);
-
-const packageCompatibilityValidator = v.optional(
-  v.object({
-    pluginApiRange: v.optional(v.string()),
-    builtWithOpenClawVersion: v.optional(v.string()),
-    pluginSdkVersion: v.optional(v.string()),
-    minGatewayVersion: v.optional(v.string()),
-  }),
-);
-
-const pluginManifestSummaryValidator = v.object({
-  schemaVersion: v.literal(1),
-  compatibility: v.optional(
-    v.object({
-      pluginApiRange: v.optional(v.string()),
-      builtWithOpenClawVersion: v.optional(v.string()),
-      pluginSdkVersion: v.optional(v.string()),
-      minGatewayVersion: v.optional(v.string()),
-    }),
-  ),
-  manifestIdentity: v.optional(
-    v.object({
-      name: v.optional(v.string()),
-      description: v.optional(v.string()),
-      version: v.optional(v.string()),
-      family: v.optional(v.string()),
-    }),
-  ),
-  configFields: v.array(
-    v.object({
-      name: v.string(),
-      description: v.optional(v.string()),
-      required: v.boolean(),
-      sensitive: v.boolean(),
-    }),
-  ),
-  mcpServers: v.array(
-    v.object({
-      name: v.string(),
-    }),
-  ),
-  bundledSkills: v.array(
-    v.object({
-      name: v.string(),
-      description: v.optional(v.string()),
-      rootPath: v.string(),
-      skillMdPath: v.string(),
-      sha256: v.string(),
-      size: v.number(),
-    }),
-  ),
-});
-
-const packageVerificationValidator = v.optional(
-  v.object({
-    tier: packageVerificationTierValidator,
-    scope: packageVerificationScopeValidator,
-    summary: v.optional(v.string()),
-    sourceRepo: v.optional(v.string()),
-    sourceCommit: v.optional(v.string()),
-    sourceTag: v.optional(v.string()),
-    sourcePath: v.optional(v.string()),
-    hasProvenance: v.optional(v.boolean()),
-    trustedOpenClawPlugin: v.optional(v.boolean()),
-    scanStatus: v.optional(
-      v.union(
-        v.literal("clean"),
-        v.literal("suspicious"),
-        v.literal("malicious"),
-        v.literal("pending"),
-        v.literal("not-run"),
-      ),
-    ),
-  }),
-);
-
-const packagePublishActorValidator = v.optional(
-  v.union(
-    v.object({
-      kind: v.literal("user"),
-      userId: v.id("users"),
-    }),
-    v.object({
-      kind: v.literal("github-actions"),
-      repository: v.string(),
-      workflow: v.string(),
-      runId: v.string(),
-      runAttempt: v.string(),
-      sha: v.string(),
-    }),
-  ),
-);
-
-const packageScanStatusValidator = v.optional(
-  v.union(
-    v.literal("clean"),
-    v.literal("suspicious"),
-    v.literal("malicious"),
-    v.literal("pending"),
-    v.literal("not-run"),
-  ),
-);
-
-const packageReleaseModerationOverrideValidator = v.object({
-  state: v.union(v.literal("approved"), v.literal("quarantined"), v.literal("revoked")),
-  reason: v.string(),
-  reviewerUserId: v.id("users"),
-  updatedAt: v.number(),
-});
-
 const securityScanTargetKindValidator = v.union(
   v.literal("skillVersion"),
-  v.literal("packageRelease"),
   v.literal("skillScanRequest"),
 );
 const securityScanJobStatusValidator = v.union(
@@ -710,7 +532,7 @@ const skillCardGenerationJobSourceValidator = v.union(
   v.literal("manual"),
 );
 
-const packageFilesValidator = v.array(
+const artifactFilesValidator = v.array(
   v.object({
     path: v.string(),
     size: v.number(),
@@ -1112,7 +934,7 @@ const publishAttemptCheckStateValidator = v.object({
 });
 
 const publishAttempts = defineTable({
-  kind: v.union(v.literal("skill"), v.literal("package")),
+  kind: v.literal("skill"),
   status: publishAttemptStatusValidator,
   userId: v.id("users"),
   ownerUserId: v.optional(v.id("users")),
@@ -1123,20 +945,18 @@ const publishAttempts = defineTable({
   version: v.string(),
   idempotencyKey: v.string(),
   artifactFingerprint: v.string(),
-  files: packageFilesValidator,
+  files: artifactFilesValidator,
   checks: v.object({
     trufflehog: publishAttemptCheckStateValidator,
     clawscan: publishAttemptCheckStateValidator,
   }),
   skillInsertArgs: v.optional(v.any()),
-  packageInsertArgs: v.optional(v.any()),
   followup: v.optional(
     v.object({
       skipWebhook: v.optional(v.boolean()),
       ownerHandle: v.optional(v.string()),
     }),
   ),
-  packageFollowup: v.optional(v.any()),
   checkClaimId: v.optional(v.string()),
   checkClaimedAt: v.optional(v.number()),
   checkClaimExpiresAt: v.optional(v.number()),
@@ -1185,16 +1005,6 @@ const skillBadges = defineTable({
 })
   .index("by_skill", ["skillId"])
   .index("by_skill_kind", ["skillId", "kind"])
-  .index("by_kind_at", ["kind", "at"]);
-
-const packageBadges = defineTable({
-  packageId: v.id("packages"),
-  kind: v.union(v.literal("highlighted")),
-  byUserId: v.id("users"),
-  at: v.number(),
-})
-  .index("by_package", ["packageId"])
-  .index("by_package_kind", ["packageId", "kind"])
   .index("by_kind_at", ["kind", "at"]);
 
 const skillEmbeddings = defineTable({
@@ -1497,236 +1307,10 @@ const skillTopicSearchDigest = defineTable({
     "updatedAt",
   ]);
 
-const packages = defineTable({
-  name: v.string(),
-  normalizedName: v.string(),
-  displayName: v.string(),
-  summary: v.optional(v.string()),
-  icon: v.optional(v.string()),
-  ownerUserId: v.id("users"),
-  ownerPublisherId: v.optional(v.id("publishers")),
-  family: packageFamilyValidator,
-  channel: packageChannelValidator,
-  isOfficial: v.boolean(),
-  runtimeId: v.optional(v.string()),
-  sourceRepo: v.optional(v.string()),
-  latestReleaseId: v.optional(v.id("packageReleases")),
-  latestVersionSummary: v.optional(
-    v.object({
-      version: v.string(),
-      createdAt: v.number(),
-      changelog: v.string(),
-      icon: v.optional(v.string()),
-      compatibility: packageCompatibilityValidator,
-      verification: packageVerificationValidator,
-      artifact: packageArtifactSummaryValidator,
-    }),
-  ),
-  tags: v.record(v.string(), v.id("packageReleases")),
-  categories: v.optional(v.array(v.string())),
-  topics: v.optional(v.array(v.string())),
-  inferredCategories: v.optional(v.array(v.string())),
-  inferredTopics: v.optional(v.array(v.string())),
-  inferredFromReleaseId: v.optional(v.id("packageReleases")),
-  inferredCategoryConfidence: v.optional(catalogClassificationConfidenceValidator),
-  inferredTopicConfidence: v.optional(catalogClassificationConfidenceValidator),
-  inferredClassifierVersion: v.optional(v.string()),
-  inferredTopicClassifierVersion: v.optional(v.string()),
-  inferredInputHash: v.optional(v.string()),
-  inferredTopicInputHash: v.optional(v.string()),
-  inferredAt: v.optional(v.number()),
-  compatibility: packageCompatibilityValidator,
-  verification: packageVerificationValidator,
-  scanStatus: packageScanStatusValidator,
-  stats: packageStatsValidator,
-  recommendedScore: v.optional(v.number()),
-  recommendedScoreVersion: v.optional(v.number()),
-  reportCount: v.optional(v.number()),
-  lastReportedAt: v.optional(v.number()),
-  softDeletedAt: v.optional(v.number()),
-  softDeletedReason: v.optional(
-    v.union(
-      v.literal("user.banned"),
-      v.literal("user.deactivated"),
-      v.literal("publisher.deleted"),
-    ),
-  ),
-  softDeletedBy: v.optional(v.id("users")),
-  softDeletedByRole: v.optional(
-    v.union(v.literal("admin"), v.literal("moderator"), v.literal("user")),
-  ),
-  createdAt: v.number(),
-  updatedAt: v.number(),
-})
-  .index("by_name", ["normalizedName"])
-  .index("by_owner", ["ownerUserId"])
-  .index("by_owner_publisher", ["ownerPublisherId"])
-  .index("by_owner_publisher_active_updated", ["ownerPublisherId", "softDeletedAt", "updatedAt"])
-  .index("by_owner_publisher_active_downloads", [
-    "ownerPublisherId",
-    "softDeletedAt",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_owner_publisher_active_installs", [
-    "ownerPublisherId",
-    "softDeletedAt",
-    "stats.installs",
-    "updatedAt",
-  ])
-  .index("by_family_updated", ["family", "updatedAt"])
-  .index("by_family_channel_updated", ["family", "channel", "updatedAt"])
-  .index("by_family_official_updated", ["family", "isOfficial", "updatedAt"])
-  .index("by_runtime_id", ["runtimeId"])
-  .index("by_active_updated", ["softDeletedAt", "updatedAt"])
-  .index("by_active_downloads", ["softDeletedAt", "stats.downloads", "updatedAt"])
-  .index("by_active_family_downloads", ["softDeletedAt", "family", "stats.downloads", "updatedAt"])
-  .index("by_active_family_official_downloads", [
-    "softDeletedAt",
-    "family",
-    "isOfficial",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_installs", ["softDeletedAt", "stats.installs", "updatedAt"])
-  .index("by_active_family_installs", ["softDeletedAt", "family", "stats.installs", "updatedAt"])
-  .index("by_active_family_official_installs", [
-    "softDeletedAt",
-    "family",
-    "isOfficial",
-    "stats.installs",
-    "updatedAt",
-  ])
-  .index("by_active_recommended_rank", [
-    "softDeletedAt",
-    "stats.stars",
-    "stats.downloads",
-    "stats.installs",
-    "updatedAt",
-  ])
-  .index("by_active_family_recommended_rank", [
-    "softDeletedAt",
-    "family",
-    "stats.stars",
-    "stats.downloads",
-    "stats.installs",
-    "updatedAt",
-  ])
-  .index("by_active_recommended_score", ["softDeletedAt", "recommendedScore", "updatedAt"])
-  .index("by_active_recommended_score_version", ["softDeletedAt", "recommendedScoreVersion"])
-  .index("by_active_family_recommended_score", [
-    "softDeletedAt",
-    "family",
-    "recommendedScore",
-    "updatedAt",
-  ])
-  .index("by_active_family_recommended_score_version", [
-    "softDeletedAt",
-    "family",
-    "recommendedScoreVersion",
-  ]);
-
-const packageReleases = defineTable({
-  packageId: v.id("packages"),
-  version: v.string(),
-  changelog: v.string(),
-  summary: v.optional(v.string()),
-  icon: v.optional(v.string()),
-  distTags: v.array(v.string()),
-  files: packageFilesValidator,
-  integritySha256: v.string(),
-  artifactKind: v.optional(v.union(v.literal("legacy-zip"), v.literal("npm-pack"))),
-  clawpackStorageId: v.optional(v.id("_storage")),
-  clawpackSha256: v.optional(v.string()),
-  clawpackSize: v.optional(v.number()),
-  clawpackFormat: v.optional(v.literal("tgz")),
-  npmIntegrity: v.optional(v.string()),
-  npmShasum: v.optional(v.string()),
-  npmTarballName: v.optional(v.string()),
-  npmUnpackedSize: v.optional(v.number()),
-  npmFileCount: v.optional(v.number()),
-  extractedPackageJson: v.optional(v.any()),
-  extractedPluginManifest: v.optional(v.any()),
-  normalizedBundleManifest: v.optional(v.any()),
-  pluginManifestSummary: v.optional(pluginManifestSummaryValidator),
-  compatibility: packageCompatibilityValidator,
-  runtimeId: v.optional(v.string()),
-  sourceRepo: v.optional(v.string()),
-  verification: packageVerificationValidator,
-  // Deprecated compatibility hash for exact /download ZIP bytes; use artifact.sha256 for installs.
-  sha256hash: v.optional(v.string()),
-  vtAnalysis: v.optional(vtAnalysisValidator),
-  skillSpectorAnalysis: v.optional(skillSpectorAnalysisValidator),
-  llmAnalysis: v.optional(
-    v.object({
-      status: v.string(),
-      verdict: v.optional(v.string()),
-      confidence: v.optional(v.string()),
-      summary: v.optional(v.string()),
-      dimensions: v.optional(
-        v.array(
-          v.object({
-            name: v.string(),
-            label: v.string(),
-            rating: v.string(),
-            detail: v.string(),
-          }),
-        ),
-      ),
-      guidance: v.optional(v.string()),
-      findings: v.optional(v.string()),
-      agenticRiskFindings: v.optional(v.array(llmAgenticRiskFindingValidator)),
-      riskSummary: v.optional(
-        v.object({
-          abnormal_behavior_control: llmRiskSummaryBucketValidator,
-          permission_boundary: llmRiskSummaryBucketValidator,
-          sensitive_data_protection: llmRiskSummaryBucketValidator,
-        }),
-      ),
-      model: v.optional(v.string()),
-      checkedAt: v.number(),
-    }),
-  ),
-  staticScan: v.optional(
-    v.object({
-      status: v.union(v.literal("clean"), v.literal("suspicious"), v.literal("malicious")),
-      reasonCodes: v.array(v.string()),
-      findings: v.array(
-        v.object({
-          code: v.string(),
-          severity: v.union(v.literal("info"), v.literal("warn"), v.literal("critical")),
-          file: v.string(),
-          line: v.number(),
-          message: v.string(),
-          evidence: v.string(),
-        }),
-      ),
-      summary: v.string(),
-      engineVersion: v.string(),
-      checkedAt: v.number(),
-    }),
-  ),
-  manualModeration: v.optional(packageReleaseModerationOverrideValidator),
-  source: v.optional(v.any()),
-  createdBy: v.id("users"),
-  publishActor: packagePublishActorValidator,
-  createdAt: v.number(),
-  softDeletedAt: v.optional(v.number()),
-  ownerDeletedAt: v.optional(v.number()),
-  ownerDeletedBy: v.optional(v.id("users")),
-})
-  .index("by_package", ["packageId"])
-  .index("by_package_active_created", ["packageId", "softDeletedAt", "createdAt"])
-  .index("by_active_created", ["softDeletedAt", "createdAt"])
-  .index("by_package_version", ["packageId", "version"])
-  .index("by_sha256hash", ["sha256hash"]);
-
 const catalogClassificationResults = defineTable({
-  targetKind: v.union(v.literal("skill"), v.literal("plugin")),
+  targetKind: v.literal("skill"),
   skillId: v.optional(v.id("skills")),
-  packageId: v.optional(v.id("packages")),
   skillVersionId: v.optional(v.id("skillVersions")),
-  packageReleaseId: v.optional(v.id("packageReleases")),
   categories: v.array(v.string()),
   topics: v.array(v.string()),
   categoryCandidates: v.array(catalogCategoryCandidateValidator),
@@ -1748,72 +1332,13 @@ const catalogClassificationResults = defineTable({
   appliedAt: v.optional(v.number()),
 })
   .index("by_skill", ["skillId"])
-  .index("by_package", ["packageId"])
   .index("by_apply_status", ["applyStatus", "classifiedAt"])
   .index("by_category_confidence", ["categoryConfidence", "classifiedAt"])
   .index("by_topic_confidence", ["topicConfidence", "classifiedAt"]);
 
-const packageInspectorWarnings = defineTable({
-  packageId: v.id("packages"),
-  releaseId: v.id("packageReleases"),
-  ownerUserId: v.id("users"),
-  ownerPublisherId: v.optional(v.id("publishers")),
-  packageName: v.string(),
-  version: v.string(),
-  findingKind: v.optional(v.union(v.literal("warning"), v.literal("error"))),
-  scanSource: v.optional(v.union(v.literal("publish"), v.literal("nightly"))),
-  inspectorVersion: v.optional(v.string()),
-  targetOpenClawVersion: v.optional(v.string()),
-  code: v.string(),
-  severity: v.optional(v.string()),
-  level: v.optional(v.string()),
-  issueClass: v.optional(v.string()),
-  compatStatus: v.optional(v.string()),
-  deprecated: v.optional(v.boolean()),
-  message: v.string(),
-  evidence: v.optional(v.array(v.string())),
-  authorRemediation: v.optional(
-    v.object({
-      summary: v.string(),
-      docsUrl: v.optional(v.string()),
-    }),
-  ),
-  fixture: v.optional(v.string()),
-  decision: v.optional(v.string()),
-  inspectorFindingId: v.optional(v.string()),
-  createdAt: v.number(),
-})
-  .index("by_package_created", ["packageId", "createdAt"])
-  .index("by_release", ["releaseId"])
-  .index("by_release_created", ["releaseId", "createdAt"])
-  .index("by_owner_user_created", ["ownerUserId", "createdAt"])
-  .index("by_owner_publisher_created", ["ownerPublisherId", "createdAt"]);
-
-const packageInspectorFindingNotifications = defineTable({
-  packageId: v.id("packages"),
-  releaseId: v.id("packageReleases"),
-  ownerUserId: v.id("users"),
-  ownerPublisherId: v.optional(v.id("publishers")),
-  packageName: v.string(),
-  version: v.string(),
-  email: v.string(),
-  findingCount: v.number(),
-  sentAt: v.number(),
-})
-  .index("by_release", ["releaseId"])
-  .index("by_owner_user_sent", ["ownerUserId", "sentAt"]);
-
-const packageInspectorScanCursors = defineTable({
-  name: v.string(),
-  cursor: v.optional(v.union(v.string(), v.null())),
-  leaseExpiresAt: v.optional(v.number()),
-  updatedAt: v.number(),
-}).index("by_name", ["name"]);
-
 const securityScanJobs = defineTable({
   targetKind: securityScanTargetKindValidator,
   skillVersionId: v.optional(v.id("skillVersions")),
-  packageReleaseId: v.optional(v.id("packageReleases")),
   skillScanRequestId: v.optional(v.id("skillScanRequests")),
   status: securityScanJobStatusValidator,
   source: securityScanJobSourceValidator,
@@ -1838,7 +1363,6 @@ const securityScanJobs = defineTable({
   .index("by_status_and_lease_expires_at", ["status", "leaseExpiresAt"])
   .index("by_status_malicious_signal_next_run_at", ["status", "hasMaliciousSignal", "nextRunAt"])
   .index("by_skill_version", ["skillVersionId"])
-  .index("by_package_release", ["packageReleaseId"])
   .index("by_skill_scan_request", ["skillScanRequestId"]);
 
 const securityScanDispatchState = defineTable({
@@ -1870,7 +1394,7 @@ const skillScanRequests = defineTable({
   skillId: v.optional(v.id("skills")),
   skillVersionId: v.optional(v.id("skillVersions")),
   githubSkillScanId: v.optional(v.id("githubSkillScans")),
-  files: packageFilesValidator,
+  files: artifactFilesValidator,
   fileChunkCount: v.optional(v.number()),
   fileManifestBytes: v.optional(v.number()),
   parsed: v.optional(
@@ -1902,7 +1426,7 @@ const skillScanRequests = defineTable({
 const skillScanRequestFileChunks = defineTable({
   skillScanRequestId: v.id("skillScanRequests"),
   chunkIndex: v.number(),
-  files: packageFilesValidator,
+  files: artifactFilesValidator,
   createdAt: v.number(),
 }).index("by_skill_scan_request_id_and_chunk_index", ["skillScanRequestId", "chunkIndex"]);
 
@@ -1928,469 +1452,6 @@ const skillCardGenerationJobs = defineTable({
   .index("by_skill", ["skillId"])
   .index("by_skill_version_status", ["skillVersionId", "status"])
   .index("by_skill_version", ["skillVersionId"]);
-
-const packageStatEvents = defineTable({
-  packageId: v.id("packages"),
-  kind: v.union(v.literal("download"), v.literal("install")),
-  occurredAt: v.number(),
-  processedAt: v.optional(v.number()),
-})
-  .index("by_unprocessed", ["processedAt"])
-  .index("by_package", ["packageId"]);
-
-const packageDailyStats = defineTable({
-  packageId: v.id("packages"),
-  day: v.number(),
-  downloads: v.number(),
-  installs: v.number(),
-  updatedAt: v.number(),
-})
-  .index("by_package_day", ["packageId", "day"])
-  .index("by_day", ["day"]);
-
-const packageLeaderboards = defineTable({
-  kind: v.string(),
-  generatedAt: v.number(),
-  rangeStartDay: v.number(),
-  rangeEndDay: v.number(),
-  items: v.array(
-    v.object({
-      packageId: v.id("packages"),
-      score: v.number(),
-      installs: v.number(),
-      downloads: v.number(),
-    }),
-  ),
-}).index("by_kind", ["kind", "generatedAt"]);
-
-const packageTrustedPublishers = defineTable({
-  packageId: v.id("packages"),
-  provider: v.literal("github-actions"),
-  repository: v.string(),
-  repositoryId: v.string(),
-  repositoryOwner: v.string(),
-  repositoryOwnerId: v.string(),
-  workflowFilename: v.string(),
-  environment: v.optional(v.string()),
-  createdByUserId: v.id("users"),
-  updatedByUserId: v.id("users"),
-  createdAt: v.number(),
-  updatedAt: v.number(),
-})
-  .index("by_package", ["packageId"])
-  .index("by_repository", ["repository", "workflowFilename"]);
-
-const packagePublishTokens = defineTable({
-  packageId: v.id("packages"),
-  version: v.string(),
-  prefix: v.string(),
-  tokenHash: v.string(),
-  provider: v.literal("github-actions"),
-  repository: v.string(),
-  repositoryId: v.string(),
-  repositoryOwner: v.string(),
-  repositoryOwnerId: v.string(),
-  workflowFilename: v.string(),
-  environment: v.optional(v.string()),
-  runId: v.string(),
-  runAttempt: v.string(),
-  sha: v.string(),
-  ref: v.string(),
-  refType: v.optional(v.string()),
-  actor: v.optional(v.string()),
-  actorId: v.optional(v.string()),
-  expiresAt: v.number(),
-  lastUsedAt: v.optional(v.number()),
-  revokedAt: v.optional(v.number()),
-  createdAt: v.number(),
-})
-  .index("by_hash", ["tokenHash"])
-  .index("by_package", ["packageId", "version", "createdAt"])
-  .index("by_package_revoked_created", ["packageId", "revokedAt", "createdAt"]);
-
-const packagePublishUploadTickets = defineTable({
-  kind: v.union(v.literal("user"), v.literal("github-actions")),
-  userId: v.optional(v.id("users")),
-  publishTokenId: v.optional(v.id("packagePublishTokens")),
-  createdAt: v.number(),
-  expiresAt: v.number(),
-  usedAt: v.optional(v.number()),
-  storageId: v.optional(v.id("_storage")),
-}).index("by_publish_token", ["publishTokenId"]);
-
-const packageSearchDigest = defineTable({
-  packageId: v.id("packages"),
-  name: v.string(),
-  normalizedName: v.string(),
-  displayName: v.string(),
-  family: packageFamilyValidator,
-  channel: packageChannelValidator,
-  isOfficial: v.boolean(),
-  ownerUserId: v.id("users"),
-  ownerPublisherId: v.optional(v.id("publishers")),
-  ownerHandle: v.optional(v.string()),
-  ownerKind: v.optional(v.union(v.literal("user"), v.literal("org"))),
-  summary: v.optional(v.string()),
-  icon: v.optional(v.string()),
-  latestVersion: v.optional(v.string()),
-  runtimeId: v.optional(v.string()),
-  categories: v.optional(v.array(v.string())),
-  topics: v.optional(v.array(v.string())),
-  pluginCategoryTags: v.optional(v.array(v.string())),
-  verificationTier: v.optional(packageVerificationTierValidator),
-  stats: v.optional(packageStatsValidator),
-  recommendedScore: v.optional(v.number()),
-  recommendedScoreVersion: v.optional(v.number()),
-  scanStatus: packageScanStatusValidator,
-  softDeletedAt: v.optional(v.number()),
-  createdAt: v.number(),
-  updatedAt: v.number(),
-})
-  .index("by_package", ["packageId"])
-  .index("by_active_updated", ["softDeletedAt", "updatedAt"])
-  .index("by_active_channel_updated", ["softDeletedAt", "channel", "updatedAt"])
-  .index("by_active_official_updated", ["softDeletedAt", "isOfficial", "updatedAt"])
-  .index("by_active_channel_official_updated", [
-    "softDeletedAt",
-    "channel",
-    "isOfficial",
-    "updatedAt",
-  ])
-  .index("by_active_family_updated", ["softDeletedAt", "family", "updatedAt"])
-  .index("by_active_family_channel_updated", ["softDeletedAt", "family", "channel", "updatedAt"])
-  .index("by_active_family_official_updated", [
-    "softDeletedAt",
-    "family",
-    "isOfficial",
-    "updatedAt",
-  ])
-  .index("by_active_normalized_name", ["softDeletedAt", "normalizedName", "updatedAt"])
-  .index("by_active_runtime_id", ["softDeletedAt", "runtimeId", "updatedAt"])
-  .index("by_active_owner_handle", ["softDeletedAt", "ownerHandle", "updatedAt"])
-  .index("by_active_name", ["softDeletedAt", "displayName"])
-  .searchIndex("search_by_display_name", {
-    searchField: "displayName",
-    filterFields: ["softDeletedAt"],
-  });
-
-const packageTopicSearchDigest = defineTable({
-  packageId: v.id("packages"),
-  name: v.string(),
-  normalizedName: v.string(),
-  displayName: v.string(),
-  family: packageFamilyValidator,
-  channel: packageChannelValidator,
-  isOfficial: v.boolean(),
-  ownerUserId: v.id("users"),
-  ownerPublisherId: v.optional(v.id("publishers")),
-  ownerHandle: v.optional(v.string()),
-  ownerKind: v.optional(v.union(v.literal("user"), v.literal("org"))),
-  summary: v.optional(v.string()),
-  icon: v.optional(v.string()),
-  latestVersion: v.optional(v.string()),
-  runtimeId: v.optional(v.string()),
-  categories: v.optional(v.array(v.string())),
-  topics: v.optional(v.array(v.string())),
-  pluginCategoryTags: v.optional(v.array(v.string())),
-  topic: v.string(),
-  verificationTier: v.optional(packageVerificationTierValidator),
-  stats: v.optional(packageStatsValidator),
-  recommendedScore: v.optional(v.number()),
-  recommendedScoreVersion: v.optional(v.number()),
-  scanStatus: packageScanStatusValidator,
-  softDeletedAt: v.optional(v.number()),
-  createdAt: v.number(),
-  updatedAt: v.number(),
-})
-  .index("by_package", ["packageId", "topic"])
-  .index("by_active_topic_updated", ["softDeletedAt", "topic", "updatedAt"])
-  .index("by_active_topic_downloads", ["softDeletedAt", "topic", "stats.downloads", "updatedAt"])
-  .index("by_active_topic_installs", ["softDeletedAt", "topic", "stats.installs", "updatedAt"])
-  .index("by_active_topic_recommended_score", [
-    "softDeletedAt",
-    "topic",
-    "recommendedScore",
-    "updatedAt",
-  ])
-  .index("by_active_official_topic_downloads", [
-    "softDeletedAt",
-    "isOfficial",
-    "topic",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_family_topic_downloads", [
-    "softDeletedAt",
-    "family",
-    "topic",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_channel_topic_downloads", [
-    "softDeletedAt",
-    "channel",
-    "topic",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_family_channel_topic_downloads", [
-    "softDeletedAt",
-    "family",
-    "channel",
-    "topic",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_family_official_topic_downloads", [
-    "softDeletedAt",
-    "family",
-    "isOfficial",
-    "topic",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_channel_official_topic_downloads", [
-    "softDeletedAt",
-    "channel",
-    "isOfficial",
-    "topic",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_family_channel_official_topic_downloads", [
-    "softDeletedAt",
-    "family",
-    "channel",
-    "isOfficial",
-    "topic",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_official_topic_installs", [
-    "softDeletedAt",
-    "isOfficial",
-    "topic",
-    "stats.installs",
-    "updatedAt",
-  ])
-  .index("by_active_official_topic_recommended_score", [
-    "softDeletedAt",
-    "isOfficial",
-    "topic",
-    "recommendedScore",
-    "updatedAt",
-  ])
-  .index("by_active_family_topic_updated", ["softDeletedAt", "family", "topic", "updatedAt"])
-  .index("by_active_channel_topic_updated", ["softDeletedAt", "channel", "topic", "updatedAt"])
-  .index("by_active_official_topic_updated", ["softDeletedAt", "isOfficial", "topic", "updatedAt"])
-  .index("by_active_family_channel_topic_updated", [
-    "softDeletedAt",
-    "family",
-    "channel",
-    "topic",
-    "updatedAt",
-  ])
-  .index("by_active_family_official_topic_updated", [
-    "softDeletedAt",
-    "family",
-    "isOfficial",
-    "topic",
-    "updatedAt",
-  ])
-  .index("by_active_channel_official_topic_updated", [
-    "softDeletedAt",
-    "channel",
-    "isOfficial",
-    "topic",
-    "updatedAt",
-  ]);
-
-const packagePluginCategorySearchDigest = defineTable({
-  packageId: v.id("packages"),
-  name: v.string(),
-  normalizedName: v.string(),
-  displayName: v.string(),
-  family: packageFamilyValidator,
-  channel: packageChannelValidator,
-  isOfficial: v.boolean(),
-  ownerUserId: v.id("users"),
-  ownerPublisherId: v.optional(v.id("publishers")),
-  ownerHandle: v.optional(v.string()),
-  ownerKind: v.optional(v.union(v.literal("user"), v.literal("org"))),
-  summary: v.optional(v.string()),
-  icon: v.optional(v.string()),
-  latestVersion: v.optional(v.string()),
-  runtimeId: v.optional(v.string()),
-  categories: v.optional(v.array(v.string())),
-  topics: v.optional(v.array(v.string())),
-  pluginCategoryTags: v.optional(v.array(v.string())),
-  pluginCategory: v.string(),
-  verificationTier: v.optional(packageVerificationTierValidator),
-  stats: v.optional(packageStatsValidator),
-  recommendedScore: v.optional(v.number()),
-  recommendedScoreVersion: v.optional(v.number()),
-  scanStatus: packageScanStatusValidator,
-  softDeletedAt: v.optional(v.number()),
-  createdAt: v.number(),
-  updatedAt: v.number(),
-})
-  .index("by_package", ["packageId", "pluginCategory"])
-  .index("by_active_category_updated", ["softDeletedAt", "pluginCategory", "updatedAt"])
-  .index("by_active_category_downloads", [
-    "softDeletedAt",
-    "pluginCategory",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_category_installs", [
-    "softDeletedAt",
-    "pluginCategory",
-    "stats.installs",
-    "updatedAt",
-  ])
-  .index("by_active_category_recommended_score", [
-    "softDeletedAt",
-    "pluginCategory",
-    "recommendedScore",
-    "updatedAt",
-  ])
-  .index("by_active_family_category_downloads", [
-    "softDeletedAt",
-    "family",
-    "pluginCategory",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_channel_category_downloads", [
-    "softDeletedAt",
-    "channel",
-    "pluginCategory",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_family_channel_category_downloads", [
-    "softDeletedAt",
-    "family",
-    "channel",
-    "pluginCategory",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_family_category_installs", [
-    "softDeletedAt",
-    "family",
-    "pluginCategory",
-    "stats.installs",
-    "updatedAt",
-  ])
-  .index("by_active_family_category_recommended_score", [
-    "softDeletedAt",
-    "family",
-    "pluginCategory",
-    "recommendedScore",
-    "updatedAt",
-  ])
-  .index("by_active_official_category_downloads", [
-    "softDeletedAt",
-    "isOfficial",
-    "pluginCategory",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_official_category_installs", [
-    "softDeletedAt",
-    "isOfficial",
-    "pluginCategory",
-    "stats.installs",
-    "updatedAt",
-  ])
-  .index("by_active_official_category_recommended_score", [
-    "softDeletedAt",
-    "isOfficial",
-    "pluginCategory",
-    "recommendedScore",
-    "updatedAt",
-  ])
-  .index("by_active_family_official_category_downloads", [
-    "softDeletedAt",
-    "family",
-    "isOfficial",
-    "pluginCategory",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_channel_official_category_downloads", [
-    "softDeletedAt",
-    "channel",
-    "isOfficial",
-    "pluginCategory",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_family_channel_official_category_downloads", [
-    "softDeletedAt",
-    "family",
-    "channel",
-    "isOfficial",
-    "pluginCategory",
-    "stats.downloads",
-    "updatedAt",
-  ])
-  .index("by_active_family_official_category_installs", [
-    "softDeletedAt",
-    "family",
-    "isOfficial",
-    "pluginCategory",
-    "stats.installs",
-    "updatedAt",
-  ])
-  .index("by_active_family_official_category_recommended_score", [
-    "softDeletedAt",
-    "family",
-    "isOfficial",
-    "pluginCategory",
-    "recommendedScore",
-    "updatedAt",
-  ])
-  .index("by_active_family_category_updated", [
-    "softDeletedAt",
-    "family",
-    "pluginCategory",
-    "updatedAt",
-  ])
-  .index("by_active_channel_category_updated", [
-    "softDeletedAt",
-    "channel",
-    "pluginCategory",
-    "updatedAt",
-  ])
-  .index("by_active_official_category_updated", [
-    "softDeletedAt",
-    "isOfficial",
-    "pluginCategory",
-    "updatedAt",
-  ])
-  .index("by_active_family_channel_category_updated", [
-    "softDeletedAt",
-    "family",
-    "channel",
-    "pluginCategory",
-    "updatedAt",
-  ])
-  .index("by_active_family_official_category_updated", [
-    "softDeletedAt",
-    "family",
-    "isOfficial",
-    "pluginCategory",
-    "updatedAt",
-  ])
-  .index("by_active_channel_official_category_updated", [
-    "softDeletedAt",
-    "channel",
-    "isOfficial",
-    "pluginCategory",
-    "updatedAt",
-  ]);
 
 const skillDailyStats = defineTable({
   skillId: v.id("skills"),
@@ -2427,7 +1488,6 @@ const skillStatBackfillState = defineTable({
 const globalStats = defineTable({
   key: v.string(),
   activeSkillsCount: v.number(),
-  activePluginsCount: v.optional(v.number()),
   updatedAt: v.number(),
 }).index("by_key", ["key"]);
 
@@ -2536,95 +1596,6 @@ const skillModerationEventLogs = defineTable({
   .index("by_appeal_createdAt", ["appealId", "createdAt"])
   .index("by_actor_createdAt", ["actorUserId", "createdAt"]);
 
-const packageReports = defineTable({
-  packageId: v.id("packages"),
-  releaseId: v.optional(v.id("packageReleases")),
-  version: v.optional(v.string()),
-  userId: v.id("users"),
-  reason: v.optional(v.string()),
-  status: v.union(
-    v.literal("open"),
-    v.literal("confirmed"),
-    v.literal("dismissed"),
-    v.literal("triaged"),
-  ),
-  triagedAt: v.optional(v.number()),
-  triagedBy: v.optional(v.id("users")),
-  triageNote: v.optional(v.string()),
-  actionTaken: v.optional(v.union(v.literal("none"), v.literal("quarantine"), v.literal("revoke"))),
-  createdAt: v.number(),
-})
-  .index("by_package", ["packageId"])
-  .index("by_package_createdAt", ["packageId", "createdAt"])
-  .index("by_release", ["releaseId"])
-  .index("by_createdAt", ["createdAt"])
-  .index("by_status_createdAt", ["status", "createdAt"])
-  .index("by_user", ["userId"])
-  .index("by_package_user", ["packageId", "userId"]);
-
-const packageAppeals = defineTable({
-  packageId: v.id("packages"),
-  releaseId: v.id("packageReleases"),
-  version: v.string(),
-  userId: v.id("users"),
-  message: v.string(),
-  status: v.union(v.literal("open"), v.literal("accepted"), v.literal("rejected")),
-  resolvedAt: v.optional(v.number()),
-  resolvedBy: v.optional(v.id("users")),
-  resolutionNote: v.optional(v.string()),
-  actionTaken: v.optional(v.union(v.literal("none"), v.literal("approve"))),
-  createdAt: v.number(),
-})
-  .index("by_package", ["packageId"])
-  .index("by_release_status_createdAt", ["releaseId", "status", "createdAt"])
-  .index("by_createdAt", ["createdAt"])
-  .index("by_status_createdAt", ["status", "createdAt"])
-  .index("by_user_createdAt", ["userId", "createdAt"]);
-
-const packageModerationEventLogs = defineTable({
-  kind: v.union(v.literal("report"), v.literal("appeal")),
-  reportId: v.optional(v.id("packageReports")),
-  appealId: v.optional(v.id("packageAppeals")),
-  actorUserId: v.id("users"),
-  action: v.string(),
-  metadata: v.optional(v.any()),
-  createdAt: v.number(),
-})
-  .index("by_report_createdAt", ["reportId", "createdAt"])
-  .index("by_appeal_createdAt", ["appealId", "createdAt"])
-  .index("by_actor_createdAt", ["actorUserId", "createdAt"]);
-
-const officialPluginMigrations = defineTable({
-  bundledPluginId: v.string(),
-  packageName: v.string(),
-  packageId: v.optional(v.id("packages")),
-  owner: v.optional(v.string()),
-  sourceRepo: v.optional(v.string()),
-  sourcePath: v.optional(v.string()),
-  sourceCommit: v.optional(v.string()),
-  phase: v.union(
-    v.literal("planned"),
-    v.literal("published"),
-    v.literal("clawpack-ready"),
-    v.literal("legacy-zip-only"),
-    v.literal("metadata-ready"),
-    v.literal("blocked"),
-    v.literal("ready-for-openclaw"),
-  ),
-  blockers: v.array(v.string()),
-  hostTargetsComplete: v.boolean(),
-  scanClean: v.boolean(),
-  moderationApproved: v.boolean(),
-  runtimeBundlesReady: v.boolean(),
-  notes: v.optional(v.string()),
-  createdAt: v.number(),
-  updatedAt: v.number(),
-})
-  .index("by_bundled_plugin", ["bundledPluginId"])
-  .index("by_package_name", ["packageName"])
-  .index("by_phase_updatedAt", ["phase", "updatedAt"])
-  .index("by_updatedAt", ["updatedAt"]);
-
 const catalogFeedPublications = defineTable({
   feedId: v.string(),
   sequence: v.number(),
@@ -2650,9 +1621,6 @@ const promotionStatusValidator = v.union(
   v.literal("ended"),
 );
 
-// Declarative activation payload consumed by the OpenClaw CLI. The CLI
-// validates authChoiceId/pluginNames against its local provider catalog and
-// never executes anything from these records.
 const promotionModelValidator = v.object({
   modelRef: v.string(),
   alias: v.optional(v.string()),
@@ -2667,9 +1635,6 @@ const promotions = defineTable({
   status: promotionStatusValidator,
   startsAt: v.number(),
   endsAt: v.number(),
-  provider: v.optional(v.string()),
-  authChoiceId: v.optional(v.string()),
-  pluginNames: v.optional(v.array(v.string())),
   models: v.array(promotionModelValidator),
   signupUrl: v.optional(v.string()),
   docsUrl: v.optional(v.string()),
@@ -3044,7 +2009,7 @@ const httpRateLimitKeys = defineTable({
   .index("by_name_and_key_and_expires_at", ["name", "key", "expiresAt"])
   .index("by_expires_at", ["expiresAt"]);
 
-const downloadMetricTargetKind = v.union(v.literal("skill"), v.literal("package"));
+const downloadMetricTargetKind = v.literal("skill");
 const downloadMetricIdentityKind = v.union(v.literal("user"), v.literal("ip"));
 
 const downloadMetricDedupes = defineTable({
@@ -3058,25 +2023,6 @@ const downloadMetricDedupes = defineTable({
   .index("by_target_identity_day", [
     "targetKind",
     "targetId",
-    "identityKind",
-    "identityHash",
-    "dayStart",
-  ])
-  .index("by_day", ["dayStart"]);
-
-const packageInstallMetricDedupes = defineTable({
-  targetKind: v.literal("package"),
-  targetId: v.id("packages"),
-  metricKind: v.literal("install"),
-  identityKind: downloadMetricIdentityKind,
-  identityHash: v.string(),
-  dayStart: v.number(),
-  createdAt: v.number(),
-})
-  .index("by_target_metric_identity_day", [
-    "targetKind",
-    "targetId",
-    "metricKind",
     "identityKind",
     "identityHash",
     "dayStart",
@@ -3129,9 +2075,8 @@ const registryArtifactBackupSyncState = defineTable({
 }).index("by_key", ["key"]);
 
 const registryArtifactBackupJobs = defineTable({
-  targetKind: v.union(v.literal("skillVersion"), v.literal("packageRelease")),
+  targetKind: v.literal("skillVersion"),
   skillVersionId: v.optional(v.id("skillVersions")),
-  packageReleaseId: v.optional(v.id("packageReleases")),
   status: v.union(
     v.literal("pending"),
     v.literal("running"),
@@ -3156,7 +2101,6 @@ const registryArtifactBackupJobs = defineTable({
   .index("by_status_leaseExpiresAt", ["status", "leaseExpiresAt"])
   .index("by_status_attempts", ["status", "attempts"])
   .index("by_skill_version", ["skillVersionId"])
-  .index("by_package_release", ["packageReleaseId"])
   .index("by_updatedAt", ["updatedAt"]);
 
 const userSkillInstalls = defineTable({
@@ -3209,27 +2153,12 @@ export default defineSchema({
   githubSkillScans,
   skills,
   skillSlugAliases,
-  packages,
-  packageReleases,
   catalogClassificationResults,
-  packageInspectorWarnings,
-  packageInspectorFindingNotifications,
-  packageInspectorScanCursors,
   securityScanJobs,
   securityScanDispatchState,
   skillScanRequests,
   skillScanRequestFileChunks,
   skillCardGenerationJobs,
-  packageStatEvents,
-  packageDailyStats,
-  packageLeaderboards,
-  packageTrustedPublishers,
-  packagePublishTokens,
-  packagePublishUploadTickets,
-  packageBadges,
-  packageSearchDigest,
-  packageTopicSearchDigest,
-  packagePluginCategorySearchDigest,
   skillVersions,
   publishAttempts,
   skillVersionFingerprints,
@@ -3249,10 +2178,6 @@ export default defineSchema({
   skillReports,
   skillAppeals,
   skillModerationEventLogs,
-  packageReports,
-  packageAppeals,
-  packageModerationEventLogs,
-  officialPluginMigrations,
   catalogFeedPublications,
   stars,
   promotions,
@@ -3269,7 +2194,6 @@ export default defineSchema({
   cliDeviceCodes,
   httpRateLimitKeys,
   downloadMetricDedupes,
-  packageInstallMetricDedupes,
   installTelemetryDedupes,
   reservedSlugs,
   reservedHandles,

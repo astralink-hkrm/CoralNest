@@ -1,30 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import { ChevronsUpDown, Loader2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../../convex/_generated/api";
 import type { Doc } from "../../convex/_generated/dataModel";
-import { collectAttentionItems } from "../components/dashboard/dashboardAttention";
-import {
-  filterByAttention,
-  filterByKind,
-  mergeDashboardItems,
-  searchDashboardItems,
-  sortDashboardItems,
-} from "../components/dashboard/dashboardCatalog";
-import { DashboardCatalogView } from "../components/dashboard/DashboardCatalogView";
-import { downloadMetricQuerySelection } from "../components/dashboard/dashboardDownloadMetrics";
-import { DashboardDownloadsInsights } from "../components/dashboard/DashboardDownloadsInsights";
 import { DashboardHeader } from "../components/dashboard/DashboardHeader";
-import { DashboardImportBanner } from "../components/dashboard/DashboardImportBanner";
 import { DashboardInventorySection } from "../components/dashboard/DashboardInventorySection";
-import { DashboardNeedsAttention } from "../components/dashboard/DashboardNeedsAttention";
 import { DashboardPublisherSelect } from "../components/dashboard/DashboardPublisherSelect";
 import { DashboardToolbar } from "../components/dashboard/DashboardToolbar";
 import { DashboardWelcome } from "../components/dashboard/DashboardWelcome";
 import type {
   DashboardKindFilter,
-  DashboardPackage,
   DashboardPublisherEntry,
   DashboardSkill,
   DashboardSortKey,
@@ -34,7 +20,6 @@ import { SignInPrompt } from "../components/SignInPrompt";
 import { DashboardSkeleton } from "../components/skeletons/DashboardSkeleton";
 import { Button } from "../components/ui/button";
 import { TooltipProvider } from "../components/ui/tooltip";
-import { getActivityTrendEndDay } from "../lib/activityTrend";
 import { addSearchParams } from "../lib/addRoutes";
 import {
   dashboardSearchParams,
@@ -43,15 +28,8 @@ import {
 } from "../lib/dashboardSearch";
 import { useAuthStatus } from "../lib/useAuthStatus";
 
-/** Matches `packages.list` server cap; plugins are not paginated on the dashboard yet. */
-const DASHBOARD_PACKAGES_LIMIT = 100;
 const DASHBOARD_LOAD_TIMEOUT_MS = 20_000;
 const DASHBOARD_VIEW_STORAGE_KEY = "clawhub.dashboard.view";
-const DEFAULT_SORT_DIR = {
-  name: "asc",
-  downloads: "desc",
-  updated: "desc",
-} as const;
 
 export const Route = createFileRoute("/dashboard")({
   validateSearch: (search) => parseDashboardSearch(search),
@@ -91,7 +69,6 @@ export function Dashboard() {
     : null;
   const selectedPublisher = selectedPublisherFromState ?? defaultPublisher ?? null;
   const activePublisherId = selectedPublisher?.publisher?._id ?? "";
-  const canManage = selectedPublisher?.role !== "publisher";
 
   const skillsQueryArgs =
     publishers === undefined || !activePublisherId
@@ -105,30 +82,8 @@ export function Dashboard() {
     initialNumItems: 50,
   });
   const mySkills = paginatedSkills as DashboardSkill[] | undefined;
-  const myPackages = useQuery(
-    api.packages.list,
-    activePublisherId
-      ? {
-          ownerPublisherId: activePublisherId as Doc<"publishers">["_id"],
-          limit: DASHBOARD_PACKAGES_LIMIT,
-        }
-      : me?._id
-        ? { ownerUserId: me._id, limit: DASHBOARD_PACKAGES_LIMIT }
-        : "skip",
-  ) as DashboardPackage[] | undefined;
-  const downloadMetrics = useQuery(
-    api.dashboard.getDownloadMetrics,
-    activePublisherId
-      ? {
-          publisherId: activePublisherId as Doc<"publishers">["_id"],
-          endDay: getActivityTrendEndDay(),
-          selection: downloadMetricQuerySelection(search.insight),
-        }
-      : "skip",
-  );
 
   const skills = mySkills ?? [];
-  const packages = myPackages ?? [];
   const ownerHandle =
     selectedPublisher?.publisher?.handle ??
     me?.handle ??
@@ -136,38 +91,14 @@ export function Dashboard() {
     me?.displayName ??
     me?._id ??
     "publisher";
-  const attentionItems = useMemo(
-    () => collectAttentionItems(skills, packages, ownerHandle),
-    [skills, packages, ownerHandle],
-  );
-  const catalogItems = useMemo(() => {
-    const merged = mergeDashboardItems(skills, packages);
-    const byKind = filterByKind(merged, kindFilter);
-    const afterAttention =
-      kindFilter === "attention" ? filterByAttention(byKind, attentionItems) : byKind;
-    const bySearch = searchDashboardItems(afterAttention, query);
-    const sorted = sortDashboardItems(bySearch, sort, sort ? DEFAULT_SORT_DIR[sort] : undefined);
-    return sorted;
-  }, [skills, packages, kindFilter, query, sort, attentionItems]);
 
   const skillsQuerySkipped = skillsQueryArgs === "skip";
-  const packagesQuerySkipped = !activePublisherId && !me?._id;
-  const isLoading =
-    (!skillsQuerySkipped && skillsStatus === "LoadingFirstPage") ||
-    (!packagesQuerySkipped && myPackages === undefined);
+  const isLoading = !skillsQuerySkipped && skillsStatus === "LoadingFirstPage";
   const resolvedPublishers = publishers ?? [];
-  const isDashboardEmpty = !isLoading && skills.length === 0 && packages.length === 0;
+  const isDashboardEmpty = !isLoading && skills.length === 0;
   const hasQuery = query.trim().length > 0;
   const showLoadMore =
-    kindFilter !== "plugin" &&
-    kindFilter !== "attention" &&
-    skills.length > 0 &&
-    skillsStatus === "CanLoadMore";
-  const showAttentionStrip = kindFilter !== "attention" && attentionItems.length > 0;
-  const skillDownloadsTotal = skills.reduce((sum, skill) => sum + (skill.stats?.downloads ?? 0), 0);
-  const pluginDownloadsTotal = packages.reduce((sum, pkg) => sum + (pkg.stats.downloads ?? 0), 0);
-  const showDownloadInsights =
-    skillDownloadsTotal + pluginDownloadsTotal > 0 && downloadMetrics !== undefined;
+    kindFilter !== "attention" && skills.length > 0 && skillsStatus === "CanLoadMore";
 
   useEffect(() => {
     if (!search.view) {
@@ -241,12 +172,8 @@ export function Dashboard() {
 
         <div className="dashboard-workspace">
           <div className="dashboard-workspace-main">
-            <DashboardImportBanner ownerHandle={ownerHandle} />
-
-            {showAttentionStrip ? <DashboardNeedsAttention items={attentionItems} /> : null}
-
             <DashboardInventorySection
-              count={catalogItems.length}
+              count={skills.length}
               toolbar={
                 <DashboardToolbar
                   kind={kindFilter}
@@ -263,14 +190,8 @@ export function Dashboard() {
                 />
               }
             >
-              {catalogItems.length > 0 ? (
+              {skills.length > 0 ? (
                 <>
-                  <DashboardCatalogView
-                    items={catalogItems}
-                    view={view}
-                    ownerHandle={ownerHandle}
-                    canManage={canManage}
-                  />
                   {showLoadMore ? (
                     <div className="dashboard-footer-row">
                       <Button
@@ -286,46 +207,20 @@ export function Dashboard() {
                   {skillsStatus === "LoadingMore" ? (
                     <div className="dashboard-footer-row flex items-center justify-center gap-2 text-sm text-muted-foreground">
                       <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                      <span>Loading more…</span>
+                      <span>Loading more&hellip;</span>
                     </div>
                   ) : null}
                 </>
               ) : (
                 <CatalogEmpty
                   hasQuery={hasQuery}
-                  kind={kindFilter}
                   query={query}
                   ownerHandle={ownerHandle}
-                  attentionCount={attentionItems.length}
                 />
               )}
             </DashboardInventorySection>
-
-            {showDownloadInsights && downloadMetrics ? (
-              <div className="dashboard-downloads-mobile-slot">
-                <DashboardDownloadsInsights
-                  skills={skills}
-                  packages={packages}
-                  metrics={downloadMetrics}
-                  insight={search.insight}
-                  onInsightChange={(insight) => patchSearch({ insight })}
-                />
-              </div>
-            ) : null}
           </div>
         </div>
-
-        {showDownloadInsights && downloadMetrics ? (
-          <div className="dashboard-downloads-desktop-slot">
-            <DashboardDownloadsInsights
-              skills={skills}
-              packages={packages}
-              metrics={downloadMetrics}
-              insight={search.insight}
-              onInsightChange={(insight) => patchSearch({ insight })}
-            />
-          </div>
-        ) : null}
       </main>
     </TooltipProvider>
   );
@@ -345,66 +240,35 @@ function DashboardLoadError({ onRetry }: { onRetry: () => void }) {
 
 function CatalogEmpty({
   hasQuery,
-  kind,
   query,
   ownerHandle,
-  attentionCount,
 }: {
   hasQuery: boolean;
-  kind: DashboardKindFilter;
   query: string;
   ownerHandle: string;
-  attentionCount: number;
 }) {
   if (hasQuery) {
     return (
       <div className="empty-state">
-        <p className="empty-state-title">No matches for “{query.trim()}”</p>
+        <p className="empty-state-title">No matches for &ldquo;{query.trim()}&rdquo;</p>
         <p className="empty-state-body">Try a different name, or clear the search.</p>
       </div>
     );
   }
 
-  if (kind === "attention") {
-    return (
-      <div className="empty-state">
-        <p className="empty-state-title">
-          {attentionCount === 0 ? "Nothing needs attention" : "No attention items match"}
-        </p>
-        <p className="empty-state-body">
-          {attentionCount === 0
-            ? "Skills and plugins with security, visibility, or validation issues appear here."
-            : "Clear filters or switch tabs to see the full catalog."}
-        </p>
-        {attentionCount === 0 ? (
-          <Button asChild size="sm" className="mt-4" variant="outline">
-            <Link to="/dashboard" search={dashboardSearchParams({ kind: "all" })}>
-              View all items
-            </Link>
-          </Button>
-        ) : null}
-      </div>
-    );
-  }
-
-  const isPlugin = kind === "plugin";
   return (
     <div className="empty-state">
-      <p className="empty-state-title">{isPlugin ? "No plugins yet" : "No skills yet"}</p>
-      <p className="empty-state-body">
-        {isPlugin
-          ? "Publish your first plugin release to validate and distribute it."
-          : "Publish your first skill to share it with the community."}
-      </p>
+      <p className="empty-state-title">No skills yet</p>
+      <p className="empty-state-body">Publish your first skill to share it with the community.</p>
       <Button asChild size="sm" className="mt-4">
         <Link
           to="/add"
           search={addSearchParams({
-            kind: isPlugin ? "plugin" : "skill",
+            kind: "skill",
             ownerHandle,
           })}
         >
-          {isPlugin ? "Add plugin" : "Add skill"}
+          Add skill
         </Link>
       </Button>
     </div>

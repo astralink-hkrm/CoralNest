@@ -19,7 +19,7 @@ function makeFeed(overrides: Partial<CatalogFeed> = {}): CatalogFeed {
     expiresAt: "2026-06-30T00:00:00.000Z",
     entries: [
       {
-        type: "plugin",
+        type: "skill",
         id: "zeta",
         title: "Zeta",
         version: "1.0.0",
@@ -37,7 +37,7 @@ function makeFeed(overrides: Partial<CatalogFeed> = {}): CatalogFeed {
         },
       },
       {
-        type: "plugin",
+        type: "skill",
         id: "alpha",
         title: "Alpha",
         version: "1.0.0",

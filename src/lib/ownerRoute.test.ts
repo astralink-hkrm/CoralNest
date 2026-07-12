@@ -7,8 +7,8 @@ import {
 } from "./ownerRoute";
 
 describe("owner route segments", () => {
-  it("uses the legacy profile route for official alias collisions", () => {
-    expect(buildPublisherProfileHref("tencent")).toBe("/user/tencent");
+  it("builds publisher profile href", () => {
+    expect(buildPublisherProfileHref("tencent")).toBe("/tencent");
     expect(buildPublisherProfileHref("steipete")).toBe("/steipete");
   });
 

@@ -1,10 +1,8 @@
-# Contributing to ClawHub
+# Contributing to CoralNest
 
-Welcome! ClawHub is the public skill registry for [OpenClaw](https://github.com/openclaw/openclaw). We appreciate bug fixes, documentation improvements, and feature contributions.
+Welcome! CoralNest is a public skill registry for agents. We appreciate bug fixes, documentation improvements, and feature contributions.
 
-- **Questions?** Ask in [#clawhub on Discord](https://discord.gg/clawd).
 - **Bug fixes** — PRs are welcome.
-- **New features or architectural changes** — please start with a Discord conversation in #clawhub first so we can align on scope.
 
 ## Local Development Setup
 
@@ -231,8 +229,7 @@ Run the narrowest meaningful check while iterating, then run the matching CI ali
 ### Crabbox remote checks
 
 Maintainers can run the same checks in a Crabbox lease instead of spending local
-CPU. ClawHub uses Crabbox as the agent-facing command surface; the Testbox
-workflow is only the backend for the default Blacksmith provider.
+CPU.
 
 ```bash
 bun run crabbox:warmup -- --provider blacksmith-testbox
@@ -267,7 +264,7 @@ AI-assisted contributions are welcome. When submitting AI-generated or AI-assist
 
 ## Security Reporting
 
-Report vulnerabilities to **security@openclaw.ai** with:
+Report vulnerabilities by opening a GitHub issue or contacting the maintainers with:
 
 - Severity assessment
 - Technical reproduction steps
@@ -278,12 +275,8 @@ See [`docs/security.md`](docs/security.md) for moderation and upload gating deta
 ## Reading Order for New Contributors
 
 1. This file (local setup)
-2. [`docs/clawhub.md`](docs/clawhub.md) — public registry overview
-3. [`docs/quickstart.md`](docs/quickstart.md) — end-to-end workflows
-4. [`docs/how-it-works.md`](docs/how-it-works.md) — registry behavior and system overview
-5. [`docs/skill-format.md`](docs/skill-format.md) — skill structure
-6. [`docs/cli.md`](docs/cli.md) — CLI reference
-7. [`docs/http-api.md`](docs/http-api.md) — HTTP endpoints
-8. [`docs/auth.md`](docs/auth.md) — authentication
-9. [`specs/deploy.md`](specs/deploy.md) — deployment
-10. [`docs/troubleshooting.md`](docs/troubleshooting.md) — common issues
+2. [`docs/quickstart.md`](docs/quickstart.md) — end-to-end workflows
+3. [`docs/how-it-works.md`](docs/how-it-works.md) — registry behavior and system overview
+4. [`docs/skill-format.md`](docs/skill-format.md) — skill structure
+5. [`docs/http-api.md`](docs/http-api.md) — HTTP endpoints
+6. [`docs/auth.md`](docs/auth.md) — authentication

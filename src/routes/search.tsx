@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Plus, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api } from "../../convex/_generated/api";
-import { PluginListItem } from "../components/PluginListItem";
 import { PublisherListItem } from "../components/PublisherListItem";
 import { BrowseResultsSkeleton } from "../components/skeletons/BrowseResultsSkeleton";
 import { SkillListItem } from "../components/SkillListItem";
@@ -14,74 +13,55 @@ import {
   type UnifiedSearchInitialData,
   type UnifiedSearchType,
   type UnifiedCreatorResult,
-  type UnifiedPluginResult,
   type UnifiedSkillResult,
 } from "../lib/useUnifiedSearch";
 
-const SEARCH_PAGE_SIZE = 25;
-
-type SearchState = {
-  q?: string;
-  type?: UnifiedSearchType;
-};
+const SEARCH_PAGE_SIZE = 10;
 
 export const Route = createFileRoute("/search")({
-  validateSearch: (search: Record<string, unknown>): SearchState => ({
-    q: typeof search.q === "string" && search.q.trim() ? search.q : undefined,
-    type:
-      search.type === "skills" || search.type === "plugins" || search.type === "creators"
-        ? search.type
-        : undefined,
+  validateSearch: (search: Record<string, string | undefined>) => ({
+    q: search.q ?? "",
+    type: (search.type as UnifiedSearchType) ?? "all",
   }),
-  loaderDeps: ({ search }) => ({
-    q: search.q,
-  }),
-  loader: async ({ deps }): Promise<UnifiedSearchInitialData | null> =>
-    await loadInitialSearchResults(deps.q),
+  loaderDeps: async ({ search: { q } }) => ({ q }),
+  loader: async ({ deps: { q } }) => {
+    if (!q) return null;
+    const trimmed = q.trim();
+    if (!trimmed) return null;
+    try {
+      const { results: rawSkills } = await convexHttp.query(api.search.search, {
+        query: trimmed,
+        limit: SEARCH_PAGE_SIZE,
+      });
+      const skillMatches = rawSkills.map((entry) => ({
+        type: "skill" as const,
+        skill: entry.skill,
+        ownerHandle: entry.ownerHandle,
+        owner: entry.owner ?? null,
+        score: entry.score,
+      }));
+      return {
+        query: trimmed,
+        activeType: "all" as const,
+        limits: {
+          skills: SEARCH_PAGE_SIZE,
+          plugins: SEARCH_PAGE_SIZE,
+          creators: SEARCH_PAGE_SIZE,
+        },
+        skillResults: skillMatches.slice(0, SEARCH_PAGE_SIZE),
+        pluginResults: [],
+        creatorResults: [],
+        skillHasMore: skillMatches.length > SEARCH_PAGE_SIZE,
+        pluginHasMore: false,
+        creatorHasMore: false,
+      };
+    } catch (error) {
+      console.error("Failed to load initial search results:", error);
+      return null;
+    }
+  },
   component: UnifiedSearchPage,
 });
-
-async function loadInitialSearchResults(query: string | undefined) {
-  const trimmed = query?.trim();
-  if (!trimmed) return null;
-
-  try {
-    const skillsRaw = (await convexHttp.action(api.search.searchSkills, {
-      query: trimmed,
-      limit: SEARCH_PAGE_SIZE + 1,
-    })) as Array<{
-      skill: UnifiedSkillResult["skill"];
-      ownerHandle: string | null;
-      owner?: UnifiedSkillResult["owner"];
-      score: number;
-    }>;
-    const skillMatches = skillsRaw.map((entry) => ({
-      type: "skill" as const,
-      skill: entry.skill,
-      ownerHandle: entry.ownerHandle,
-      owner: entry.owner ?? null,
-      score: entry.score,
-    }));
-    return {
-      query: trimmed,
-      activeType: "all" as const,
-      limits: {
-        skills: SEARCH_PAGE_SIZE,
-        plugins: SEARCH_PAGE_SIZE,
-        creators: SEARCH_PAGE_SIZE,
-      },
-      skillResults: skillMatches.slice(0, SEARCH_PAGE_SIZE),
-      pluginResults: [],
-      creatorResults: [],
-      skillHasMore: skillMatches.length > SEARCH_PAGE_SIZE,
-      pluginHasMore: false,
-      creatorHasMore: false,
-    };
-  } catch (error) {
-    console.error("Failed to load initial search results:", error);
-    return null;
-  }
-}
 
 function UnifiedSearchPage() {
   const search = Route.useSearch();
@@ -102,13 +82,10 @@ function UnifiedSearchPage() {
   const {
     results: allResults,
     skillResults,
-    pluginResults,
     creatorResults,
     skillCount,
-    pluginCount,
     creatorCount,
     skillHasMore,
-    pluginHasMore,
     creatorHasMore,
     isSearching,
   } = useUnifiedSearch(search.q ?? "", "all", {
@@ -119,22 +96,19 @@ function UnifiedSearchPage() {
       creators: resultLimit,
     },
   });
-  const results: Array<UnifiedSkillResult | UnifiedPluginResult | UnifiedCreatorResult> =
+  const results: Array<UnifiedSkillResult | UnifiedCreatorResult> =
     activeType === "all"
       ? allResults
       : activeType === "skills"
         ? skillResults
-        : activeType === "plugins"
-          ? pluginResults
-          : creatorResults;
-  const allCount = skillCount + pluginCount + creatorCount;
-  const allHasMore = skillHasMore || pluginHasMore || creatorHasMore;
+        : creatorResults;
+  const allCount = skillCount + creatorCount;
+  const allHasMore = skillHasMore || creatorHasMore;
   const canLoadMore =
     search.q &&
     !isSearching &&
     ((activeType === "all" && allHasMore) ||
       (activeType === "skills" && skillHasMore) ||
-      (activeType === "plugins" && pluginHasMore) ||
       (activeType === "creators" && creatorHasMore));
   const hasOtherTypeMatches = activeType !== "all" && allCount > 0;
 
@@ -187,7 +161,7 @@ function UnifiedSearchPage() {
           <input
             className="browse-search-input"
             type="text"
-            placeholder="Search skills, plugins, and creators..."
+            placeholder="Search skills and creators..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             autoFocus
@@ -221,13 +195,6 @@ function UnifiedSearchPage() {
           Skills
         </button>
         <button
-          className={`search-tab${activeType === "plugins" ? " is-active" : ""}`}
-          type="button"
-          onClick={() => setType("plugins")}
-        >
-          Plugins
-        </button>
-        <button
           className={`search-tab${activeType === "creators" ? " is-active" : ""}`}
           type="button"
           onClick={() => setType("creators")}
@@ -240,7 +207,7 @@ function UnifiedSearchPage() {
         <BrowseResultsSkeleton count={activeType === "all" ? 8 : 6} />
       ) : !search.q ? (
         <Card className="text-center p-10">
-          <p className="text-ink-soft">Enter a search term to find skills, plugins, and creators</p>
+          <p className="text-ink-soft">Enter a search term to find skills and creators</p>
         </Card>
       ) : results.length === 0 ? (
         <SearchEmptyState
@@ -260,13 +227,6 @@ function UnifiedSearchPage() {
                   ))}
                 </SearchResultSection>
               ) : null}
-              {pluginResults.length > 0 ? (
-                <SearchResultSection title="Plugins">
-                  {pluginResults.map((item) => (
-                    <PluginResultRow key={`plugin-${item.plugin.name}`} result={item} />
-                  ))}
-                </SearchResultSection>
-              ) : null}
               {creatorResults.length > 0 ? (
                 <SearchResultSection title="Creators" bare>
                   <CreatorResultsList results={creatorResults} />
@@ -280,8 +240,6 @@ function UnifiedSearchPage() {
               {results.map((item) =>
                 item.type === "skill" ? (
                   <SkillResultRow key={`skill-${item.skill._id}`} result={item} />
-                ) : item.type === "plugin" ? (
-                  <PluginResultRow key={`plugin-${item.plugin.name}`} result={item} />
                 ) : null,
               )}
             </div>
@@ -314,14 +272,9 @@ function SearchEmptyState({
   onSearchAllTypes: () => void;
   query: string;
 }) {
-  const browseHref =
-    activeType === "plugins" ? "/plugins" : activeType === "creators" ? "/creators" : "/skills";
+  const browseHref = activeType === "creators" ? "/creators" : "/skills";
   const browseLabel =
-    activeType === "plugins"
-      ? "Show all plugins"
-      : activeType === "creators"
-        ? "Show all creators"
-        : "Show all skills";
+    activeType === "creators" ? "Show all creators" : "Show all skills";
 
   return (
     <Card className="search-empty-state">
@@ -337,10 +290,10 @@ function SearchEmptyState({
         </a>
         <a
           className="search-empty-action"
-          href={`/add?kind=${activeType === "plugins" ? "plugin" : "skill"}`}
+          href="/add?kind=skill"
         >
           <Plus size={14} aria-hidden="true" />
-          {activeType === "plugins" ? "Add a plugin" : "Add a skill or plugin"}
+          Add a skill
         </a>
       </div>
     </Card>
@@ -387,8 +340,4 @@ function CreatorResultsList({ results }: { results: UnifiedCreatorResult[] }) {
 function SkillResultRow({ result }: { result: UnifiedSkillResult }) {
   const skill = result.skill as unknown as PublicSkill;
   return <SkillListItem skill={skill} ownerHandle={result.ownerHandle} owner={result.owner} />;
-}
-
-function PluginResultRow({ result }: { result: UnifiedPluginResult }) {
-  return <PluginListItem item={result.plugin} />;
 }

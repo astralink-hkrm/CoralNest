@@ -1,6 +1,6 @@
-export const CLAWHUB_SITE_URL = "https://clawhub.ai";
-export const CLAWHUB_REPOSITORY_URL = "https://github.com/openclaw/clawhub";
-export const CLAWHUB_DOCS_URL = "https://docs.openclaw.ai/clawhub/";
+export const CLAWHUB_SITE_URL = "https://coralnest.ai";
+export const CLAWHUB_REPOSITORY_URL = "https://github.com/saksharagarwalm2/CoralNest";
+export const CLAWHUB_DOCS_URL = "https://coralnest.ai/docs";
 export const OPENCLAW_DOCS_LLMS_URL = "https://docs.openclaw.ai/llms.txt";
 export const CLAWHUB_OPENAPI_URL = `${CLAWHUB_SITE_URL}/api/v1/openapi.json`;
 
@@ -22,11 +22,6 @@ export const PUBLIC_REGISTRY_SURFACES = [
     summary: "Browse and search skill bundles centered on SKILL.md.",
   },
   {
-    label: "Plugins and packages",
-    path: PublicRegistryPaths.plugins,
-    summary: "Browse and search OpenClaw plugin package records.",
-  },
-  {
     label: "Creators",
     path: PublicRegistryPaths.creators,
     summary: "Browse public user and organization creators.",
@@ -34,7 +29,7 @@ export const PUBLIC_REGISTRY_SURFACES = [
   {
     label: "Search",
     path: PublicRegistryPaths.search,
-    summary: "Search the public ClawHub catalog.",
+    summary: "Search the public CoralNest catalog.",
   },
   {
     label: "Security audits",
@@ -45,11 +40,6 @@ export const PUBLIC_REGISTRY_SURFACES = [
     label: "Publish a skill",
     path: PublicRegistryPaths.publishSkill,
     summary: "Publish a new skill or update an existing skill.",
-  },
-  {
-    label: "Publish a plugin",
-    path: PublicRegistryPaths.publishPlugin,
-    summary: "Publish an OpenClaw plugin package.",
   },
 ] as const;
 

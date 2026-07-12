@@ -1,5 +1,5 @@
 {
-  "name": "clawhub",
+  "name": "coralnest",
   "private": true,
   "workspaces": [
     "packages/clawhub",

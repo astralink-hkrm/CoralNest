@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 process.env.VITE_CONVEX_URL = process.env.VITE_CONVEX_URL || "https://example.convex.cloud";
 
 const fetchSkillPageDataMock = vi.fn();
-const resolveOpenClawPluginSlugMock = vi.fn();
 
 vi.mock("../convex/client", () => ({
   convex: {},
@@ -29,10 +28,6 @@ vi.mock("@tanstack/react-router", () => ({
 
 vi.mock("../lib/skillPage", () => ({
   fetchSkillPageData: (...args: unknown[]) => fetchSkillPageDataMock(...args),
-}));
-
-vi.mock("../lib/slugRoute", () => ({
-  resolveOpenClawPluginSlug: (...args: unknown[]) => resolveOpenClawPluginSlugMock(...args),
 }));
 
 async function loadRoute() {
@@ -140,46 +135,9 @@ describe("skill route loader", () => {
 
   beforeEach(() => {
     fetchSkillPageDataMock.mockReset();
-    resolveOpenClawPluginSlugMock.mockReset();
-  });
-
-  it("redirects OpenClaw plugin slugs before skill slug lookup", async () => {
-    resolveOpenClawPluginSlugMock.mockResolvedValue({
-      kind: "plugin",
-      name: "@openclaw/codex",
-      href: "/openclaw/plugins/codex",
-    });
-
-    expect(await runLegacyLoader({ owner: "openclaw", slug: "codex" })).toEqual({
-      redirect: {
-        href: "/openclaw/plugins/codex",
-        replace: true,
-      },
-    });
-    expect(resolveOpenClawPluginSlugMock).toHaveBeenCalledWith("codex", "openclaw");
-    expect(fetchSkillPageDataMock).not.toHaveBeenCalled();
-  });
-
-  it("redirects npm-style OpenClaw scoped plugin aliases before skill lookup", async () => {
-    resolveOpenClawPluginSlugMock.mockResolvedValue({
-      kind: "plugin",
-      name: "@openclaw/codex",
-      href: "/openclaw/plugins/codex",
-    });
-
-    expect(await runLegacyLoader({ owner: "@openclaw", slug: "codex" })).toEqual({
-      redirect: {
-        href: "/openclaw/plugins/codex",
-        replace: true,
-      },
-    });
-    expect(resolveOpenClawPluginSlugMock).toHaveBeenCalledWith("codex", "@openclaw");
-    expect(fetchSkillPageDataMock).not.toHaveBeenCalled();
   });
 
   it("does not resolve unsupported npm-style scopes as skill slugs", async () => {
-    resolveOpenClawPluginSlugMock.mockResolvedValue(null);
-
     expect(await runLegacyLoader({ owner: "@someone", slug: "weather" })).toEqual({
       notFound: true,
     });
@@ -187,7 +145,6 @@ describe("skill route loader", () => {
   });
 
   it("redirects legacy owner/slug paths to publisher-centric skill paths", async () => {
-    resolveOpenClawPluginSlugMock.mockResolvedValue(null);
 
     expect(await runLegacyLoader({ owner: "legacy-owner", slug: "weather" })).toEqual({
       redirect: {
@@ -199,7 +156,6 @@ describe("skill route loader", () => {
   });
 
   it("returns initial page data when the route is already canonical", async () => {
-    resolveOpenClawPluginSlugMock.mockResolvedValue(null);
     fetchSkillPageDataMock.mockResolvedValue({
       owner: "steipete",
       displayName: "Weather",
@@ -248,7 +204,6 @@ describe("skill route loader", () => {
   });
 
   it("does not redirect when canonical owner data is missing", async () => {
-    resolveOpenClawPluginSlugMock.mockResolvedValue(null);
     fetchSkillPageDataMock.mockResolvedValue({
       owner: null,
       displayName: "Weather",

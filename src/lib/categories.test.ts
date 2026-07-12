@@ -1,11 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
-  buildPluginTopicBrowseHref,
   buildSkillCategoryBrowseHref,
   buildSkillTopicBrowseHref,
   formatCatalogTopicLabel,
   getSkillCategoryForSkill,
-  resolvePluginBrowseCategorySlug,
   resolveSkillBrowseCategorySlug,
   SKILL_CATEGORIES,
 } from "./categories";
@@ -15,11 +13,6 @@ describe("skill category helpers", () => {
     expect(resolveSkillBrowseCategorySlug("workflows")).toBe("automation");
     expect(resolveSkillBrowseCategorySlug("mcp-tools")).toBe("integrations");
     expect(resolveSkillBrowseCategorySlug("unknown")).toBeUndefined();
-
-    expect(resolvePluginBrowseCategorySlug("data")).toBe("tools");
-    expect(resolvePluginBrowseCategorySlug("dev-tools")).toBe("runtime");
-    expect(resolvePluginBrowseCategorySlug("unknown")).toBeUndefined();
-    expect(resolvePluginBrowseCategorySlug("constructor")).toBeUndefined();
     expect(resolveSkillBrowseCategorySlug("toString")).toBeUndefined();
   });
 
@@ -58,8 +51,7 @@ describe("catalog topic browse helpers", () => {
     expect(formatCatalogTopicLabel("Agent Security")).toBe("#agent-security");
   });
 
-  it("builds skill and plugin browse links from topic slugs", () => {
+  it("builds skill browse links from topic slugs", () => {
     expect(buildSkillTopicBrowseHref("security-audit")).toBe("/skills?topic=security-audit");
-    expect(buildPluginTopicBrowseHref("security-audit")).toBe("/plugins?topic=security-audit");
   });
 });

@@ -5,28 +5,18 @@ import type { Doc, Id } from "./_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { internalMutation, internalQuery, mutation, query } from "./functions";
 import { assertAdmin, requireUser } from "./lib/access";
-import { tryNormalizePackageName } from "./lib/packageRegistry";
 
 export type PromotionStatus = "draft" | "active" | "ended";
 
 const PROMOTION_SLUG_PATTERN = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
-// Cross-repo authoring contracts with the OpenClaw promotions consumer.
-// The CLI rejects the entire promotion when modelRef / provider /
-// authChoiceId violate these grammars (they are echoed into copy-paste
-// commands, so anything else is a shell-injection path), and it skips
-// aliases that are not typed identifiers — so reject at authoring time
-// instead of publishing a promotion clients cannot claim. Plugin names use
-// the registry's canonical npm-safe grammar (scoped names allowed).
 const PROMOTION_MODEL_REF_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:/-]*$/;
 const PROMOTION_ALIAS_PATTERN = /^[A-Za-z0-9_.:-]+$/;
-const PROMOTION_IDENTIFIER_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._@/-]*$/;
 const MAX_SLUG_LENGTH = 64;
 const MAX_TITLE_LENGTH = 120;
 const MAX_BLURB_LENGTH = 500;
 const MAX_SHORT_FIELD_LENGTH = 128;
 const MAX_URL_LENGTH = 500;
 const MAX_MODELS = 20;
-const MAX_PLUGIN_NAMES = 10;
 const STAFF_LIST_PAGE_SIZE = 100;
 const ACTIVE_SET_LIMIT = 50;
 
@@ -43,9 +33,6 @@ const promotionInputArgs = {
   sponsor: v.optional(v.string()),
   startsAt: v.number(),
   endsAt: v.number(),
-  provider: v.optional(v.string()),
-  authChoiceId: v.optional(v.string()),
-  pluginNames: v.optional(v.array(v.string())),
   models: v.array(promotionModelArgValidator),
   signupUrl: v.optional(v.string()),
   docsUrl: v.optional(v.string()),
@@ -71,9 +58,6 @@ export type PromotionInput = {
   sponsor?: string;
   startsAt: number;
   endsAt: number;
-  provider?: string;
-  authChoiceId?: string;
-  pluginNames?: string[];
   models: PromotionModelInput[];
   signupUrl?: string;
   docsUrl?: string;
@@ -179,46 +163,7 @@ export function normalizePromotionInput(input: PromotionInput): PromotionInput {
     };
   });
 
-  const rawPluginNames = (input.pluginNames ?? []).map((name) => name.trim()).filter(Boolean);
-  if (rawPluginNames.length > MAX_PLUGIN_NAMES) {
-    throw new ConvexError(`Too many plugin names (max ${MAX_PLUGIN_NAMES})`);
-  }
-  const pluginNames = rawPluginNames.map((name) => {
-    if (name.length > 214) throw new ConvexError(`Plugin name too long: ${name}`);
-    const normalized = tryNormalizePackageName(name);
-    if (!normalized) {
-      throw new ConvexError(
-        "Plugin names must be lowercase and npm-safe (example: @scope/name or plugin-name)",
-      );
-    }
-    return normalized;
-  });
-
   const sponsor = requireShortField("Sponsor", input.sponsor, MAX_SHORT_FIELD_LENGTH);
-  const provider = requireShortField("Provider", input.provider, MAX_SHORT_FIELD_LENGTH);
-  if (provider && !PROMOTION_IDENTIFIER_PATTERN.test(provider)) {
-    throw new ConvexError("Provider may only use letters, digits, and . _ @ / - characters");
-  }
-  const authChoiceId = requireShortField(
-    "authChoiceId",
-    input.authChoiceId,
-    MAX_SHORT_FIELD_LENGTH,
-  );
-  if (authChoiceId && !PROMOTION_IDENTIFIER_PATTERN.test(authChoiceId)) {
-    throw new ConvexError("authChoiceId may only use letters, digits, and . _ @ / - characters");
-  }
-  // The CLI refuses to configure models outside the promotion's declared
-  // provider (`<provider>/<model>`), so a mismatched ref is unclaimable.
-  if (provider) {
-    for (const model of models) {
-      const prefix = `${provider}/`;
-      if (!model.modelRef.startsWith(prefix) || model.modelRef.length <= prefix.length) {
-        throw new ConvexError(
-          `modelRef "${model.modelRef}" must start with the promotion provider prefix "${prefix}"`,
-        );
-      }
-    }
-  }
   const signupUrl = requireHttpsUrl("signupUrl", input.signupUrl);
   const docsUrl = requireHttpsUrl("docsUrl", input.docsUrl);
   const launchPageUrl = requireHttpsUrl("launchPageUrl", input.launchPageUrl);
@@ -230,9 +175,6 @@ export function normalizePromotionInput(input: PromotionInput): PromotionInput {
     ...(sponsor ? { sponsor } : {}),
     startsAt: input.startsAt,
     endsAt: input.endsAt,
-    ...(provider ? { provider } : {}),
-    ...(authChoiceId ? { authChoiceId } : {}),
-    ...(pluginNames.length > 0 ? { pluginNames } : {}),
     models,
     ...(signupUrl ? { signupUrl } : {}),
     ...(docsUrl ? { docsUrl } : {}),
@@ -266,11 +208,6 @@ export function toPublicPromotion(promotion: Doc<"promotions">, now: number) {
     active: isPromotionActive(promotion, now),
     startsAt: promotion.startsAt,
     endsAt: promotion.endsAt,
-    ...(promotion.provider ? { provider: promotion.provider } : {}),
-    ...(promotion.authChoiceId ? { authChoiceId: promotion.authChoiceId } : {}),
-    ...(promotion.pluginNames && promotion.pluginNames.length > 0
-      ? { pluginNames: promotion.pluginNames }
-      : {}),
     models: promotion.models,
     ...(promotion.signupUrl ? { signupUrl: promotion.signupUrl } : {}),
     ...(promotion.docsUrl ? { docsUrl: promotion.docsUrl } : {}),

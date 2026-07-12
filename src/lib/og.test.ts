@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { buildPluginMeta, buildPublisherMeta, buildSkillMeta, fetchSkillMeta } from "./og";
+import { buildPublisherMeta, buildSkillMeta, fetchSkillMeta } from "./og";
 
 describe("og helpers", () => {
   afterEach(() => {
@@ -25,23 +25,6 @@ describe("og helpers", () => {
     expect(meta.image).toContain("version=1.2.3");
     expect(meta.image).not.toContain("title=");
     expect(meta.image).not.toContain("description=");
-  });
-
-  it("builds plugin metadata", () => {
-    const meta = buildPluginMeta({
-      name: "@openclaw/codex",
-      owner: "openclaw",
-      displayName: "Codex",
-      summary: "OpenClaw Codex harness.",
-      latestVersion: "1.0.0",
-    });
-    expect(meta.title).toBe("Codex — ClawHub Plugins");
-    expect(meta.description).toBe("OpenClaw Codex harness.");
-    expect(meta.url).toBe("https://clawhub.ai/openclaw/plugins/codex");
-    expect(meta.image).toContain("/og/plugin?");
-    expect(meta.image).toContain("v=5");
-    expect(meta.image).toContain("name=%40openclaw%2Fcodex");
-    expect(meta.image).toContain("version=1.0.0");
   });
 
   it("builds publisher metadata", () => {

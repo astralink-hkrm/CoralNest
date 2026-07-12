@@ -27,13 +27,6 @@ if (process.env.CLAWHUB_DISABLE_CRONS !== "1" && process.env.CLAWHUB_PREVIEW !==
   );
 
   crons.interval(
-    "package-trending-leaderboard",
-    { minutes: 60 },
-    internal.packageLeaderboards.rebuildTrendingLeaderboardAction,
-    { limit: 200 },
-  );
-
-  crons.interval(
     "recommendation-score-refresh",
     { hours: 6 },
     internal.statsMaintenance.runRecommendationScoreBackfillInternal,
@@ -56,13 +49,6 @@ if (process.env.CLAWHUB_DISABLE_CRONS !== "1" && process.env.CLAWHUB_PREVIEW !==
     {},
   );
 
-  crons.interval(
-    "package-stat-events",
-    { minutes: 15 },
-    internal.packages.processPackageStatEventsInternal,
-    { batchSize: 100 },
-  );
-
   // Syncs accumulated stat deltas to skill documents every 6 hours.
   // Runs infrequently to avoid thundering-herd reactive query invalidation.
   // Uses processedAt field to track progress (independent of the action cursor).
@@ -82,18 +68,6 @@ if (process.env.CLAWHUB_DISABLE_CRONS !== "1" && process.env.CLAWHUB_PREVIEW !==
       batchSize: 1000,
       maxBatches: 20,
       confirmationToken: "PRUNE_PROCESSED_SKILL_STAT_EVENTS",
-    },
-  );
-
-  crons.interval(
-    "package-stat-events-prune",
-    { hours: 24 },
-    internal.packages.pruneProcessedPackageStatEventsInternal,
-    {
-      retentionDays: 7,
-      batchSize: 1000,
-      maxBatches: 20,
-      confirmationToken: "PRUNE_PROCESSED_PACKAGE_STAT_EVENTS",
     },
   );
 
@@ -147,13 +121,6 @@ if (process.env.CLAWHUB_DISABLE_CRONS !== "1" && process.env.CLAWHUB_PREVIEW !==
   crons.interval("vt-cache-backfill", { minutes: 30 }, internal.vt.backfillActiveSkillsVTCache, {
     batchSize: 100,
   });
-
-  crons.interval(
-    "package-scan-backfill",
-    { minutes: 30 },
-    internal.packages.backfillPackageReleaseScansInternal,
-    { batchSize: 100 },
-  );
 
   crons.interval(
     "skill-scan-request-prune",

@@ -7,10 +7,6 @@ export const DocsLinks = {
     clawhub: {
         acceptableUsage: openClawDocsUrl("clawhub/acceptable-usage"),
         publishing: openClawDocsUrl("clawhub/publishing"),
-        packageScopeFaq: openClawDocsUrl("clawhub/publishing#package-scope-must-match-selected-owner"),
-    },
-    openclaw: {
-        pluginPackageMetadata: openClawDocsUrl("plugins/sdk-setup#package-metadata"),
     },
 };
 //# sourceMappingURL=docsLinks.js.map

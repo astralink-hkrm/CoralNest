@@ -6,25 +6,11 @@ import { hashToken } from "./tokens";
 
 type TokenAuthResult = { user: Doc<"users">; userId: Doc<"users">["_id"] };
 type ApiTokenDoc = Doc<"apiTokens">;
-type PackagePublishTokenAuthResult = {
-  kind: "github-actions";
-  publishToken: Doc<"packagePublishTokens">;
-};
-type PackagePublishTokenDoc = Doc<"packagePublishTokens">;
-type UserPackagePublishAuthResult = {
-  kind: "user";
-  user: Doc<"users">;
-  userId: Doc<"users">["_id"];
-};
 
 const internalRefs = internal as unknown as {
   tokens: {
     getByHashInternal: unknown;
     getUserForTokenInternal: unknown;
-    touchInternal: unknown;
-  };
-  packagePublishTokens: {
-    getByHashInternal: unknown;
     touchInternal: unknown;
   };
 };
@@ -107,39 +93,6 @@ export async function getOptionalApiTokenUser(
   if (!user || user.deletedAt || user.deactivatedAt) return null;
 
   return { user, userId: user._id };
-}
-
-export async function requirePackagePublishAuth(
-  ctx: ActionCtx,
-  request: Request,
-): Promise<UserPackagePublishAuthResult | PackagePublishTokenAuthResult> {
-  const header = request.headers.get("authorization") ?? request.headers.get("Authorization");
-  const token = parseBearerToken(header);
-  if (!token) throw new ConvexError(MISSING_API_TOKEN_MESSAGE);
-
-  const tokenHash = await hashToken(token);
-  const publishToken = (await ctx.runQuery(
-    internalRefs.packagePublishTokens.getByHashInternal as never,
-    {
-      tokenHash,
-    } as never,
-  )) as PackagePublishTokenDoc | null;
-  if (publishToken && !publishToken.revokedAt && publishToken.expiresAt > Date.now()) {
-    try {
-      await ctx.runMutation(
-        internalRefs.packagePublishTokens.touchInternal as never,
-        {
-          tokenId: publishToken._id,
-        } as never,
-      );
-    } catch {
-      // Best-effort metadata; publish auth should not fail on touch contention.
-    }
-    return { kind: "github-actions", publishToken };
-  }
-
-  const auth = await requireApiTokenUser(ctx, request);
-  return { kind: "user", user: auth.user, userId: auth.userId };
 }
 
 export function parseBearerToken(header: string | null) {

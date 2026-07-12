@@ -198,7 +198,7 @@ function recoveredSuspiciousAnalysis(attempt: Doc<"publishAttempts">) {
     verdict: "suspicious",
     summary:
       attempt.checks.clawscan.summary ??
-      "ClawHub security review marked this staged artifact suspicious.",
+      "CoralNest security review marked this staged artifact suspicious.",
     model: "prepublication-recovery",
     checkedAt: attempt.checks.clawscan.checkedAt ?? Date.now(),
   };
@@ -781,30 +781,6 @@ export const previewNvidiaGitHubDownloadBackfillInternal = internalQuery({
     };
   },
 });
-
-type PluginPackageFamily = (typeof PLUGIN_PACKAGE_FAMILIES)[number];
-
-type LatestPluginManifestSummaryCandidate = {
-  packageName: string;
-  displayName: string;
-  release: Doc<"packageReleases"> | null;
-};
-
-type LatestPluginManifestSummaryCandidatePage = {
-  page: LatestPluginManifestSummaryCandidate[];
-  isDone: boolean;
-  continueCursor: string;
-};
-
-type PluginManifestSummaryBackfillSample = {
-  packageName: string;
-  displayName: string;
-  version: string;
-  releaseId: Id<"packageReleases">;
-  configFieldCount: number;
-  mcpServerCount: number;
-  bundledSkillCount: number;
-};
 
 type PluginManifestSummaryBackfillResult = {
   ok: true;

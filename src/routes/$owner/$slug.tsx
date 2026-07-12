@@ -16,8 +16,6 @@ import {
 } from "../../lib/ownerRoute";
 import { consumePostPublishFlash } from "../../lib/postPublishFlash";
 import { fetchSkillPageData } from "../../lib/skillPage";
-import { resolveOpenClawPluginSlug } from "../../lib/slugRoute";
-
 function isPostPublishFlag(value: unknown) {
   const normalized = typeof value === "string" ? value.trim().replace(/^"|"$/g, "") : value;
   return normalized === "1" || normalized === "true" || normalized === 1 || normalized === true;
@@ -41,14 +39,6 @@ export const Route = createFileRoute("/$owner/$slug")({
     }
   },
   loader: async ({ params }) => {
-    const pluginTarget = await resolveOpenClawPluginSlug(params.slug, params.owner);
-    if (pluginTarget) {
-      throw redirect({
-        href: pluginTarget.href,
-        replace: true,
-      });
-    }
-
     if (params.owner.startsWith("@")) throw notFound();
 
     throw redirect({

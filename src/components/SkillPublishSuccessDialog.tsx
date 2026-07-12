@@ -65,13 +65,13 @@ function buildAbsoluteSkillUrl(skillPath: string) {
 
 function buildXShareUrl(displayName: string, skillUrl: string) {
   const params = new URLSearchParams({
-    text: `${displayName} is now live on ClawHub 🦞 Check it out: ${skillUrl}`,
+    text: `${displayName} is now live on CoralNest. Check it out: ${skillUrl}`,
   });
   return `https://twitter.com/intent/tweet?${params.toString()}`;
 }
 
 function buildDiscordShareText(displayName: string, skillUrl: string) {
-  return `I just published ${displayName} on ClawHub: ${skillUrl}`;
+  return `I just published ${displayName} on CoralNest: ${skillUrl}`;
 }
 
 export function SkillPublishSuccessDialog({

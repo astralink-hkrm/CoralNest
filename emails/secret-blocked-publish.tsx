@@ -20,7 +20,7 @@ export default function SecretBlockedPublishEmail({
   version,
   preheader,
 }: SecretBlockedPublishEmailProps) {
-  const title = `ClawHub blocked a ${artifactKind} publish`;
+  const title = `CoralNest blocked a ${artifactKind} publish`;
   const railLabel = artifactKind === "plugin" ? "Plugin Review" : "Skill Review";
   return (
     <ClawHubEmailLayout preview={preheader} railLabel={railLabel}>

@@ -57,7 +57,7 @@ export const Route = createFileRoute("/import")({
     const siteUrl = getClawHubSiteUrl();
     const title = `Import from GitHub | ${SITE_NAME}`;
     const description =
-      "Import SKILL.md and skills.md files from your public GitHub repositories into ClawHub.";
+      "Import SKILL.md and skills.md files from your public GitHub repositories into CoralNest.";
 
     return {
       links: [
@@ -161,7 +161,7 @@ type PublishResultRow = {
 
 const OPENCLAW_SKILLS_DISCORD_URL =
   "https://discord.com/channels/1456350064065904867/1456891440897724637";
-const PUBLIC_CLAWHUB_SITE_URL = "https://clawhub.ai";
+const PUBLIC_CLAWHUB_SITE_URL = "https://coralnest.ai";
 const LOCAL_SHARE_HOSTS = new Set(["localhost", "127.0.0.1", "0.0.0.0", "::1", "[::1]"]);
 const GITHUB_REPO_PAGE_SIZE = 100;
 const DEV_MOCK_SKILL_NAMES = [
@@ -911,11 +911,11 @@ export function ImportGitHub() {
                   </div>
                   <div className="space-y-1 text-sm text-[color:var(--ink-soft)]">
                     <p>
-                      All skills published on ClawHub are licensed under MIT-0. Free to use, modify,
+                      All skills published on CoralNest are licensed under MIT-0. Free to use, modify,
                       and redistribute. No attribution required.
                     </p>
                     <p>
-                      ClawHub does not support paid skills, per-skill pricing, or paywalled
+                      CoralNest does not support paid skills, per-skill pricing, or paywalled
                       releases.
                     </p>
                   </div>
@@ -1205,7 +1205,7 @@ function LoadingPanel({ label, description }: { label: string; description: stri
   return (
     <Card className="min-h-[112px] justify-center">
       <CardContent className="flex-row items-center gap-4">
-        <ClawHubSpinner />
+        <CoralNestSpinner />
         <div className="min-w-0">
           <div className="text-sm font-semibold text-[color:var(--ink)]">{label}</div>
           <div className="text-xs text-[color:var(--ink-soft)]">{description}</div>
@@ -1215,7 +1215,7 @@ function LoadingPanel({ label, description }: { label: string; description: stri
   );
 }
 
-function ClawHubSpinner() {
+function CoralNestSpinner() {
   return (
     <span className="clawhub-import-spinner" aria-hidden="true">
       <span className="clawhub-import-spinner-emoji" />

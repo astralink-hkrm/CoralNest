@@ -1,6 +1,6 @@
 import { Check, ChevronDown, Search } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { BrowseCategoryIcon } from "../lib/browseCategoryIcons";
+import { getCategoryIconComponent, UNRESOLVED_SKILL_CATEGORY_ICON } from "../lib/categoryIcons";
 import type { BrowseCategory } from "../lib/categories";
 
 type HomeListingCategorySelectProps = {
@@ -10,7 +10,7 @@ type HomeListingCategorySelectProps = {
 };
 
 function CategoryOption({
-  slug,
+  slug: _slug,
   label,
   icon,
   selected,
@@ -24,6 +24,7 @@ function CategoryOption({
   onSelect: () => void;
   reset?: boolean;
 }) {
+  const Icon = icon ? getCategoryIconComponent(icon) ?? UNRESOLVED_SKILL_CATEGORY_ICON : UNRESOLVED_SKILL_CATEGORY_ICON;
   return (
     <li
       className={`home-v2-listing-category-option-wrap${reset ? " is-reset" : ""}`}
@@ -39,12 +40,7 @@ function CategoryOption({
         <span className="home-v2-listing-category-option-mark" aria-hidden="true">
           {selected ? <Check size={12} strokeWidth={2.5} /> : null}
         </span>
-        <BrowseCategoryIcon
-          slug={slug}
-          icon={icon}
-          size={16}
-          className="home-v2-listing-category-option-icon"
-        />
+        <Icon size={16} className="home-v2-listing-category-option-icon" strokeWidth={1.8} />
         <span className="home-v2-listing-category-option-label">{label}</span>
       </button>
     </li>
@@ -136,12 +132,10 @@ export function HomeListingCategorySelect({
         onClick={() => setOpen((current) => !current)}
       >
         <span className="home-v2-listing-category-trigger-main">
-          <BrowseCategoryIcon
-            slug={selectedCategory?.slug ?? null}
-            icon={selectedCategory?.icon}
-            size={15}
-            className="home-v2-listing-category-trigger-category-icon"
-          />
+          {(() => {
+            const TI = selectedCategory?.icon ? getCategoryIconComponent(selectedCategory.icon) ?? UNRESOLVED_SKILL_CATEGORY_ICON : UNRESOLVED_SKILL_CATEGORY_ICON;
+            return <TI size={15} className="home-v2-listing-category-trigger-category-icon" strokeWidth={1.8} />;
+          })()}
           <span className="home-v2-listing-category-trigger-label">{selectedLabel}</span>
         </span>
         <ChevronDown

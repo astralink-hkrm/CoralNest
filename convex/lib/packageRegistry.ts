@@ -1,12 +1,4 @@
-import {
-  listMissingOpenClawExternalCodePluginFieldPaths,
-  normalizeOpenClawExternalPluginCompatibility,
-} from "clawhub-schema";
-import type {
-  BundlePublishMetadata,
-  PackageCompatibility,
-  PackageVerificationSummary,
-} from "clawhub-schema";
+import type { BundlePublishMetadata } from "clawhub-schema";
 import { ConvexError } from "convex/values";
 import semver from "semver";
 import type { ActionCtx } from "../_generated/server";
@@ -143,25 +135,6 @@ function findSkillMarkdownFiles(files: PluginManifestSummaryFile[], rootPath: st
     });
 }
 
-function extractCompatibilityFromManifest(
-  manifest: JsonRecord,
-  fallback?: PackageCompatibility,
-): PackageCompatibility | undefined {
-  const normalized = normalizeOpenClawExternalPluginCompatibility({ openclaw: manifest.openclaw });
-  const compatibility = {
-    pluginApiRange: normalized?.pluginApiRange ?? fallback?.pluginApiRange,
-    builtWithOpenClawVersion:
-      normalized?.builtWithOpenClawVersion ?? fallback?.builtWithOpenClawVersion,
-    pluginSdkVersion: normalized?.pluginSdkVersion ?? fallback?.pluginSdkVersion,
-    minGatewayVersion: normalized?.minGatewayVersion ?? fallback?.minGatewayVersion,
-  };
-  const entries = Object.entries(compatibility).filter(
-    (entry): entry is [keyof PackageCompatibility, string] =>
-      typeof entry[1] === "string" && entry[1].trim().length > 0,
-  );
-  return entries.length > 0 ? Object.fromEntries(entries) : undefined;
-}
-
 function extractManifestIdentity(manifest: JsonRecord) {
   const identity = {
     name: optionalString(manifest.name),
@@ -278,12 +251,7 @@ export function derivePluginManifestSummary(params: {
   pluginManifest: JsonRecord;
   skillManifest?: JsonRecord;
   files: PluginManifestSummaryFile[];
-  compatibility?: PackageCompatibility;
 }) {
-  const compatibility = extractCompatibilityFromManifest(
-    params.pluginManifest,
-    params.compatibility,
-  );
   const manifestIdentity = extractManifestIdentity(params.pluginManifest);
   const skillManifest = params.skillManifest ?? params.pluginManifest;
   const skillRoots = uniq([
@@ -312,7 +280,6 @@ export function derivePluginManifestSummary(params: {
 
   return {
     schemaVersion: 1 as const,
-    ...(compatibility ? { compatibility } : {}),
     ...(manifestIdentity ? { manifestIdentity } : {}),
     configFields: extractConfigFields(params.pluginManifest),
     mcpServers: extractMcpServerNames(params.pluginManifest).map((name) => ({ name })),
@@ -453,9 +420,9 @@ function buildVerification(source: SourceInfo | undefined): PackageVerificationS
 }
 
 function extractCompatibility(
-  packageJson: JsonRecord | undefined,
-): PackageCompatibility | undefined {
-  return normalizeOpenClawExternalPluginCompatibility(packageJson);
+  _packageJson: JsonRecord | undefined,
+): Record<string, string> | undefined {
+  return undefined;
 }
 
 export function extractCodePluginArtifacts(params: {

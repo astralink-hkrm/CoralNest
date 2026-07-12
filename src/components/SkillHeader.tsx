@@ -6,7 +6,7 @@ import { useState, type ReactNode } from "react";
 import type { Doc, Id } from "../../convex/_generated/dataModel";
 import type { ActivityTrend } from "../lib/activityTrend";
 import { getSkillBadges, isSkillOfficial } from "../lib/badges";
-import { BrowseCategoryIcon } from "../lib/browseCategoryIcons";
+import { getCategoryIconComponent, UNRESOLVED_SKILL_CATEGORY_ICON } from "../lib/categoryIcons";
 import {
   buildSkillCategoryBrowseHref,
   buildSkillTopicBrowseHref,
@@ -387,12 +387,10 @@ export function SkillHeader({
                             href={buildSkillCategoryBrowseHref(categoryItem)}
                             aria-label={`View ${categoryItem.label} skills`}
                           >
-                            <BrowseCategoryIcon
-                              slug={categoryItem.slug}
-                              icon={categoryItem.icon}
-                              size={14}
-                              className="skill-category-icon"
-                            />
+                            {(() => {
+                              const CI = getCategoryIconComponent(categoryItem.icon) ?? UNRESOLVED_SKILL_CATEGORY_ICON;
+                              return <CI size={14} className="skill-category-icon" strokeWidth={1.8} />;
+                            })()}
                             <span>{categoryItem.label}</span>
                           </a>
                         ))}

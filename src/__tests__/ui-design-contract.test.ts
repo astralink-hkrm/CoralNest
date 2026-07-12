@@ -208,7 +208,7 @@ describe("restored UI design contract", () => {
     expect(headerSource).toContain('className="github-sign-in-button"');
     expect(headerSource).toContain('className="sign-in-full-copy"');
     expect(headerSource).toContain('className="sign-in-compact-copy"');
-    expect(headerSource).toContain("Search skills, plugins, and creators");
+    expect(headerSource).toContain("Search skills and creators");
     expect(headerSource).not.toContain('className="navbar-tabs-primary"');
     expect(headerSource).not.toContain('className="navbar-tabs-secondary"');
 
@@ -284,17 +284,13 @@ describe("restored UI design contract", () => {
   it("requires the experiment hero and canonical home catalog without later sections", () => {
     const homeSource = home();
     const listingSource = read("src/components/HomeListingSection.tsx");
-    const appsSource = read("src/components/HomeAppsSection.tsx");
     const publishersSource = read("src/components/HomePopularPublishersSection.tsx");
     const css = styles();
 
     expect(homeSource).toContain('className="home-v2-main oc-app-surface"');
     expect(homeSource).toContain("home-v2-headline oc-hero-title");
     expect(listingSource).toContain("home-v2-listing-card oc-card oc-card-interactive");
-    expect(listingSource).toContain("home-v2-listing-kind oc-segmented");
-    expect(appsSource).toContain("home-v2-apps-tile oc-card oc-card-interactive");
-    expect(appsSource).toContain('className="home-v2-apps-workflow-header"');
-    expect(appsSource).not.toContain('className="home-v2-apps-workflow-header oc-card"');
+    expect(listingSource).toContain("home-v2-listing-view oc-segmented");
     expect(publishersSource).toContain(
       "home-v2-popular-publisher-card oc-card oc-card-interactive",
     );
@@ -310,7 +306,6 @@ describe("restored UI design contract", () => {
     expect(homeSource).not.toContain("Featured skills");
     expect(homeSource).not.toContain("Trending Now");
     expect(listingSource).toContain("SKILL_CATEGORIES");
-    expect(listingSource).toContain("PLUGIN_CATEGORIES");
     expect(listingSource).toContain("HomeListingCategorySelect");
     expect(cssRule(css, ".home-v2-listing-toolbar")).toContain("display: flex");
     expect(cssRule(css, ".home-v2-listing-grid")).toContain(

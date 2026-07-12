@@ -1,5 +1,5 @@
 import { Download, Star } from "lucide-react";
-import { BrowseCategoryIcon } from "../lib/browseCategoryIcons";
+import { getCategoryIconComponent, UNRESOLVED_SKILL_CATEGORY_ICON } from "../lib/categoryIcons";
 import { buildSkillCategoryBrowseHref, type SkillCategory } from "../lib/categories";
 import { formatSkillStatsTriplet } from "../lib/numberFormat";
 import type { PublicPublisher, PublicSkill } from "../lib/publicUser";
@@ -126,7 +126,10 @@ export function SkillRelatedSection({
       <div className="related-skills-footer">
         <Button asChild variant="ghost" size="xs" className="related-skills-category-link">
           <a href={buildSkillCategoryBrowseHref(category)}>
-            <BrowseCategoryIcon slug={category.slug} icon={category.icon} size={13} />
+            {(() => {
+              const CI = getCategoryIconComponent(category.icon) ?? UNRESOLVED_SKILL_CATEGORY_ICON;
+              return <CI size={13} strokeWidth={1.8} />;
+            })()}
             More in {category.label}
           </a>
         </Button>

@@ -3,9 +3,8 @@
   "generated_at": "2026-05-14T18:43:58.463Z",
   "validation_summary": {
     "ok": true,
-    "rowCount": 1250,
+    "rowCount": 1000,
     "skillCount": 1000,
-    "pluginCount": 250,
     "findings": []
   },
   "review_samples": {

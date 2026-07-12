@@ -3,67 +3,6 @@ export declare const CATALOG_TOPIC_LIMIT = 5;
 export declare const CATALOG_TOPIC_MAX_LENGTH = 48;
 export declare const INTERNAL_UNCATEGORIZED_CATEGORY = "other";
 export declare const RESERVED_CATALOG_TOPIC_SLUGS: readonly ["approved", "audited", "certified", "clawhub", "community", "curated", "endorsed", "featured", "official", "officials", "openclaw", "recommended", "staff-pick", "trusted", "trusted-publisher", "verified"];
-export declare const PLUGIN_CATEGORY_DEFINITIONS: readonly [{
-    readonly slug: "channels";
-    readonly label: "Channels";
-    readonly icon: "message-circle";
-    readonly description: "Messaging and collaboration channel integrations.";
-}, {
-    readonly slug: "models";
-    readonly label: "Models";
-    readonly icon: "brain";
-    readonly description: "Model providers, inference backends, and model routing.";
-}, {
-    readonly slug: "memory";
-    readonly label: "Memory";
-    readonly icon: "database";
-    readonly description: "Memory providers, embeddings, and retrieval.";
-}, {
-    readonly slug: "context";
-    readonly label: "Context";
-    readonly icon: "book-open";
-    readonly description: "Context engines and context management.";
-}, {
-    readonly slug: "voice";
-    readonly label: "Voice";
-    readonly icon: "message-square";
-    readonly description: "Speech synthesis, transcription, voice calls, and audio interaction.";
-}, {
-    readonly slug: "media";
-    readonly label: "Media";
-    readonly icon: "palette";
-    readonly description: "Image, video, audio, and other media understanding or generation.";
-}, {
-    readonly slug: "web";
-    readonly label: "Web";
-    readonly icon: "globe";
-    readonly description: "Web search, browsing, fetching, research, and information retrieval.";
-}, {
-    readonly slug: "tools";
-    readonly label: "Tools";
-    readonly icon: "wrench";
-    readonly description: "Agent tools, workflows, scheduled work, and service automation.";
-}, {
-    readonly slug: "runtime";
-    readonly label: "Runtime";
-    readonly icon: "git-branch";
-    readonly description: "Developer tooling, agent runtimes, coding, testing, and execution backends.";
-}, {
-    readonly slug: "gateway";
-    readonly label: "Gateway";
-    readonly icon: "activity";
-    readonly description: "Gateway extensions, deployment, observability, and operational tooling.";
-}, {
-    readonly slug: "security";
-    readonly label: "Security";
-    readonly icon: "shield";
-    readonly description: "Authentication, authorization, security controls, and policy enforcement.";
-}, {
-    readonly slug: "other";
-    readonly label: "Other";
-    readonly icon: "package";
-    readonly description: "Plugins that do not yet fit another browse category.";
-}];
 export declare const SKILL_CATEGORY_DEFINITIONS: readonly [{
     readonly slug: "integrations";
     readonly label: "Integrations";
@@ -149,18 +88,10 @@ export declare const SKILL_CATEGORY_DEFINITIONS: readonly [{
     readonly description: "Skills that do not yet fit another browse category.";
     readonly keywords: readonly [];
 }];
-export type PluginCategorySlug = (typeof PLUGIN_CATEGORY_DEFINITIONS)[number]["slug"];
 export type SkillCategorySlug = (typeof SKILL_CATEGORY_DEFINITIONS)[number]["slug"];
-export declare const PLUGIN_CATEGORY_SLUGS: ("other" | "channels" | "models" | "memory" | "context" | "voice" | "media" | "web" | "tools" | "runtime" | "gateway" | "security")[];
-export declare const SKILL_CATEGORY_SLUGS: ("other" | "security" | "integrations" | "automation" | "research" | "development" | "productivity" | "communication" | "creative" | "knowledge" | "agents" | "operations" | "finance" | "lifestyle")[];
-export declare function isPluginCategorySlug(value: string | null | undefined): value is PluginCategorySlug;
+export declare const SKILL_CATEGORY_SLUGS: ("agents" | "automation" | "communication" | "creative" | "development" | "finance" | "integrations" | "knowledge" | "lifestyle" | "operations" | "other" | "productivity" | "research" | "security")[];
 export declare function isSkillCategorySlug(value: string | null | undefined): value is SkillCategorySlug;
-export declare function normalizePluginCategories(values: readonly string[] | null | undefined): PluginCategorySlug[];
 export declare function normalizeSkillCategories(values: readonly string[] | null | undefined): SkillCategorySlug[];
-export declare function resolvePluginCategories(input: {
-    declared?: readonly string[] | null;
-    inferred?: readonly string[] | null;
-}): PluginCategorySlug[];
 export declare function resolveSkillCategories(input: {
     declared?: readonly string[] | null;
     inferred?: readonly string[] | null;

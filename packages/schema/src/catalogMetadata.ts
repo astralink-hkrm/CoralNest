@@ -22,81 +22,6 @@ export const RESERVED_CATALOG_TOPIC_SLUGS = [
 ] as const;
 const CATALOG_TOPIC_FORMAT_CONTROL_RE = /\p{Cf}/u;
 
-export const PLUGIN_CATEGORY_DEFINITIONS = [
-  {
-    slug: "channels",
-    label: "Channels",
-    icon: "message-circle",
-    description: "Messaging and collaboration channel integrations.",
-  },
-  {
-    slug: "models",
-    label: "Models",
-    icon: "brain",
-    description: "Model providers, inference backends, and model routing.",
-  },
-  {
-    slug: "memory",
-    label: "Memory",
-    icon: "database",
-    description: "Memory providers, embeddings, and retrieval.",
-  },
-  {
-    slug: "context",
-    label: "Context",
-    icon: "book-open",
-    description: "Context engines and context management.",
-  },
-  {
-    slug: "voice",
-    label: "Voice",
-    icon: "message-square",
-    description: "Speech synthesis, transcription, voice calls, and audio interaction.",
-  },
-  {
-    slug: "media",
-    label: "Media",
-    icon: "palette",
-    description: "Image, video, audio, and other media understanding or generation.",
-  },
-  {
-    slug: "web",
-    label: "Web",
-    icon: "globe",
-    description: "Web search, browsing, fetching, research, and information retrieval.",
-  },
-  {
-    slug: "tools",
-    label: "Tools",
-    icon: "wrench",
-    description: "Agent tools, workflows, scheduled work, and service automation.",
-  },
-  {
-    slug: "runtime",
-    label: "Runtime",
-    icon: "git-branch",
-    description: "Developer tooling, agent runtimes, coding, testing, and execution backends.",
-  },
-  {
-    slug: "gateway",
-    label: "Gateway",
-    icon: "activity",
-    description: "Gateway extensions, deployment, observability, and operational tooling.",
-  },
-  {
-    slug: "security",
-    label: "Security",
-    icon: "shield",
-    description: "Authentication, authorization, security controls, and policy enforcement.",
-  },
-  {
-    slug: "other",
-    label: "Other",
-    icon: "package",
-    description: "Plugins that do not yet fit another browse category.",
-  },
-] as const;
-
 export const SKILL_CATEGORY_DEFINITIONS = [
   {
     slug: "integrations",
@@ -215,20 +140,11 @@ export const SKILL_CATEGORY_DEFINITIONS = [
   },
 ] as const;
 
-export type PluginCategorySlug = (typeof PLUGIN_CATEGORY_DEFINITIONS)[number]["slug"];
 export type SkillCategorySlug = (typeof SKILL_CATEGORY_DEFINITIONS)[number]["slug"];
 
-export const PLUGIN_CATEGORY_SLUGS = PLUGIN_CATEGORY_DEFINITIONS.map((category) => category.slug);
 export const SKILL_CATEGORY_SLUGS = SKILL_CATEGORY_DEFINITIONS.map((category) => category.slug);
 
-const PLUGIN_CATEGORY_SLUG_SET = new Set<string>(PLUGIN_CATEGORY_SLUGS);
 const SKILL_CATEGORY_SLUG_SET = new Set<string>(SKILL_CATEGORY_SLUGS);
-
-export function isPluginCategorySlug(
-  value: string | null | undefined,
-): value is PluginCategorySlug {
-  return Boolean(value && PLUGIN_CATEGORY_SLUG_SET.has(value));
-}
 
 export function isSkillCategorySlug(value: string | null | undefined): value is SkillCategorySlug {
   return Boolean(value && SKILL_CATEGORY_SLUG_SET.has(value));
@@ -236,7 +152,7 @@ export function isSkillCategorySlug(value: string | null | undefined): value is 
 
 function normalizeCategories<T extends string>(
   values: readonly string[] | null | undefined,
-  kind: "plugin" | "skill",
+  kind: "skill",
   isCategorySlug: (value: string) => value is T,
 ): T[] {
   const normalized: T[] = [];
@@ -262,12 +178,6 @@ function normalizeCategories<T extends string>(
   return exclusiveCategories;
 }
 
-export function normalizePluginCategories(
-  values: readonly string[] | null | undefined,
-): PluginCategorySlug[] {
-  return normalizeCategories(values, "plugin", isPluginCategorySlug);
-}
-
 export function normalizeSkillCategories(
   values: readonly string[] | null | undefined,
 ): SkillCategorySlug[] {
@@ -289,13 +199,6 @@ function resolveCategories<T extends string>({
   }
   const inferredCategories = normalize(inferred);
   return inferredCategories.length > 0 ? inferredCategories : normalize(["other"]);
-}
-
-export function resolvePluginCategories(input: {
-  declared?: readonly string[] | null;
-  inferred?: readonly string[] | null;
-}): PluginCategorySlug[] {
-  return resolveCategories({ ...input, normalize: normalizePluginCategories });
 }
 
 export function resolveSkillCategories(input: {

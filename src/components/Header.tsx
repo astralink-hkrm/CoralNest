@@ -30,7 +30,6 @@ import {
 import { gravatarUrl } from "../lib/gravatar";
 import { PRIMARY_NAV_ITEMS, SECONDARY_NAV_ITEMS } from "../lib/nav-items";
 import { buildPublisherProfileHref, buildSkillDetailHref } from "../lib/ownerRoute";
-import { buildPluginDetailHref, displayPluginPackageName } from "../lib/pluginRoutes";
 import { SITE_NAME } from "../lib/site";
 import { applyTheme, useThemeMode } from "../lib/theme";
 import { clearAuthError, setAuthError } from "../lib/useAuthError";
@@ -38,7 +37,6 @@ import { useAuthStatus } from "../lib/useAuthStatus";
 import {
   useUnifiedSearch,
   type UnifiedCreatorResult,
-  type UnifiedPluginResult,
   type UnifiedSkillResult,
 } from "../lib/useUnifiedSearch";
 import { MarketplaceIcon } from "./MarketplaceIcon";
@@ -97,18 +95,13 @@ function GitHubLogo({ className }: { className?: string }) {
   );
 }
 
-type TypeaheadSection = "skills" | "plugins" | "creators";
+type TypeaheadSection = "skills" | "creators";
 
 type TypeaheadItem =
   | {
       kind: "skill";
       key: string;
       result: UnifiedSkillResult;
-    }
-  | {
-      kind: "plugin";
-      key: string;
-      result: UnifiedPluginResult;
     }
   | {
       kind: "creator";
@@ -156,13 +149,12 @@ export default function Header() {
   const showMobileTypeahead = showTypeahead && hasNavSearchQuery;
   const {
     skillResults,
-    pluginResults,
     creatorResults,
     isSearching: typeaheadSearching,
   } = useUnifiedSearch(navSearchQuery, "all", {
     debounceMs: 180,
     enabled: typeaheadOpen && hasNavSearchQuery,
-    limits: { skills: 4, plugins: 4, creators: 4 },
+    limits: { skills: 4, creators: 4 },
   });
   const typeaheadSkillItems = useMemo<TypeaheadItem[]>(() => {
     if (!hasNavSearchQuery) return [];
@@ -180,23 +172,6 @@ export default function Header() {
     }
     return items;
   }, [hasNavSearchQuery, skillResults, trimmedNavSearchQuery]);
-
-  const typeaheadPluginItems = useMemo<TypeaheadItem[]>(() => {
-    if (!hasNavSearchQuery) return [];
-    const items: TypeaheadItem[] = [];
-    for (const result of pluginResults) {
-      items.push({ kind: "plugin", key: `plugin-${result.plugin.name}`, result });
-    }
-    if (pluginResults.length > 0) {
-      items.push({
-        kind: "footer",
-        key: "footer-plugins",
-        section: "plugins",
-        label: `See plugin results for "${trimmedNavSearchQuery}"`,
-      });
-    }
-    return items;
-  }, [hasNavSearchQuery, pluginResults, trimmedNavSearchQuery]);
 
   const typeaheadCreatorItems = useMemo<TypeaheadItem[]>(() => {
     if (!hasNavSearchQuery) return [];
@@ -216,8 +191,8 @@ export default function Header() {
   }, [creatorResults, hasNavSearchQuery, trimmedNavSearchQuery]);
 
   const typeaheadItems = useMemo(
-    () => [...typeaheadSkillItems, ...typeaheadPluginItems, ...typeaheadCreatorItems],
-    [typeaheadCreatorItems, typeaheadPluginItems, typeaheadSkillItems],
+    () => [...typeaheadSkillItems, ...typeaheadCreatorItems],
+    [typeaheadCreatorItems, typeaheadSkillItems],
   );
   const activeTypeaheadItem = showTypeahead ? typeaheadItems[typeaheadActiveIndex] : undefined;
   const activeTypeaheadId = activeTypeaheadItem
@@ -324,12 +299,6 @@ export default function Header() {
       }
       void navigate({
         to: buildSkillDetailHref(resultOwnerHandle, item.result.skill.slug),
-      });
-    } else if (item.kind === "plugin") {
-      void navigate({
-        to: buildPluginDetailHref(item.result.plugin.name, {
-          ownerHandle: item.result.plugin.ownerHandle,
-        }),
       });
     } else if (item.kind === "creator") {
       const publisherHandle = item.result.creator.handle.trim();
@@ -548,7 +517,7 @@ export default function Header() {
                   className="navbar-search-input"
                   type="search"
                   role="combobox"
-                  placeholder="Search skills, plugins, and creators"
+                  placeholder="Search skills and creators"
                   value={navSearchQuery}
                   onChange={(e) => {
                     setNavSearchQuery(e.target.value);
@@ -566,18 +535,17 @@ export default function Header() {
                 <NavSearchShortcutKbd isApple={isAppleSearchShortcut} />
               </form>
               {showTypeahead && !mobileSearchOpen ? (
-                <SearchTypeahead
-                  activeIndex={typeaheadActiveIndex}
-                  loading={typeaheadSearching}
-                  onHoverItem={setTypeaheadActiveIndex}
-                  onSelectItem={navigateToTypeaheadItem}
-                  creatorItems={typeaheadCreatorItems}
-                  pluginItems={typeaheadPluginItems}
-                  query={trimmedNavSearchQuery}
-                  skillItems={typeaheadSkillItems}
-                />
-              ) : null}
-            </div>
+                  <SearchTypeahead
+                    activeIndex={typeaheadActiveIndex}
+                    loading={typeaheadSearching}
+                    onHoverItem={setTypeaheadActiveIndex}
+                    onSelectItem={navigateToTypeaheadItem}
+                    creatorItems={typeaheadCreatorItems}
+                    query={trimmedNavSearchQuery}
+                    skillItems={typeaheadSkillItems}
+                  />
+                ) : null}
+              </div>
           </div>
 
           <div className="navbar-calm-actions nav-actions">
@@ -747,7 +715,7 @@ export default function Header() {
                 className="navbar-search-input"
                 type="search"
                 role="combobox"
-                placeholder="Search skills, plugins, and creators"
+                placeholder="Search skills and creators"
                 value={navSearchQuery}
                 onChange={(e) => {
                   setNavSearchQuery(e.target.value);
@@ -785,7 +753,6 @@ export default function Header() {
                 onHoverItem={setTypeaheadActiveIndex}
                 onSelectItem={navigateToTypeaheadItem}
                 creatorItems={typeaheadCreatorItems}
-                pluginItems={typeaheadPluginItems}
                 query={trimmedNavSearchQuery}
                 skillItems={typeaheadSkillItems}
               />
@@ -840,7 +807,6 @@ function SearchTypeahead({
   loading,
   onHoverItem,
   onSelectItem,
-  pluginItems,
   query,
   skillItems,
 }: {
@@ -849,27 +815,24 @@ function SearchTypeahead({
   loading: boolean;
   onHoverItem: (index: number) => void;
   onSelectItem: (item: TypeaheadItem) => void;
-  pluginItems: TypeaheadItem[];
   query: string;
   skillItems: TypeaheadItem[];
 }) {
   const hasQuery = query.length > 0;
   const hasSkillMatches = skillItems.some((item) => item.kind === "skill");
-  const hasPluginMatches = pluginItems.some((item) => item.kind === "plugin");
   const hasCreatorMatches = creatorItems.some((item) => item.kind === "creator");
-  const hasMatches = hasSkillMatches || hasPluginMatches || hasCreatorMatches;
-  const pluginStartIndex = skillItems.length;
-  const creatorStartIndex = skillItems.length + pluginItems.length;
+  const hasMatches = hasSkillMatches || hasCreatorMatches;
+  const creatorStartIndex = skillItems.length;
 
   return (
-    <div className="navbar-search-typeahead" id="navbar-search-typeahead">
+      <div className="navbar-search-typeahead" id="navbar-search-typeahead">
       <div className="navbar-search-typeahead-panel">
         {!hasQuery ? (
           <div className="navbar-search-typeahead-status is-empty">
             <span className="navbar-search-typeahead-status-icon" aria-hidden="true">
               <Search size={17} />
             </span>
-            <span>Start typing to search skills, plugins, and creators</span>
+            <span>Start typing to search skills and creators</span>
           </div>
         ) : null}
         {hasQuery && loading && !hasMatches ? (
@@ -882,7 +845,7 @@ function SearchTypeahead({
         ) : null}
         {hasQuery && !loading && !hasMatches ? (
           <div className="navbar-search-typeahead-status">
-            No skills, plugins, or creators found for "{query}"
+            No skills or creators found for "{query}"
           </div>
         ) : null}
         {hasMatches ? (
@@ -909,30 +872,6 @@ function SearchTypeahead({
                     active={activeIndex === index}
                     item={item}
                     index={index}
-                    onHoverItem={onHoverItem}
-                    onSelectItem={onSelectItem}
-                  />
-                ))}
-              </div>
-            ) : null}
-            {hasPluginMatches ? (
-              <div
-                className="navbar-search-typeahead-section"
-                role="group"
-                aria-labelledby="navbar-search-typeahead-plugins-heading"
-              >
-                <div
-                  id="navbar-search-typeahead-plugins-heading"
-                  className="navbar-search-typeahead-heading"
-                >
-                  Plugins
-                </div>
-                {pluginItems.map((item, index) => (
-                  <TypeaheadRow
-                    key={item.key}
-                    active={activeIndex === pluginStartIndex + index}
-                    item={item}
-                    index={pluginStartIndex + index}
                     onHoverItem={onHoverItem}
                     onSelectItem={onSelectItem}
                   />
@@ -1027,20 +966,6 @@ function TypeaheadRowIcon({ item }: { item: TypeaheadItem }) {
     );
   }
 
-  if (item.kind === "plugin") {
-    const label = item.result.plugin.displayName || item.result.plugin.name;
-    return (
-      <span className="navbar-search-typeahead-icon" aria-hidden="true">
-        <MarketplaceIcon
-          kind="plugin"
-          label={label}
-          categorySlug={item.result.plugin.categories?.[0]}
-          size="xs"
-        />
-      </span>
-    );
-  }
-
   if (item.kind === "creator") {
     const publisher = item.result.creator;
     return (
@@ -1069,22 +994,6 @@ function getTypeaheadRowBody(item: TypeaheadItem) {
           official={item.result.owner?.official === true}
           packageName={item.result.skill.slug}
         />
-      ),
-    };
-  }
-  if (item.kind === "plugin") {
-    const packageName = displayPluginPackageName(item.result.plugin.name);
-    const owner = item.result.plugin.ownerHandle ? `@${item.result.plugin.ownerHandle}` : null;
-    return {
-      title: item.result.plugin.displayName,
-      meta: owner ? (
-        <TypeaheadPublisherMeta
-          owner={owner}
-          official={item.result.plugin.isOfficial}
-          packageName={packageName}
-        />
-      ) : (
-        packageName
       ),
     };
   }

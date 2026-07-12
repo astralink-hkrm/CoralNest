@@ -32,15 +32,11 @@ const CatalogFeedEntryBaseSchema = {
         candidates: CatalogFeedInstallCandidateSchema.array(),
     },
 };
-export const CatalogFeedPluginEntrySchema = type({
-    ...CatalogFeedEntryBaseSchema,
-    type: '"plugin"',
-});
 export const CatalogFeedSkillEntrySchema = type({
     ...CatalogFeedEntryBaseSchema,
     type: '"skill"',
 });
-export const CatalogFeedEntrySchema = type(CatalogFeedPluginEntrySchema.or(CatalogFeedSkillEntrySchema));
+export const CatalogFeedEntrySchema = type(CatalogFeedSkillEntrySchema);
 export const CatalogFeedSchema = type({
     "+": "reject",
     schemaVersion: "number",

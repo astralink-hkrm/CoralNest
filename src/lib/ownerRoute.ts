@@ -1,5 +1,3 @@
-import { getOpenClawExtensionPackageName } from "./openClawExtensionSlugs";
-
 const OWNER_ROUTE_HANDLE_PATTERN = /^[a-zA-Z0-9](?:[a-zA-Z0-9._-]{0,38}[a-zA-Z0-9])?$/;
 const OWNER_ROUTE_SCOPE_PATTERN = /^@[a-zA-Z0-9](?:[a-zA-Z0-9._-]{0,38}[a-zA-Z0-9])?$/;
 
@@ -24,13 +22,7 @@ function routeSegment(value: string) {
 }
 
 export function buildPublisherProfileHref(handle: string) {
-  return isLegacyPublisherProfileHandle(handle)
-    ? `/user/${routeSegment(handle)}`
-    : `/${routeSegment(handle)}`;
-}
-
-export function isLegacyPublisherProfileHandle(handle: string) {
-  return Boolean(getOpenClawExtensionPackageName(handle));
+  return `/${routeSegment(handle)}`;
 }
 
 export function buildSkillDetailHref(owner: string, slug: string) {

@@ -24,7 +24,6 @@ type ScanOptions = {
 };
 
 type ScanDownloadOptions = {
-  kind?: "skill" | "plugin";
   version?: string;
   output?: string;
 };
@@ -78,11 +77,10 @@ export async function cmdScanDownload(
   options: ScanDownloadOptions,
 ) {
   const name = nameArg.trim();
-  if (!name) fail("Skill or plugin name required");
+  if (!name) fail("Skill slug required");
   const version = options.version?.trim();
   if (!version) fail("--version required");
-  const kind = options.kind ?? "skill";
-  if (kind !== "skill" && kind !== "plugin") fail('--kind must be "skill" or "plugin"');
+  const kind = "skill";
 
   const token = await requireAuthToken();
   const registry = await getRegistry(opts, { cache: true });

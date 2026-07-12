@@ -1,14 +1,12 @@
-# ClawHub Design System
+# CoralNest Design System
 
-This document outlines the design rules, patterns, and guidelines for the ClawHub platform to ensure consistency, accessibility, and maintainability across all components.
+This document outlines the design rules, patterns, and guidelines for the CoralNest platform to ensure consistency, accessibility, and maintainability across all components.
 
 ---
 
 ## Color System
 
-### Brand Palette (OpenClaw)
-
-ClawHub uses a strict **3-5 color palette** based on the OpenClaw brand:
+CoralNest uses a strict **3-5 color palette**:
 
 | Token           | Light Mode | Dark Mode | Usage                                           |
 | --------------- | ---------- | --------- | ----------------------------------------------- |

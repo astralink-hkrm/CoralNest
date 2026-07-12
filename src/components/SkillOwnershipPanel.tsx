@@ -405,7 +405,7 @@ export function SkillOwnershipPanel({
           <DialogHeader>
             <DialogTitle>Delete skill</DialogTitle>
             <DialogDescription>
-              Delete <strong>{slug}</strong> from public ClawHub surfaces. Accidental deletes can be
+              Delete <strong>{slug}</strong> from public CoralNest surfaces. Accidental deletes can be
               restored.
             </DialogDescription>
           </DialogHeader>

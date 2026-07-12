@@ -73,7 +73,7 @@ describe("users route redirect", () => {
     });
   });
 
-  it("keeps existing official-alias publishers reachable from the legacy profile route", async () => {
+  it("redirects legacy /user profile routes to publisher profiles", async () => {
     const route = (await import("../routes/user/$handle")).Route as unknown as {
       __config: {
         beforeLoad: (args: {
@@ -83,11 +83,13 @@ describe("users route redirect", () => {
       };
     };
 
-    redirectMock.mockClear();
     expect(() =>
       route.__config.beforeLoad({ params: { handle: "tencent" }, search: {} }),
-    ).not.toThrow();
-    expect(redirectMock).not.toHaveBeenCalled();
+    ).toThrow();
+    expect(redirectMock).toHaveBeenCalledWith({
+      href: "/tencent",
+      replace: true,
+    });
   });
 
   it("redirects legacy org profile routes to publisher profiles", async () => {

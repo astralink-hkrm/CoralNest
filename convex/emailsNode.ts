@@ -15,7 +15,7 @@ import {
   type NotificationArtifact,
 } from "./lib/emails";
 
-const DEFAULT_FROM = "ClawHub Security <noreply@notifications.openclaw.ai>";
+const DEFAULT_FROM = "CoralNest Security <noreply@coralnest.ai>";
 
 const notificationArtifactValidator = v.object({
   kind: v.union(v.literal("skill"), v.literal("plugin")),

@@ -34,7 +34,7 @@ function PopularPublisherCard({
   publisher?: PublicPublisherListItem;
 }) {
   const name = publisher?.displayName?.trim() || pinned.name;
-  const bio = publisher?.bio?.trim() || "Publisher on ClawHub.";
+  const bio = publisher?.bio?.trim() || "Publisher on CoralNest.";
   const kind = publisher?.kind ?? pinned.kind;
   const itemCount = (publisher?.stats?.skills ?? 0) + (publisher?.stats?.packages ?? 0);
 

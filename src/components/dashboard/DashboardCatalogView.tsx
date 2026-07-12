@@ -1,9 +1,11 @@
 import { Download, EyeOff } from "lucide-react";
 import type { ReactNode } from "react";
 import { formatCompactStat } from "../../lib/numberFormat";
-import { buildPluginDetailHref } from "../../lib/pluginRoutes";
 import { timeAgo } from "../../lib/timeAgo";
 import { truncateText } from "../../lib/truncateText";
+
+const buildPluginDetailHref = () => "#";
+
 import {
   artifactStatusToScanStatus,
   packageArtifactStatus,

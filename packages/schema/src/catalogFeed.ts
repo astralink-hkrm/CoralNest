@@ -44,21 +44,13 @@ const CatalogFeedEntryBaseSchema = {
   },
 } as const;
 
-export const CatalogFeedPluginEntrySchema = type({
-  ...CatalogFeedEntryBaseSchema,
-  type: '"plugin"',
-});
-export type CatalogFeedPluginEntry = (typeof CatalogFeedPluginEntrySchema)[inferred];
-
 export const CatalogFeedSkillEntrySchema = type({
   ...CatalogFeedEntryBaseSchema,
   type: '"skill"',
 });
 export type CatalogFeedSkillEntry = (typeof CatalogFeedSkillEntrySchema)[inferred];
 
-export const CatalogFeedEntrySchema = type(
-  CatalogFeedPluginEntrySchema.or(CatalogFeedSkillEntrySchema),
-);
+export const CatalogFeedEntrySchema = type(CatalogFeedSkillEntrySchema);
 export type CatalogFeedEntry = (typeof CatalogFeedEntrySchema)[inferred];
 
 export const CatalogFeedSchema = type({

@@ -46,7 +46,7 @@ type SecurityAuditExportEntry = {
   value: unknown;
 };
 
-const EXPORT_README = `# ClawHub Security Audit Export
+const EXPORT_README = `# CoralNest Security Audit Export
 
 This archive contains stored scanner outcomes for one ClawHub artifact version.
 

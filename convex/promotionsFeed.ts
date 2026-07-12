@@ -26,11 +26,6 @@ export function toPromotionsFeedEntry(promotion: Doc<"promotions">): PromotionsF
     ...(promotion.sponsor ? { sponsor: promotion.sponsor } : {}),
     startsAt: promotion.startsAt,
     endsAt: promotion.endsAt,
-    ...(promotion.provider ? { provider: promotion.provider } : {}),
-    ...(promotion.authChoiceId ? { authChoiceId: promotion.authChoiceId } : {}),
-    ...(promotion.pluginNames && promotion.pluginNames.length > 0
-      ? { pluginNames: promotion.pluginNames }
-      : {}),
     models: promotion.models,
     ...(promotion.signupUrl ? { signupUrl: promotion.signupUrl } : {}),
     ...(promotion.docsUrl ? { docsUrl: promotion.docsUrl } : {}),

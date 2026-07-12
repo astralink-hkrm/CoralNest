@@ -36,7 +36,7 @@ export function PublisherListItem({ publisher, variant = "list" }: PublisherList
   const publishedCount = publisher.stats.packages + publisher.stats.skills;
   const summary =
     publisher.bio?.trim() ||
-    (publisher.kind === "org" ? "Org publisher on ClawHub." : "Publisher on ClawHub.");
+    (publisher.kind === "org" ? "Org publisher on CoralNest." : "Publisher on CoralNest.");
   const summaryInMain = variant !== "grid";
   const featuredItems = publisher.publishedItems.slice(0, 3);
 

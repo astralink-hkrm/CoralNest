@@ -4,9 +4,5 @@ export declare const DocsLinks: {
     readonly clawhub: {
         readonly acceptableUsage: string;
         readonly publishing: string;
-        readonly packageScopeFaq: string;
-    };
-    readonly openclaw: {
-        readonly pluginPackageMetadata: string;
     };
 };

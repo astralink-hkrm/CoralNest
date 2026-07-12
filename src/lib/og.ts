@@ -1,5 +1,4 @@
 import { buildSkillDetailHref, buildPublisherProfileHref } from "./ownerRoute";
-import { buildPluginDetailHref } from "./pluginRoutes";
 import { getRuntimeEnv } from "./runtimeEnv";
 import { getClawHubSiteUrl, SITE_DESCRIPTION } from "./site";
 
@@ -18,14 +17,6 @@ type SkillMeta = {
   image: string;
   url: string;
   owner: string | null;
-};
-
-type PluginMetaSource = {
-  name: string;
-  displayName?: string | null;
-  summary?: string | null;
-  owner?: string | null;
-  latestVersion?: string | null;
 };
 
 type PublisherMetaSource = {
@@ -52,7 +43,6 @@ type BasicMeta = {
 };
 
 const OG_SKILL_IMAGE_LAYOUT_VERSION = "10";
-const OG_PLUGIN_IMAGE_LAYOUT_VERSION = "5";
 const OG_PUBLISHER_IMAGE_LAYOUT_VERSION = "8";
 
 function getSiteUrl() {
@@ -94,9 +84,9 @@ export function buildSkillMeta(source: SkillMetaSource): SkillMeta {
   const displayName = clean(source.displayName) || clean(source.slug);
   const summary = clean(source.summary);
   const version = clean(source.version);
-  const title = `${displayName} — ClawHub`;
+  const title = `${displayName} — CoralNest`;
   const description =
-    summary || (owner ? `Agent skill by @${owner} on ClawHub.` : SITE_DESCRIPTION);
+    summary || (owner ? `Agent skill by @${owner} on CoralNest.` : SITE_DESCRIPTION);
   const ownerPath = owner || ownerId || "unknown";
   const url = `${siteUrl}${buildSkillDetailHref(ownerPath, source.slug)}`;
   const imageParams = new URLSearchParams();
@@ -113,35 +103,14 @@ export function buildSkillMeta(source: SkillMetaSource): SkillMeta {
   };
 }
 
-export function buildPluginMeta(source: PluginMetaSource): BasicMeta {
-  const siteUrl = getSiteUrl();
-  const displayName = clean(source.displayName) || clean(source.name);
-  const summary = clean(source.summary);
-  const owner = clean(source.owner);
-  const latestVersion = clean(source.latestVersion);
-  const title = `${displayName} — ClawHub Plugins`;
-  const description = summary || (owner ? `Plugin by @${owner} on ClawHub.` : SITE_DESCRIPTION);
-  const url = `${siteUrl}${buildPluginDetailHref(source.name, { ownerHandle: owner })}`;
-  const imageParams = new URLSearchParams();
-  imageParams.set("v", OG_PLUGIN_IMAGE_LAYOUT_VERSION);
-  imageParams.set("name", source.name);
-  if (latestVersion) imageParams.set("version", latestVersion);
-  return {
-    title,
-    description: truncate(description, 200),
-    image: `${siteUrl}/og/plugin?${imageParams.toString()}`,
-    url,
-  };
-}
-
 export function buildPublisherMeta(source: PublisherMetaSource): BasicMeta {
   const siteUrl = getSiteUrl();
   const handle = clean(source.handle).replace(/^@+/, "");
   const displayName = clean(source.displayName) || `@${handle}`;
   const bio = clean(source.bio);
   const image = clean(source.image);
-  const title = `${displayName} — ClawHub`;
-  const description = bio || `Publisher @${handle} on ClawHub.`;
+  const title = `${displayName} — CoralNest`;
+  const description = bio || `Publisher @${handle} on CoralNest.`;
   const imageParams = new URLSearchParams();
   imageParams.set("v", OG_PUBLISHER_IMAGE_LAYOUT_VERSION);
   imageParams.set("handle", handle);

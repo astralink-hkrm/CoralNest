@@ -418,7 +418,7 @@ function buildSkillScanReportZip(status: Record<string, unknown>) {
     "",
     "Start with `clawscan.json`. ClawScan is the primary security verdict for the submitted artifact. Its `summary` field is the short explanation of what triggered the result, and `guidance` explains what to change before uploading a fixed version.",
     "",
-    "- `malicious` means ClawHub blocked the submitted version from public install surfaces.",
+    "- `malicious` means CoralNest blocked the submitted version from public install surfaces.",
     "- `suspicious` means ClawHub found behavior that needs review before users should rely on it.",
     "- `clean` means ClawHub did not find blocking security issues in this scan.",
     "",

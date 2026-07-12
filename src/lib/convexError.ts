@@ -27,10 +27,10 @@ function cleanupConvexMessage(message: string) {
 
 function normalizeGenericDenialMessage(message: string) {
   if (/^unauthorized$/i.test(message)) {
-    return "Sign in required. If this ClawHub account was deleted, banned, or disabled, it cannot perform this action.";
+    return "Sign in required. If this account was deleted, banned, or disabled, it cannot perform this action.";
   }
   if (/^forbidden$/i.test(message)) {
-    return "This ClawHub account does not have permission to perform this action, or the account is not in good standing.";
+    return "This account does not have permission to perform this action, or the account is not in good standing.";
   }
   return message;
 }

@@ -109,41 +109,27 @@ Public read:
   - Hosted skills are exported as stored files.
   - Current GitHub-backed skills with a `clean` or `suspicious` scan are exported
     as `public-github` handoff descriptors.
-- `GET /api/v1/packages?limit=&cursor=&sort=`
-  - `sort`: `updated` (default), `recommended`, `downloads`, legacy alias `installs`
-  - Invalid `sort` values return `400`
-- `GET /api/v1/plugins?limit=&cursor=&sort=`
-  - `sort`: `recommended` (default), `downloads`, `updated`, legacy alias `installs`
-- `GET /api/v1/plugins/search?q=...`
-- `GET /api/v1/packages/{name}/versions/{version}/artifact`
-- `GET /api/v1/packages/{name}/versions/{version}/security`
-- `GET /api/v1/packages/{name}/versions/{version}/artifact/download`
-- `GET /api/npm/{package}`
-- `GET /api/npm/{package}/-/{tarball}.tgz`
+
 
 Auth required:
 
 - `POST /api/v1/skills` (publish, multipart preferred)
 - `DELETE /api/v1/skills/{slug}`
-- `DELETE /api/v1/packages/{name}`
 - `POST /api/v1/skills/{slug}/undelete`
-- `POST /api/v1/packages/{name}/undelete`
 - `POST /api/v1/skills/{slug}/rename`
 - `POST /api/v1/skills/{slug}/merge`
 - `POST /api/v1/skills/{slug}/transfer`
-- `POST /api/v1/packages/{name}/transfer`
 - `POST /api/v1/skills/{slug}/transfer/accept`
 - `POST /api/v1/skills/{slug}/transfer/reject`
 - `POST /api/v1/skills/{slug}/transfer/cancel`
 - `GET /api/v1/skills/export?startDate=&endDate=&limit=&cursor=`
-- `GET /api/v1/plugins/export?startDate=&endDate=&limit=&cursor=&family=`
 - `GET /api/v1/transfers/incoming`
 - `GET /api/v1/transfers/outgoing`
 - `GET /api/v1/whoami`
 
 Admin only:
 
-- `POST /api/v1/users/reserve` reserves root slugs and private no-release package placeholders for an owner handle.
+- `POST /api/v1/users/reserve` reserves root slugs for an owner handle.
 
 ## Legacy
 

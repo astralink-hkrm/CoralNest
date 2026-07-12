@@ -9,14 +9,10 @@ import {
   clampActivityTrendEndDay,
   getActivityTrendRangeForEndDay,
 } from "./lib/downloadTrend";
-import { normalizePackageName } from "./lib/packageRegistry";
 import { canAccessPublisherOwnerScope } from "./lib/publishers";
 import { readCanonicalStat } from "./lib/skillStats";
 
-const dashboardMetricSelectionValidator = v.union(
-  v.object({ kind: v.literal("skill"), slug: v.string() }),
-  v.object({ kind: v.literal("plugin"), name: v.string() }),
-);
+const dashboardMetricSelectionValidator = v.object({ kind: v.literal("skill"), slug: v.string() });
 
 type MetricPoint = { day: number; value: number };
 
@@ -51,31 +47,6 @@ async function aggregateSkillDownloads(ctx: QueryCtx, skills: Doc<"skills">[], e
   };
 }
 
-async function aggregatePluginDownloads(
-  ctx: QueryCtx,
-  packages: Doc<"packages">[],
-  endDay: number,
-) {
-  const { startDay } = getActivityTrendRangeForEndDay(endDay);
-  const points = emptyPoints(endDay);
-  const trends = await Promise.all(
-    packages.map(async (pkg) => {
-      const rows = await ctx.db
-        .query("packageDailyStats")
-        .withIndex("by_package_day", (q) =>
-          q.eq("packageId", pkg._id).gte("day", startDay).lte("day", endDay),
-        )
-        .take(ACTIVITY_TREND_DAYS);
-      return buildDailyMetricTrends(rows, endDay).downloads.points;
-    }),
-  );
-  for (const trend of trends) addPoints(points, trend);
-  return {
-    allTimeDownloads: packages.reduce((sum, pkg) => sum + Math.max(0, pkg.stats.downloads), 0),
-    points,
-  };
-}
-
 async function listPublisherSkills(
   ctx: QueryCtx,
   publisher: Doc<"publishers">,
@@ -105,17 +76,6 @@ async function listPublisherSkills(
     .collect();
 }
 
-function uniquePackages(packages: Doc<"packages">[]) {
-  const seen = new Set<Id<"packages">>();
-  const unique: Doc<"packages">[] = [];
-  for (const pkg of packages) {
-    if (seen.has(pkg._id)) continue;
-    seen.add(pkg._id);
-    unique.push(pkg);
-  }
-  return unique;
-}
-
 function legacyPersonalOwnerUserId(publisher: Doc<"publishers">, userId: Id<"users">) {
   return publisher.kind === "user" ? (publisher.linkedUserId ?? userId) : undefined;
 }
@@ -130,36 +90,6 @@ function isOwnedByDashboardPublisher(
   return Boolean(
     legacyOwnerUserId && item.ownerUserId === legacyOwnerUserId && !item.ownerPublisherId,
   );
-}
-
-async function listPublisherPackages(
-  ctx: QueryCtx,
-  publisher: Doc<"publishers">,
-  userId: Id<"users">,
-) {
-  const packages = await ctx.db
-    .query("packages")
-    .withIndex("by_owner_publisher_active_updated", (q) =>
-      q.eq("ownerPublisherId", publisher._id).eq("softDeletedAt", undefined),
-    )
-    .order("desc")
-    .collect();
-
-  const legacyOwnerUserId = legacyPersonalOwnerUserId(publisher, userId);
-  if (legacyOwnerUserId) {
-    const legacyPackages = await ctx.db
-      .query("packages")
-      .withIndex("by_owner", (q) => q.eq("ownerUserId", legacyOwnerUserId))
-      .order("desc")
-      .collect();
-    packages.push(
-      ...legacyPackages.filter(
-        (pkg) => !pkg.softDeletedAt && isOwnedByDashboardPublisher(pkg, publisher, userId),
-      ),
-    );
-  }
-
-  return uniquePackages(packages);
 }
 
 export const getDownloadMetrics = query({
@@ -181,10 +111,9 @@ export const getDownloadMetrics = query({
 
     const endDay = clampActivityTrendEndDay(args.endDay, Date.now());
     let skills: Doc<"skills">[] = [];
-    let packages: Doc<"packages">[] = [];
 
     const selection = args.selection;
-    if (selection?.kind === "skill") {
+    if (selection) {
       const publisherOwned = await ctx.db
         .query("skills")
         .withIndex("by_owner_publisher_slug", (q) =>
@@ -207,30 +136,15 @@ export const getDownloadMetrics = query({
           isOwnedByDashboardPublisher(skill, publisher, userId) &&
           all.findIndex((candidate) => candidate._id === skill._id) === index,
       );
-    } else if (selection?.kind === "plugin") {
-      const pkg = await ctx.db
-        .query("packages")
-        .withIndex("by_name", (q) => q.eq("normalizedName", normalizePackageName(selection.name)))
-        .unique();
-      if (pkg && !pkg.softDeletedAt && isOwnedByDashboardPublisher(pkg, publisher, userId)) {
-        packages = [pkg];
-      }
     } else {
-      [skills, packages] = await Promise.all([
-        listPublisherSkills(ctx, publisher, userId),
-        listPublisherPackages(ctx, publisher, userId),
-      ]);
+      skills = await listPublisherSkills(ctx, publisher, userId);
     }
 
-    const [skillMetrics, pluginMetrics] = await Promise.all([
-      aggregateSkillDownloads(ctx, skills, endDay),
-      aggregatePluginDownloads(ctx, packages, endDay),
-    ]);
+    const skillMetrics = await aggregateSkillDownloads(ctx, skills, endDay);
     return {
       endDay,
-      allTimeDownloads: skillMetrics.allTimeDownloads + pluginMetrics.allTimeDownloads,
+      allTimeDownloads: skillMetrics.allTimeDownloads,
       skills: skillMetrics,
-      plugins: pluginMetrics,
     };
   },
 });

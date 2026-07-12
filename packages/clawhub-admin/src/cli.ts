@@ -6,10 +6,6 @@ import { resolveClawdbotDefaultWorkspace } from "../../clawhub/src/cli/clawdbotC
 import { cmdLoginFlow, cmdLogout, cmdWhoami } from "../../clawhub/src/cli/commands/auth.js";
 import { cmdUnhideSkill } from "../../clawhub/src/cli/commands/delete.js";
 import {
-  cmdGetPackageTrustedPublisher,
-  cmdPackageModerationStatus,
-} from "../../clawhub/src/cli/commands/packages.js";
-import {
   cmdListSkillReports,
   cmdTriageSkillReport,
 } from "../../clawhub/src/cli/commands/skills.js";
@@ -48,19 +44,6 @@ import {
   cmdRepairScopedPackages,
 } from "./commands/orgs.js";
 import {
-  cmdDeletePackageTrustedPublisher,
-  cmdListPackageMigrations,
-  cmdListPackageReports,
-  cmdModeratePackageRelease,
-  cmdPackageModerationQueue,
-  cmdRepairPackageName,
-  cmdRepairPackageRuntimeId,
-  cmdSetPackageTrustedPublisher,
-  cmdTriagePackageReport,
-  cmdTransferPackageOwner,
-  cmdUpsertPackageMigration,
-} from "./commands/packages.js";
-import {
   cmdCreatePromotion,
   cmdListPromotions,
   cmdSetPromotionStatus,
@@ -71,7 +54,7 @@ const program = new Command()
   .name("clawhub-admin")
   .description(
     `${styleTitle(`ClawHub Admin CLI ${getAdminCliBuildLabel()}`)}\n${styleEnvBlock(
-      "platform-only moderation, user administration, and package operations.",
+      "platform-only moderation, user administration, and skill operations.",
     )}`,
   )
   .version(getAdminCliVersion(), "-V, --cli-version", "Show CLI version")
@@ -291,20 +274,6 @@ users
     await cmdRecoverPersonalPublisher(opts, handle, options, isInputAllowed());
   });
 
-const plugins = program
-  .command("plugins")
-  .alias("plugin")
-  .description("Plugin moderation and operations")
-  .showHelpAfterError()
-  .showSuggestionAfterError();
-
-const packages = program
-  .command("packages")
-  .alias("package")
-  .description("Package moderation and operations")
-  .showHelpAfterError()
-  .showSuggestionAfterError();
-
 const org = program
   .command("org")
   .description("Org publisher administration")
@@ -344,12 +313,6 @@ const promotions = program
   .showHelpAfterError()
   .showSuggestionAfterError();
 
-registerPluginOperations(plugins);
-registerPluginModerationCommands(plugins);
-registerPluginGovernanceCommands(plugins);
-registerPluginOperations(packages);
-registerPluginModerationCommands(packages);
-registerPluginGovernanceCommands(packages);
 registerOfficialPublisherCommands(publisher);
 registerOrgCommands(org);
 registerEmailCommands(email);
@@ -575,201 +538,7 @@ function registerOrgCommands(command: Command) {
     });
 }
 
-function registerPluginGovernanceCommands(command: Command) {
-  command
-    .command("transfer")
-    .description("Transfer a plugin package to another publisher without changing package stats")
-    .argument("<name>", "Plugin package name")
-    .requiredOption("--to <owner>", "Destination publisher handle")
-    .requiredOption("--reason <reason>", "Audit reason")
-    .option("--apply", "Write changes; defaults to dry-run")
-    .option("--json", "Output JSON")
-    .action(async (name, options) => {
-      const opts = await resolveGlobalOpts();
-      await cmdTransferPackageOwner(opts, name, options);
-    });
 
-  command
-    .command("repair-name")
-    .description("Admin repair for plugin package names")
-    .argument("<name>", "Current plugin package name")
-    .requiredOption("--next-name <name>", "Target plugin package name")
-    .option("--retire-target", "Rename and soft-delete the current target package first")
-    .option("--owner <handle>", "Transfer repaired package to a publisher handle")
-    .requiredOption("--reason <reason>", "Audit reason")
-    .option("--apply", "Write changes; defaults to dry-run")
-    .option("--json", "Output JSON")
-    .action(async (name, options) => {
-      const opts = await resolveGlobalOpts();
-      await cmdRepairPackageName(opts, name, options);
-    });
-
-  command
-    .command("repair-runtime-id")
-    .description("Admin repair for plugin package runtime ids")
-    .argument("<name>", "Current plugin package name")
-    .requiredOption("--next-runtime-id <id>", "Target plugin runtime id")
-    .requiredOption("--reason <reason>", "Audit reason")
-    .option("--apply", "Write changes; defaults to dry-run")
-    .option("--json", "Output JSON")
-    .action(async (name, options) => {
-      const opts = await resolveGlobalOpts();
-      await cmdRepairPackageRuntimeId(opts, name, options);
-    });
-
-  command
-    .command("migrations")
-    .description("List official plugin migration rows")
-    .option(
-      "--phase <phase>",
-      "planned|published|clawpack-ready|legacy-zip-only|metadata-ready|blocked|ready-for-openclaw|all",
-      "all",
-    )
-    .option("--cursor <cursor>", "Resume cursor")
-    .option("--limit <n>", "Number of migrations to show (max 100)", (value) =>
-      Number.parseInt(value, 10),
-    )
-    .option("--json", "Output JSON")
-    .action(async (options) => {
-      const opts = await resolveGlobalOpts();
-      await cmdListPackageMigrations(opts, options);
-    });
-
-  command
-    .command("set-migration")
-    .description("Create or update an official plugin migration row")
-    .argument("<bundled-plugin-id>", "Bundled OpenClaw plugin id")
-    .requiredOption("--package <name>", "ClawHub package name")
-    .option("--owner <owner>", "Migration owner")
-    .option("--source-repo <repo>", "Source repository")
-    .option("--source-path <path>", "Source path inside repository")
-    .option("--source-commit <sha>", "Source commit SHA")
-    .option(
-      "--phase <phase>",
-      "planned|published|clawpack-ready|legacy-zip-only|metadata-ready|blocked|ready-for-openclaw",
-    )
-    .option("--blockers <items>", "Comma-separated migration blockers")
-    .option("--host-targets-complete", "Mark host target metadata complete")
-    .option("--scan-clean", "Mark scan state clean")
-    .option("--moderation-approved", "Mark moderation approved")
-    .option("--runtime-bundles-ready", "Mark runtime bundles ready")
-    .option("--notes <text>", "Operator notes")
-    .option("--json", "Output JSON")
-    .action(async (bundledPluginId, options) => {
-      const opts = await resolveGlobalOpts();
-      await cmdUpsertPackageMigration(opts, bundledPluginId, options);
-    });
-
-  const trustedPublisher = command
-    .command("trusted-publisher")
-    .description("Manage plugin trusted publisher config")
-    .showHelpAfterError()
-    .showSuggestionAfterError();
-
-  trustedPublisher
-    .command("get")
-    .description("Show trusted publisher config for a plugin package")
-    .argument("<name>", "Plugin package name")
-    .option("--json", "Output JSON")
-    .action(async (name, options) => {
-      const opts = await resolveGlobalOpts();
-      await cmdGetPackageTrustedPublisher(opts, name, options);
-    });
-
-  trustedPublisher
-    .command("set")
-    .description("Attach or replace trusted publisher config for a plugin package")
-    .argument("<name>", "Plugin package name")
-    .requiredOption("--repository <repo>", "GitHub repo (owner/repo or URL)")
-    .requiredOption("--workflow-filename <file>", "Workflow filename, for example publish.yml")
-    .option("--environment <name>", "Optional GitHub environment name to pin")
-    .option("--json", "Output JSON")
-    .action(async (name, options) => {
-      const opts = await resolveGlobalOpts();
-      await cmdSetPackageTrustedPublisher(opts, name, options);
-    });
-
-  trustedPublisher
-    .command("delete")
-    .description("Remove trusted publisher config from a plugin package")
-    .argument("<name>", "Plugin package name")
-    .option("--json", "Output JSON")
-    .action(async (name, options) => {
-      const opts = await resolveGlobalOpts();
-      await cmdDeletePackageTrustedPublisher(opts, name, options);
-    });
-}
-
-function registerPluginModerationCommands(command: Command) {
-  command
-    .command("reports")
-    .description("List plugin reports for moderator review")
-    .option("--status <status>", "open|confirmed|dismissed|all", "open")
-    .option("--cursor <cursor>", "Resume cursor")
-    .option("--limit <n>", "Number of reports to show (max 100)", (value) =>
-      Number.parseInt(value, 10),
-    )
-    .option("--json", "Output JSON")
-    .action(async (options) => {
-      const opts = await resolveGlobalOpts();
-      await cmdListPackageReports(opts, options);
-    });
-
-  command
-    .command("triage-report")
-    .description("Resolve or reopen a plugin report")
-    .argument("<report-id>", "Plugin report id")
-    .requiredOption("--status <status>", "open|confirmed|dismissed")
-    .option("--note <text>", "Review note; required unless reopening")
-    .option("--action <action>", "Final action: none|quarantine|revoke")
-    .option("--yes", "Skip confirmation for artifact availability changes")
-    .option("--json", "Output JSON")
-    .action(async (reportId, options) => {
-      const opts = await resolveGlobalOpts();
-      await cmdTriagePackageReport(opts, reportId, options);
-    });
-}
-
-function registerPluginOperations(command: Command) {
-  command
-    .command("moderate")
-    .description("Set plugin release moderation state")
-    .argument("<name>", "Plugin package name")
-    .requiredOption("--version <version>", "Plugin package version")
-    .requiredOption("--state <state>", "approved|quarantined|revoked")
-    .requiredOption("--reason <text>", "Moderation note/reason")
-    .option("--json", "Output JSON")
-    .action(async (name, options) => {
-      const opts = await resolveGlobalOpts();
-      await cmdModeratePackageRelease(opts, name, options);
-    });
-
-  command
-    .command("status")
-    .alias("moderation-status")
-    .description("Show plugin moderation status")
-    .argument("<name>", "Plugin package name")
-    .option("--json", "Output JSON")
-    .action(async (name, options) => {
-      const opts = await resolveGlobalOpts();
-      await cmdPackageModerationStatus(opts, name, options);
-    });
-
-  command
-    .command("queue")
-    .alias("moderation-queue")
-    .description("List plugin releases that need moderation")
-    .option("--status <status>", "open|blocked|manual|all", "open")
-    .option("--cursor <cursor>", "Resume cursor")
-    .option("--limit <n>", "Number of releases to show (max 100)", (value) =>
-      Number.parseInt(value, 10),
-    )
-    .option("--json", "Output JSON")
-    .action(async (options) => {
-      const opts = await resolveGlobalOpts();
-      await cmdPackageModerationQueue(opts, options);
-    });
-}
 
 function registerSkillModerationCommands(command: Command) {
   command

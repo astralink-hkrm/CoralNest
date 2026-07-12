@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { ExternalLink, MoreHorizontal, Settings, Upload } from "lucide-react";
 import { buildSkillSettingsHref } from "../../lib/ownerRoute";
-import { buildPluginDetailHref } from "../../lib/pluginRoutes";
 import { buildSkillHref } from "../skillDetailUtils";
+
+const buildPluginDetailHref = () => "#";
+
 import {
   DropdownMenu,
   DropdownMenuContent,

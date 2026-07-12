@@ -9,7 +9,6 @@ import {
   formatRelativeUpdatedAt,
   getCatalogItemShortTypeLabel,
   groupPublisherCatalogItemsByTopic,
-  parsePluginCatalogRoute,
   publisherCatalogItemMatchesCategory,
   resolveDefaultCatalogTab,
   shouldShowPublisherCatalogLoadMore,
@@ -455,25 +454,6 @@ describe("publisher profile helpers", () => {
     ).toBe("59");
   });
 
-  it("parses publisher-scoped plugin routes from catalog hrefs", () => {
-    expect(
-      parsePluginCatalogRoute({
-        _id: "packages:gateway",
-        kind: "plugin",
-        displayName: "Gateway",
-        summary: null,
-        icon: null,
-        href: "/expediagroup/plugins/travel-gateway",
-        stars: 0,
-        isOfficial: true,
-        updatedAt: 1,
-      }),
-    ).toEqual({
-      ownerHandle: "expediagroup",
-      name: "@expediagroup/travel-gateway",
-    });
-  });
-
   it("renames empty topic groups to uncategorized and sorts them last", () => {
     const groups = groupPublisherCatalogItemsByTopic([
       {
@@ -586,28 +566,11 @@ describe("publisher profile helpers", () => {
         isOfficial: false,
         updatedAt: 1,
       },
-      {
-        _id: "packages:gateway",
-        kind: "plugin" as const,
-        displayName: "Gateway Plugin",
-        summary: null,
-        topics: [],
-        categories: ["gateway"],
-        icon: null,
-        href: "/plugins/gateway",
-        installs: 0,
-        stars: 0,
-        isOfficial: false,
-        updatedAt: 1,
-      },
     ];
 
     expect(
       buildPublisherCatalogCategoryOptions(items, "skill").map((category) => category.slug),
     ).toEqual(["development"]);
-    expect(
-      buildPublisherCatalogCategoryOptions(items, "plugin").map((category) => category.slug),
-    ).toEqual(["gateway"]);
     expect(publisherCatalogItemMatchesCategory(items[0], "development")).toBe(true);
     expect(publisherCatalogItemMatchesCategory(items[0], "automation")).toBe(false);
   });

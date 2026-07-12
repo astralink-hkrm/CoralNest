@@ -13,7 +13,7 @@ import {
   toOptionalNumber,
 } from "./shared";
 
-const DEFAULT_CLAWHUB_NOREPLY_FROM = "ClawHub <noreply@notifications.openclaw.ai>";
+const DEFAULT_CLAWHUB_NOREPLY_FROM = "CoralNest <noreply@coralnest.ai>";
 
 const usersV1InternalRefs = internal as unknown as {
   publishers: {

@@ -1,39 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { HomeAppsSection } from "../components/HomeAppsSection";
 import { HomeBringSkillsSection } from "../components/HomeBringSkillsSection";
 import { HomeListingSection } from "../components/HomeListingSection";
 import { HomePopularPublishersSection } from "../components/HomePopularPublishersSection";
 import { HomePromotionsSection } from "../components/HomePromotionsSection";
 import { HomeV2FoldBottomFade } from "../components/HomeV2FoldBottomFade";
-import { HOME_APP_ICON_PRELOAD_HREFS } from "../lib/homeApps";
 import { fetchInitialHomeListing, type HomeListingInitialData } from "../lib/homeListingData";
 
-type HomeRouteHeadLink =
-  | {
-      rel: "preconnect";
-      href: string;
-    }
-  | {
-      rel: "preload";
-      as: "image";
-      href: string;
-    };
-
-function imagePreloadLink(href: string): HomeRouteHeadLink {
-  return {
-    rel: "preload",
-    as: "image",
-    href,
-  };
-}
+type HomeRouteHeadLink = {
+  rel: "preconnect" | "preload";
+  href: string;
+  as?: "image";
+};
 
 const HOME_ROUTE_HEAD_LINKS = [
   {
     rel: "preconnect",
     href: "https://cdn.jsdelivr.net",
   },
-  ...HOME_APP_ICON_PRELOAD_HREFS.map(imagePreloadLink),
 ] satisfies HomeRouteHeadLink[];
 
 export const Route = createFileRoute("/")({
@@ -363,7 +347,7 @@ function SkillsHome() {
           >
             {slotState.phase === "stopped" && slotState.isHackJackpot ? (
               <img
-                src="/og-clawhub-watermark.png"
+                src=""
                 alt=""
                 aria-hidden="true"
                 className="home-v2-hack-lobster"
@@ -417,7 +401,6 @@ function SkillsHome() {
       <HomePromotionsSection />
       <HomeListingSection initialListing={initialListing} />
       <HomePopularPublishersSection />
-      <HomeAppsSection />
       <HomeBringSkillsSection />
     </main>
   );

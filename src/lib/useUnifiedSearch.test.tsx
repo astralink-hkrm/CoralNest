@@ -4,18 +4,13 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useUnifiedSearch } from "./useUnifiedSearch";
 
-const { searchSkillsMock, fetchPluginCatalogMock, convexQueryMock } = vi.hoisted(() => ({
+const { searchSkillsMock, convexQueryMock } = vi.hoisted(() => ({
   searchSkillsMock: vi.fn(),
-  fetchPluginCatalogMock: vi.fn(),
   convexQueryMock: vi.fn(),
 }));
 
 vi.mock("convex/react", () => ({
   useAction: () => searchSkillsMock,
-}));
-
-vi.mock("./packageApi", () => ({
-  fetchPluginCatalog: (...args: unknown[]) => fetchPluginCatalogMock(...args),
 }));
 
 vi.mock("../convex/client", () => ({
@@ -37,18 +32,6 @@ function makeSkill(slug: string) {
     },
     ownerHandle: "owner",
     score: 1,
-  };
-}
-
-function makePlugin(name: string) {
-  return {
-    name,
-    displayName: name,
-    family: "code-plugin",
-    channel: "community",
-    isOfficial: false,
-    createdAt: 1,
-    updatedAt: 1,
   };
 }
 
@@ -77,29 +60,25 @@ function makeCreator(handle: string) {
 describe("useUnifiedSearch", () => {
   beforeEach(() => {
     searchSkillsMock.mockReset();
-    fetchPluginCatalogMock.mockReset();
     convexQueryMock.mockReset();
   });
 
   it("uses matching loader data without repeating the initial skill search", async () => {
     searchSkillsMock.mockResolvedValue([]);
-    fetchPluginCatalogMock.mockResolvedValue({ items: [], nextCursor: null });
     convexQueryMock.mockResolvedValue({ page: [], continueCursor: null, isDone: true });
 
     const initialData = {
       query: "japanese-reading-grader",
       activeType: "all" as const,
-      limits: { skills: 25, plugins: 25, creators: 25 },
+      limits: { skills: 25, creators: 25 },
       skillResults: [
         {
           type: "skill" as const,
           ...makeSkill("japanese-reading-grader"),
         },
       ],
-      pluginResults: [],
       creatorResults: [],
       skillHasMore: true,
-      pluginHasMore: false,
       creatorHasMore: false,
     };
 
@@ -107,7 +86,7 @@ describe("useUnifiedSearch", () => {
       useUnifiedSearch("japanese-reading-grader", "all", {
         initialData,
         debounceMs: 0,
-        limits: { skills: 25, plugins: 25, creators: 25 },
+        limits: { skills: 25, creators: 25 },
       }),
     );
 
@@ -118,7 +97,6 @@ describe("useUnifiedSearch", () => {
     expect(result.current.skillHasMore).toBe(true);
 
     await waitFor(() => {
-      expect(fetchPluginCatalogMock).toHaveBeenCalled();
       expect(convexQueryMock).toHaveBeenCalled();
     });
 
@@ -128,10 +106,6 @@ describe("useUnifiedSearch", () => {
 
   it("requests one extra result and exposes hasMore without inflating counts", async () => {
     searchSkillsMock.mockResolvedValue([makeSkill("one"), makeSkill("two"), makeSkill("three")]);
-    fetchPluginCatalogMock.mockResolvedValue({
-      items: [makePlugin("one-plugin"), makePlugin("two-plugin"), makePlugin("three-plugin")],
-      nextCursor: null,
-    });
     convexQueryMock.mockResolvedValue({
       page: [makeCreator("one-creator"), makeCreator("two-creator"), makeCreator("three-creator")],
       continueCursor: null,
@@ -141,13 +115,12 @@ describe("useUnifiedSearch", () => {
     const { result } = renderHook(() =>
       useUnifiedSearch("ghost", "all", {
         debounceMs: 0,
-        limits: { skills: 2, plugins: 2, creators: 2 },
+        limits: { skills: 2, creators: 2 },
       }),
     );
 
     await waitFor(() => {
       expect(result.current.skillCount).toBe(2);
-      expect(result.current.pluginCount).toBe(2);
       expect(result.current.creatorCount).toBe(2);
     });
 
@@ -155,18 +128,7 @@ describe("useUnifiedSearch", () => {
       query: "ghost",
       limit: 3,
     });
-    expect(fetchPluginCatalogMock).toHaveBeenCalledWith(
-      expect.objectContaining({ q: "ghost", limit: 3 }),
-    );
-    expect(convexQueryMock.mock.calls.at(-1)?.[1]).toEqual({
-      query: "ghost",
-      paginationOpts: { cursor: null, numItems: 3 },
-    });
     expect(result.current.skillResults.map((entry) => entry.skill.slug)).toEqual(["one", "two"]);
-    expect(result.current.pluginResults.map((entry) => entry.plugin.name)).toEqual([
-      "one-plugin",
-      "two-plugin",
-    ]);
     expect(result.current.creatorResults.map((entry) => entry.creator.handle)).toEqual([
       "one-creator",
       "two-creator",
@@ -174,31 +136,26 @@ describe("useUnifiedSearch", () => {
     expect(result.current.results.map((entry) => entry.type)).toEqual([
       "skill",
       "skill",
-      "plugin",
-      "plugin",
       "creator",
       "creator",
     ]);
     expect(result.current.skillHasMore).toBe(true);
-    expect(result.current.pluginHasMore).toBe(true);
     expect(result.current.creatorHasMore).toBe(true);
   });
 
-  it("caps requested skill and plugin limits at the backend search maximum", async () => {
+  it("caps requested skill and creator limits at the backend search maximum", async () => {
     searchSkillsMock.mockResolvedValue([]);
-    fetchPluginCatalogMock.mockResolvedValue({ items: [], nextCursor: null });
     convexQueryMock.mockResolvedValue({ page: [], continueCursor: null, isDone: true });
 
     renderHook(() =>
       useUnifiedSearch("ghost", "all", {
         debounceMs: 0,
-        limits: { skills: 150, plugins: 150, creators: 150 },
+        limits: { skills: 150, creators: 150 },
       }),
     );
 
     await waitFor(() => {
       expect(searchSkillsMock).toHaveBeenCalled();
-      expect(fetchPluginCatalogMock).toHaveBeenCalled();
       expect(convexQueryMock).toHaveBeenCalled();
     });
 
@@ -206,9 +163,6 @@ describe("useUnifiedSearch", () => {
       query: "ghost",
       limit: 101,
     });
-    expect(fetchPluginCatalogMock).toHaveBeenCalledWith(
-      expect.objectContaining({ q: "ghost", limit: 101 }),
-    );
     expect(convexQueryMock.mock.calls.at(-1)?.[1]).toEqual({
       query: "ghost",
       paginationOpts: { cursor: null, numItems: 50 },
@@ -217,7 +171,6 @@ describe("useUnifiedSearch", () => {
 
   it("does not leave creator load more stuck after the publisher page cap", async () => {
     searchSkillsMock.mockResolvedValue([]);
-    fetchPluginCatalogMock.mockResolvedValue({ items: [], nextCursor: null });
     convexQueryMock.mockResolvedValue({
       page: Array.from({ length: 50 }, (_, index) => makeCreator(`creator-${index}`)),
       continueCursor: "next-page",
