@@ -3,7 +3,6 @@ import { useMutation } from "convex/react";
 import { useRef, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Container } from "../../components/layout/Container";
-import { SignInButton } from "../../components/SignInButton";
 import { AuthFlowSkeleton } from "../../components/skeletons/ProtectedPageSkeletons";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
@@ -85,12 +84,7 @@ export function CliDeviceAuth() {
           </CardHeader>
           <CardContent className="space-y-4">
             {!isAuthenticated || !me ? (
-              <>
-                <p className="text-sm text-[color:var(--ink-soft)]">
-                  Sign in to authorize the CLI.
-                </p>
-                <SignInButton disabled={isLoading} />
-              </>
+              <p className="text-sm text-[color:var(--ink-soft)]">Sign in to authorize the CLI.</p>
             ) : (
               <>
                 <div className="space-y-2">

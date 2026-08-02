@@ -212,7 +212,7 @@ describe("restored UI design contract", () => {
     expect(sharedCss).toContain("--status-pending-fg: var(--oc-text-muted)");
 
     for (const sourcePath of [
-      "src/components/SignInPrompt.tsx",
+      "src/components/EmptyState.tsx",
       "src/components/SkillOwnershipPanel.tsx",
       "src/routes/import.tsx",
       "src/routes/settings.tsx",
@@ -253,20 +253,19 @@ describe("restored UI design contract", () => {
     expect(headerSource).toContain('className="navbar-search-mobile-wrap"');
     expect(headerSource).toContain('className="navbar-search-mobile-clear"');
     expect(headerSource).toContain('className="mobile-nav-section mobile-nav-appearance-section"');
-    expect(headerSource).toContain('className="user-dropdown-theme-row"');
-    expect(headerSource).toContain('className="user-dropdown-theme-button"');
     expect(headerSource).toContain('className="navbar-theme-switcher"');
-    expect(headerSource).toContain('className="navbar-theme-switcher-skeleton"');
     expect(headerSource).not.toContain('className="theme-mode-toggle"');
-    expect(headerSource).toContain('className="github-sign-in-button"');
-    expect(headerSource).toContain('className="sign-in-full-copy"');
-    expect(headerSource).toContain('className="sign-in-compact-copy"');
+    expect(headerSource).not.toContain('className="github-sign-in-button"');
+    expect(headerSource).not.toContain('className="sign-in-full-copy"');
+    expect(headerSource).not.toContain('className="sign-in-compact-copy"');
+    expect(headerSource).not.toContain('className="user-trigger"');
+    expect(headerSource).not.toContain('className="user-dropdown-theme-row"');
     expect(headerSource).toContain("Search skills, plugins, and creators");
     expect(headerSource).not.toContain('className="navbar-tabs-primary"');
     expect(headerSource).not.toContain('className="navbar-tabs-secondary"');
 
     expect(navSource).toContain("export const SECONDARY_NAV_ITEMS");
-    expect(navSource).toContain('label: "Official"');
+    expect(navSource).toContain('label: "Connectors"');
     expect(navSource).toContain('label: "Docs"');
     expect(navSource).toContain("href: CLAWHUB_DOCS_URL");
     expect(publicRegistrySource).toContain(
@@ -301,13 +300,6 @@ describe("restored UI design contract", () => {
     expect(css).toContain("height: var(--navbar-theme-collapsed-w)");
     const mobileDrawerTheme = cssRule(css, ".mobile-nav-appearance-section .navbar-theme-switcher");
     expect(mobileDrawerTheme).toContain("width: var(--navbar-theme-expanded-w)");
-    const userDropdown = cssRule(css, ".user-dropdown-content");
-    expect(userDropdown).toContain("border-radius: var(--r-md)");
-    expect(userDropdown).toContain("overflow: hidden");
-    const themeRow = cssRule(css, ".user-dropdown-theme-row");
-    expect(themeRow).toContain("grid-template-columns: repeat(3, minmax(0, 1fr))");
-    const themeButton = cssRule(css, ".user-dropdown-theme-button");
-    expect(themeButton).toContain("justify-content: center");
     expect(css).toContain("--r-btn: var(--r-sm)");
 
     cssMediaContaining(css, "(max-width: 1100px)", [
@@ -391,11 +383,11 @@ describe("restored UI design contract", () => {
     const css = styles();
 
     expect(navSource).toContain('title: "Browse"');
-    expect(navSource).toContain('title: "Publish"');
     expect(navSource).toContain('title: "Ecosystem"');
     expect(navSource).toContain('title: "Community"');
-    expect(navSource).toContain('label: "Publish Skill"');
-    expect(navSource).toContain('label: "Publish Plugin"');
+    expect(navSource).not.toContain('title: "Publish"');
+    expect(navSource).not.toContain('label: "Publish Skill"');
+    expect(navSource).not.toContain('label: "Publish Plugin"');
     expect(navSource).toContain('label: "GitHub"');
     expect(navSource).toContain('label: "OpenClaw"');
     expect(navSource).toContain('label: "Status"');

@@ -33,7 +33,6 @@ import {
   type PublisherOwnerMembership,
 } from "../../components/PublisherOwnerSelect";
 import { PublishFormSkeleton } from "../../components/PublishFormSkeleton";
-import { SignInButton } from "../../components/SignInButton";
 import {
   SKILL_PUBLISH_SUMMARY_MAX_LENGTH,
   SkillShortSummaryField,
@@ -612,9 +611,7 @@ export function Upload() {
           <EmptyState
             title="Sign in to publish a skill"
             description="You need to be signed in to publish skills on ClawHub."
-          >
-            <SignInButton />
-          </EmptyState>
+          />
         </Container>
       </main>
     );

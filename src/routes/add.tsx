@@ -12,12 +12,12 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../../convex/_generated/api";
+import { EmptyState } from "../components/EmptyState";
 import { Container } from "../components/layout/Container";
 import {
   PublisherOwnerSelect,
   type PublisherOwnerMembership,
 } from "../components/PublisherOwnerSelect";
-import { SignInPrompt } from "../components/SignInPrompt";
 import { Card, CardContent } from "../components/ui/card";
 import type { AddKind, AddMethod } from "../lib/addRoutes";
 import { useAuthStatus } from "../lib/useAuthStatus";
@@ -99,7 +99,16 @@ export function AddPage() {
   }
 
   if (!isAuthenticated || !me) {
-    return <SignInPrompt title="Sign in to add a skill or plugin." />;
+    return (
+      <main className="py-10">
+        <Container size="narrow">
+          <EmptyState
+            title="Sign in required"
+            description="Use the ClawHub CLI to publish or manage skills and plugins."
+          />
+        </Container>
+      </main>
+    );
   }
 
   return (

@@ -146,9 +146,6 @@ export function HomePopularPublishersSection() {
           </h2>
           <p className="oc-section-copy">Explore skills and plugins from official creators.</p>
         </div>
-        <Link to="/official" className="home-v2-popular-publishers-link oc-action oc-action-ghost">
-          Browse official <ArrowRight size={14} aria-hidden="true" />
-        </Link>
       </header>
       <div
         ref={viewportRef}

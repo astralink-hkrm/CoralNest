@@ -8,7 +8,9 @@ export const PublicRegistryPaths = {
   home: "/",
   skills: "/skills",
   plugins: "/plugins",
-  official: "/official",
+  mcp: "/mcp",
+  persona: "/persona",
+  connectors: "/connectors",
   search: "/search",
   audits: "/audits",
   publishSkill: "/skills/publish",
@@ -27,9 +29,19 @@ export const PUBLIC_REGISTRY_SURFACES = [
     summary: "Browse and search OpenClaw plugin package records.",
   },
   {
-    label: "Official",
-    path: PublicRegistryPaths.official,
-    summary: "Browse official organizations publishing on ClawHub.",
+    label: "MCP servers",
+    path: PublicRegistryPaths.mcp,
+    summary: "Browse and search MCP server packages.",
+  },
+  {
+    label: "Personas",
+    path: PublicRegistryPaths.persona,
+    summary: "Browse and search Persona packages.",
+  },
+  {
+    label: "Connectors",
+    path: PublicRegistryPaths.connectors,
+    summary: "Browse managed, agent-agnostic SaaS connectors.",
   },
   {
     label: "Search",

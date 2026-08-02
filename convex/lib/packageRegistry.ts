@@ -355,16 +355,29 @@ export function normalizePublishFiles(files: PublishFile[]) {
 }
 
 export function assertPackageVersion(
-  family: "code-plugin" | "bundle-plugin" | "skill" | "claw",
+  family: "code-plugin" | "bundle-plugin" | "skill" | "claw" | "mcp" | "persona" | "connectors",
   version: string,
 ) {
   const trimmed = version.trim();
   if (!trimmed) throw new ConvexError("Version required");
-  if ((family === "code-plugin" || family === "claw") && !semver.valid(trimmed)) {
+  if (
+    (family === "code-plugin" ||
+      family === "claw" ||
+      family === "mcp" ||
+      family === "persona" ||
+      family === "connectors") &&
+    !semver.valid(trimmed)
+  ) {
     throw new ConvexError(
       family === "claw"
         ? "Claw versions must be valid semver"
-        : "Code plugin versions must be valid semver",
+        : family === "mcp"
+          ? "MCP server versions must be valid semver"
+          : family === "persona"
+            ? "Persona versions must be valid semver"
+            : family === "connectors"
+              ? "Connector versions must be valid semver"
+              : "Code plugin versions must be valid semver",
     );
   }
   return trimmed;

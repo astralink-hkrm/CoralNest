@@ -1,5 +1,10 @@
 import { authTables } from "@convex-dev/auth/server";
-import { createClawManifestSummarySchema } from "clawhub-schema";
+import {
+  createClawManifestSummarySchema,
+  createConnectorManifestSummarySchema,
+  createMcpManifestSummarySchema,
+  createPersonaManifestSummarySchema,
+} from "clawhub-schema";
 import { defineSchema, defineTable } from "convex/server";
 import { type GenericValidator, v } from "convex/values";
 import {
@@ -584,6 +589,9 @@ const packageFamilyValidator = v.union(
   v.literal("code-plugin"),
   v.literal("bundle-plugin"),
   v.literal("claw"),
+  v.literal("mcp"),
+  v.literal("persona"),
+  v.literal("connectors"),
 );
 
 const packageChannelValidator = v.union(
@@ -717,6 +725,36 @@ const clawManifestSummaryValidator = createClawManifestSummarySchema<GenericVali
   string: v.string(),
   number: v.number(),
   stringArray: v.array(v.string()),
+  // Convex validators cannot express string lengths; publication must validate with the shared schema.
+  boundedString: () => v.string(),
+  optional: (validator) => v.optional(validator),
+  object: (fields) => v.object(fields),
+});
+
+const mcpManifestSummaryValidator = createMcpManifestSummarySchema<GenericValidator>({
+  literalOne: v.literal(1),
+  string: v.string(),
+  number: v.number(),
+  // Convex validators cannot express string lengths; publication must validate with the shared schema.
+  boundedString: () => v.string(),
+  optional: (validator) => v.optional(validator),
+  object: (fields) => v.object(fields),
+});
+
+const personaManifestSummaryValidator = createPersonaManifestSummarySchema<GenericValidator>({
+  literalOne: v.literal(1),
+  string: v.string(),
+  number: v.number(),
+  // Convex validators cannot express string lengths; publication must validate with the shared schema.
+  boundedString: () => v.string(),
+  optional: (validator) => v.optional(validator),
+  object: (fields) => v.object(fields),
+});
+
+const connectorManifestSummaryValidator = createConnectorManifestSummarySchema<GenericValidator>({
+  literalOne: v.literal(1),
+  string: v.string(),
+  number: v.number(),
   // Convex validators cannot express string lengths; publication must validate with the shared schema.
   boundedString: () => v.string(),
   optional: (validator) => v.optional(validator),
@@ -1823,6 +1861,9 @@ const packageReleases = defineTable({
   manifestSearchTerms: v.optional(v.array(v.string())),
   pluginManifestSummary: v.optional(pluginManifestSummaryValidator),
   clawManifestSummary: v.optional(clawManifestSummaryValidator),
+  mcpManifestSummary: v.optional(mcpManifestSummaryValidator),
+  personaManifestSummary: v.optional(personaManifestSummaryValidator),
+  connectorManifestSummary: v.optional(connectorManifestSummaryValidator),
   compatibility: packageCompatibilityValidator,
   runtimeId: v.optional(v.string()),
   sourceRepo: v.optional(v.string()),

@@ -30,7 +30,8 @@ import type {
   DashboardSortKey,
   DashboardView,
 } from "../components/dashboard/types";
-import { SignInPrompt } from "../components/SignInPrompt";
+import { EmptyState } from "../components/EmptyState";
+import { Container } from "../components/layout/Container";
 import { DashboardSkeleton } from "../components/skeletons/DashboardSkeleton";
 import { Button } from "../components/ui/button";
 import { TooltipProvider } from "../components/ui/tooltip";
@@ -196,7 +197,16 @@ export function Dashboard() {
   }
 
   if (!isAuthenticated || !me) {
-    return <SignInPrompt title="Sign in to access your dashboard." />;
+    return (
+      <main className="py-10">
+        <Container size="narrow">
+          <EmptyState
+            title="Sign in to access your dashboard."
+            description="Dashboard features are unavailable in public read-only mode."
+          />
+        </Container>
+      </main>
+    );
   }
 
   const publisherSelector =

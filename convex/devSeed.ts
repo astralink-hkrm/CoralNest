@@ -66,6 +66,18 @@ type SeedActionResult = {
 };
 
 type SeedMutationResult = Record<string, unknown>;
+
+type SeedLocalModerationResult = {
+  ok: boolean;
+  ownerUserId: Id<"users">;
+  ownerPublisherId: Id<"publishers">;
+  storageIdsToDelete?: Id<"_storage">[];
+};
+
+type SeedFamilyFixtureResult = {
+  ok: boolean;
+  seeded: string[];
+};
 type PublicCorpusExistingRowsResult = {
   ok: true;
   skipped: string[];
@@ -864,14 +876,26 @@ async function seedLocalFixturesHandler(
     scannedSkillStorageId,
     flaggedPluginStorageId,
     scannedPluginStorageId,
+    mcpFixtureReadmeStorageId,
+    personaFixtureReadmeStorageId,
   ] = await Promise.all([
     ctx.storage.store(new Blob([FLAGGED_SKILL_MD], { type: "text/markdown" })),
     ctx.storage.store(new Blob([SCANNED_SKILL_MD], { type: "text/markdown" })),
     ctx.storage.store(new Blob([FLAGGED_PLUGIN_README], { type: "text/markdown" })),
     ctx.storage.store(new Blob([SCANNED_PLUGIN_README], { type: "text/markdown" })),
+    ctx.storage.store(
+      new Blob(["Local fixture MCP server exposing GitHub issues and PRs over MCP."], {
+        type: "text/markdown",
+      }),
+    ),
+    ctx.storage.store(
+      new Blob(["Local fixture persona for first-line support workflows."], {
+        type: "text/markdown",
+      }),
+    ),
   ]);
 
-  const fixtureResult: SeedMutationResult = await ctx.runMutation(
+  const fixtureResult: SeedLocalModerationResult = await ctx.runMutation(
     internal.devSeed.seedLocalModerationFixturesMutation,
     {
       reset: args.reset,
@@ -891,6 +915,14 @@ async function seedLocalFixturesHandler(
       scannedPluginReadme: SCANNED_PLUGIN_README,
     },
   );
+  const familyFixtureResult: SeedFamilyFixtureResult = await ctx.runMutation(
+    internal.devSeed.seedFamilyPresentationFixturesMutation,
+    {
+      reset: args.reset,
+      ownerUserId: fixtureResult.ownerUserId,
+      readmeStorageIds: [mcpFixtureReadmeStorageId, personaFixtureReadmeStorageId],
+    },
+  );
   const storageIdsToDelete = Array.isArray(fixtureResult.storageIdsToDelete)
     ? fixtureResult.storageIdsToDelete.filter(
         (storageId): storageId is Id<"_storage"> => typeof storageId === "string",
@@ -902,7 +934,14 @@ async function seedLocalFixturesHandler(
 
   return {
     ok: true,
-    results: [{ slug: "local-moderation-fixtures", ...result }],
+    results: [
+      { slug: "local-moderation-fixtures", ...result },
+      {
+        slug: "family-presentation-fixtures",
+        ok: true,
+        seeded: familyFixtureResult.seeded,
+      },
+    ],
   };
 }
 
@@ -3885,6 +3924,372 @@ export const seedLocalModerationFixturesMutation = internalMutation({
     scannedPluginReadme: v.string(),
   },
   handler: seedLocalModerationFixturesHandler,
+});
+
+export const seedFamilyPresentationFixturesMutation = internalMutation({
+  args: {
+    reset: v.optional(v.boolean()),
+    ownerUserId: v.optional(v.id("users")),
+    readmeStorageIds: v.array(v.id("_storage")),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    const owner = await ensureSeedOwner(ctx, args.ownerUserId);
+    const { userId, publisherId } = owner;
+    const reset = args.reset ?? false;
+
+    const familyFixtureSpecs: Array<{
+      name: string;
+      displayName: string;
+      summary: string;
+      family: "mcp" | "persona" | "connectors";
+      version: string;
+      mcpManifestSummary?: {
+        schemaVersion: 1;
+        name: string;
+        description?: string;
+        transport: "stdio";
+        command: string;
+        argCount: number;
+        envCount: number;
+        toolCount: number;
+      };
+      personaManifestSummary?: {
+        schemaVersion: 1;
+        id: string;
+        name?: string;
+        description?: string;
+        traitCount: number;
+        instructionFileCount: number;
+      };
+      connectorManifestSummary?: {
+        schemaVersion: 1;
+        id: string;
+        name?: string;
+        description?: string;
+        service: string;
+        transport: "managed" | "mcp" | "http" | "sdk";
+        auth: "managed" | "oauth2" | "api-key" | "none";
+        scopeCount: number;
+        targetCount: number;
+      };
+    }> = [
+      {
+        name: "fixture-github-mcp",
+        displayName: "GitHub MCP Server",
+        summary: "Local fixture MCP server exposing GitHub issues and PRs over MCP.",
+        family: "mcp",
+        version: "0.1.0",
+        mcpManifestSummary: {
+          schemaVersion: 1,
+          name: "github-mcp",
+          description: "Exposes GitHub issues and PRs over MCP.",
+          transport: "stdio",
+          command: "npx",
+          argCount: 2,
+          envCount: 1,
+          toolCount: 0,
+        },
+      },
+      {
+        name: "fixture-support-persona",
+        displayName: "Support Persona",
+        summary: "Local fixture persona for first-line support workflows.",
+        family: "persona",
+        version: "0.1.0",
+        personaManifestSummary: {
+          schemaVersion: 1,
+          id: "support-agent",
+          name: "Support Agent",
+          description: "A friendly first-line support persona.",
+          traitCount: 2,
+          instructionFileCount: 1,
+        },
+      },
+      {
+        name: "fixture-github-connector",
+        displayName: "GitHub Connector",
+        summary: "Local fixture connector linking GitHub repositories and issues.",
+        family: "connectors",
+        version: "0.1.0",
+        connectorManifestSummary: {
+          schemaVersion: 1,
+          id: "github",
+          name: "GitHub",
+          description: "Connect GitHub repositories, issues, and pull requests.",
+          service: "github",
+          transport: "managed",
+          auth: "oauth2",
+          scopeCount: 3,
+          targetCount: 2,
+        },
+      },
+      {
+        name: "composio-slack-connector",
+        displayName: "Composio Slack Connector",
+        summary: "Composio open-source connector for Slack agent actions, channels, and messaging.",
+        family: "connectors",
+        version: "1.0.0",
+        connectorManifestSummary: {
+          schemaVersion: 1,
+          id: "composio-slack",
+          name: "Composio Slack Connector",
+          description: "Execute Slack actions and manage channel subscriptions for AI agents.",
+          service: "slack",
+          transport: "managed",
+          auth: "oauth2",
+          scopeCount: 6,
+          targetCount: 4,
+        },
+      },
+      {
+        name: "composio-linear-connector",
+        displayName: "Composio Linear Connector",
+        summary: "Composio open-source connector for Linear issue tracking & project management.",
+        family: "connectors",
+        version: "1.0.0",
+        connectorManifestSummary: {
+          schemaVersion: 1,
+          id: "composio-linear",
+          name: "Composio Linear Connector",
+          description: "Create, search, and update Linear issues and cycles.",
+          service: "linear",
+          transport: "managed",
+          auth: "oauth2",
+          scopeCount: 4,
+          targetCount: 3,
+        },
+      },
+      {
+        name: "composio-notion-connector",
+        displayName: "Composio Notion Connector",
+        summary: "Composio open-source connector for Notion workspace databases & pages.",
+        family: "connectors",
+        version: "1.0.0",
+        connectorManifestSummary: {
+          schemaVersion: 1,
+          id: "composio-notion",
+          name: "Composio Notion Connector",
+          description: "Query Notion databases and create pages from AI agents.",
+          service: "notion",
+          transport: "managed",
+          auth: "oauth2",
+          scopeCount: 5,
+          targetCount: 4,
+        },
+      },
+      {
+        name: "composio-gmail-connector",
+        displayName: "Composio Gmail Connector",
+        summary: "Composio open-source connector for Gmail email automation & drafting.",
+        family: "connectors",
+        version: "1.0.0",
+        connectorManifestSummary: {
+          schemaVersion: 1,
+          id: "composio-gmail",
+          name: "Composio Gmail Connector",
+          description: "Search messages, send emails, and create drafts in Gmail.",
+          service: "gmail",
+          transport: "managed",
+          auth: "oauth2",
+          scopeCount: 5,
+          targetCount: 3,
+        },
+      },
+      {
+        name: "composio-jira-connector",
+        displayName: "Composio Jira Connector",
+        summary: "Composio open-source connector for Jira software tickets & sprints.",
+        family: "connectors",
+        version: "1.0.0",
+        connectorManifestSummary: {
+          schemaVersion: 1,
+          id: "composio-jira",
+          name: "Composio Jira Connector",
+          description: "Manage Jira issues, sprints, and project boards.",
+          service: "jira",
+          transport: "managed",
+          auth: "oauth2",
+          scopeCount: 7,
+          targetCount: 5,
+        },
+      },
+      {
+        name: "composio-trello-connector",
+        displayName: "Composio Trello Connector",
+        summary: "Composio open-source connector for Trello boards & cards.",
+        family: "connectors",
+        version: "1.0.0",
+        connectorManifestSummary: {
+          schemaVersion: 1,
+          id: "composio-trello",
+          name: "Composio Trello Connector",
+          description: "Create and move Trello cards across lists and boards.",
+          service: "trello",
+          transport: "managed",
+          auth: "oauth2",
+          scopeCount: 3,
+          targetCount: 2,
+        },
+      },
+      {
+        name: "composio-supabase-connector",
+        displayName: "Composio Supabase Connector",
+        summary: "Composio open-source connector for Supabase database operations & auth.",
+        family: "connectors",
+        version: "1.0.0",
+        connectorManifestSummary: {
+          schemaVersion: 1,
+          id: "composio-supabase",
+          name: "Composio Supabase Connector",
+          description: "Interact with Supabase SQL tables, storage, and edge functions.",
+          service: "supabase",
+          transport: "sdk",
+          auth: "api-key",
+          scopeCount: 4,
+          targetCount: 3,
+        },
+      },
+      {
+        name: "composio-discord-connector",
+        displayName: "Composio Discord Connector",
+        summary: "Composio open-source connector for Discord bot interactions & webhooks.",
+        family: "connectors",
+        version: "1.0.0",
+        connectorManifestSummary: {
+          schemaVersion: 1,
+          id: "composio-discord",
+          name: "Composio Discord Connector",
+          description: "Post messages, create channels, and listen to Discord events.",
+          service: "discord",
+          transport: "managed",
+          auth: "oauth2",
+          scopeCount: 4,
+          targetCount: 3,
+        },
+      },
+      {
+        name: "composio-gcal-connector",
+        displayName: "Composio Google Calendar Connector",
+        summary: "Composio open-source connector for Google Calendar event scheduling.",
+        family: "connectors",
+        version: "1.0.0",
+        connectorManifestSummary: {
+          schemaVersion: 1,
+          id: "composio-gcal",
+          name: "Composio Google Calendar Connector",
+          description: "Schedule events, check availability, and invite attendees.",
+          service: "google-calendar",
+          transport: "managed",
+          auth: "oauth2",
+          scopeCount: 4,
+          targetCount: 2,
+        },
+      },
+    ];
+
+    const seeded: string[] = [];
+
+    for (const [index, spec] of familyFixtureSpecs.entries()) {
+      const existing = await findSeedPluginFixtureByName(ctx, spec.name);
+      if (existing && !reset) {
+        seeded.push(spec.name);
+        continue;
+      }
+      if (existing && reset) {
+        await deletePackageAndReleases(ctx, existing._id);
+      }
+
+      const readmeStorageId = args.readmeStorageIds[index] ?? args.readmeStorageIds[0];
+      const compatibility = { pluginApiRange: ">=0.1.0" };
+      const verification = {
+        tier: "structural" as const,
+        scope: "artifact-only" as const,
+        summary: "Seeded local family presentation fixture.",
+        scanStatus: "clean" as const,
+      };
+      const stats = { downloads: 4, installs: 1, stars: 0, versions: 0 };
+      const normalizedName = normalizePackageName(spec.name);
+      const packageId = await ctx.db.insert("packages", {
+        name: spec.name,
+        normalizedName,
+        displayName: spec.displayName,
+        summary: spec.summary,
+        ownerUserId: userId,
+        ownerPublisherId: publisherId,
+        family: spec.family,
+        channel: "community",
+        isOfficial: false,
+        runtimeId: normalizedName,
+        sourceRepo: "openclaw/local-dev-fixture",
+        latestReleaseId: undefined,
+        latestVersionSummary: undefined,
+        tags: {},
+        compatibility,
+        verification,
+        scanStatus: "clean",
+        stats,
+        ...seededPackageRecommendationPatch(stats),
+        softDeletedAt: undefined,
+        createdAt: now,
+        updatedAt: now,
+      });
+      const releaseVersion = spec.version;
+      const releaseId = await ctx.db.insert("packageReleases", {
+        packageId,
+        version: releaseVersion,
+        changelog: "Seeded local family presentation fixture release.",
+        summary: spec.summary,
+        distTags: ["latest"],
+        files: [
+          {
+            path: "README.md",
+            size: spec.summary.length,
+            storageId: readmeStorageId,
+            sha256: `public-corpus-${normalizedName}`,
+            contentType: "text/markdown",
+          },
+        ],
+        integritySha256: `public-corpus-integrity-${normalizedName}`,
+        extractedPackageJson: {
+          name: spec.name,
+          version: releaseVersion,
+          description: spec.summary,
+        },
+        mcpManifestSummary: spec.mcpManifestSummary,
+        personaManifestSummary: spec.personaManifestSummary,
+        connectorManifestSummary: spec.connectorManifestSummary,
+        compatibility,
+        verification,
+        sha256hash: `public-corpus-hash-${normalizedName}`,
+        source: { kind: "github", repo: "openclaw/local-dev-fixture", path: "." },
+        createdBy: userId,
+        publishActor: { kind: "user", userId },
+        createdAt: now,
+        softDeletedAt: undefined,
+      });
+      await ctx.db.patch(packageId, {
+        latestReleaseId: releaseId,
+        latestVersionSummary: {
+          version: releaseVersion,
+          createdAt: now,
+          changelog: "Seeded local family presentation fixture.",
+          compatibility,
+          verification,
+        },
+        tags: { latest: releaseId },
+        stats: { ...stats, versions: 1 },
+        updatedAt: now,
+      });
+      const packageDoc = await ctx.db.get(packageId);
+      if (packageDoc) {
+        await upsertPackageSearchDigest(ctx, extractPackageDigestFields(packageDoc));
+      }
+      seeded.push(spec.name);
+    }
+
+    return { ok: true, seeded: [...new Set(seeded)] };
+  },
 });
 
 function githubBackedSkillModeration(scanStatus: GitHubSkillScanStatus, removedAt?: number) {

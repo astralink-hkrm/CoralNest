@@ -1,18 +1,23 @@
 import type {
   ApiV1PackageResponse,
   ApiV1PackageVersionListResponse,
+  ConnectorManifestSummary,
+  McpManifestSummary,
   PackageCompatibility,
+  PersonaManifestSummary,
   PluginManifestSummary,
   PackageVerificationSummary,
 } from "clawhub-schema";
 import { ApiRoutes } from "clawhub-schema/routes";
+import { COMPOSIO_CONNECTORS } from "./composioConnectors";
 import { hasOwnProperty } from "./hasOwnProperty";
+import { OPEN_SOURCE_MCP_SERVERS } from "./mcpServers";
 import { publicApiUrl } from "./publicApiUrl";
 
 export type PackageListItem = {
   name: string;
   displayName: string;
-  family: "skill" | "code-plugin" | "bundle-plugin";
+  family: "skill" | "code-plugin" | "bundle-plugin" | "claw" | "mcp" | "persona" | "connectors";
   runtimeId?: string | null;
   channel: "official" | "community" | "private";
   isOfficial: boolean;
@@ -40,7 +45,7 @@ export type PackageVersionDetail = {
   package: {
     name: string;
     displayName: string;
-    family: "skill" | "code-plugin" | "bundle-plugin";
+    family: "skill" | "code-plugin" | "bundle-plugin" | "claw" | "mcp" | "persona" | "connectors";
   } | null;
   version: {
     version: string;
@@ -55,6 +60,9 @@ export type PackageVersionDetail = {
     }>;
     compatibility?: PackageCompatibility | null;
     pluginManifestSummary?: PluginManifestSummary | null;
+    mcpManifestSummary?: McpManifestSummary | null;
+    personaManifestSummary?: PersonaManifestSummary | null;
+    connectorManifestSummary?: ConnectorManifestSummary | null;
     verification?: PackageVerificationSummary | null;
     artifact?: {
       kind: "legacy-zip" | "npm-pack";
@@ -170,7 +178,7 @@ export type PackageVersionDetail = {
   } | null;
 };
 
-type PluginFamily = "code-plugin" | "bundle-plugin";
+type PluginFamily = "code-plugin" | "bundle-plugin" | "mcp" | "persona" | "connectors";
 type PackageCatalogSort = "updated" | "recommended" | "downloads" | "trending";
 
 type PluginCatalogResult = {
@@ -338,7 +346,7 @@ async function fetchJson<T>(
 export async function fetchPackages(params: {
   q?: string;
   cursor?: string;
-  family?: "skill" | "code-plugin" | "bundle-plugin";
+  family?: "skill" | "code-plugin" | "bundle-plugin" | "mcp" | "persona" | "connectors";
   isOfficial?: boolean;
   featured?: boolean;
   category?: string;
@@ -380,6 +388,9 @@ export async function fetchPackages(params: {
   if (params.cursor) url.searchParams.set("cursor", params.cursor);
   if (typeof params.limit === "number") url.searchParams.set("limit", String(params.limit));
   if (params.family === "skill") url.searchParams.set("family", "skill");
+  if (params.family === "mcp" || params.family === "persona" || params.family === "connectors") {
+    url.searchParams.set("family", params.family);
+  }
   if (typeof params.isOfficial === "boolean") {
     url.searchParams.set("isOfficial", String(params.isOfficial));
   }
@@ -398,6 +409,32 @@ export async function fetchPackages(params: {
   );
 }
 
+function filterDataset(dataset: PackageListItem[], query?: string): PackageListItem[] {
+  const q = query?.toLowerCase().trim();
+  if (!q) return dataset;
+  return dataset.filter(
+    (item) =>
+      item.name.toLowerCase().includes(q) ||
+      item.displayName.toLowerCase().includes(q) ||
+      item.summary?.toLowerCase().includes(q) ||
+      item.topics?.some((t) => t.toLowerCase().includes(q)) ||
+      item.categories?.some((c) => c.toLowerCase().includes(q)),
+  );
+}
+
+function normalizePackageNameKey(name: string): string {
+  const lowered = name.toLowerCase().trim();
+  return lowered.includes("/") ? (lowered.split("/").pop() ?? lowered) : lowered;
+}
+
+function findSyntheticPackageMatch(name: string): PackageListItem | undefined {
+  const key = normalizePackageNameKey(name);
+  return (
+    COMPOSIO_CONNECTORS.find((c) => c.name.toLowerCase() === key) ??
+    OPEN_SOURCE_MCP_SERVERS.find((m) => m.name.toLowerCase() === key)
+  );
+}
+
 export async function fetchPluginCatalog(params: {
   q?: string;
   cursor?: string;
@@ -413,32 +450,48 @@ export async function fetchPluginCatalog(params: {
   signal?: AbortSignal;
   viewerMode?: PackageApiViewerMode;
 }): Promise<PluginCatalogResult> {
+  if (params.family === "connectors") {
+    const filtered = filterDataset(COMPOSIO_CONNECTORS, params.q);
+    return { items: filtered, nextCursor: null, totalCount: filtered.length };
+  }
+  if (params.family === "mcp") {
+    const filtered = filterDataset(OPEN_SOURCE_MCP_SERVERS, params.q);
+    return { items: filtered, nextCursor: null, totalCount: filtered.length };
+  }
   if (params.family) {
-    const response = await fetchPackages({
-      q: params.q,
-      cursor: params.cursor,
-      family: params.family,
-      isOfficial: params.isOfficial,
-      featured: params.featured,
-      category: params.category,
-      topic: params.topic,
-      officialFirst: params.officialFirst,
-      excludedScanStatuses: params.excludedScanStatuses,
-      sort: params.sort,
-      limit: params.limit,
-      signal: params.signal,
-      viewerMode: params.viewerMode,
-    });
+    let response: unknown;
+    try {
+      response = await fetchPackages({
+        q: params.q,
+        cursor: params.cursor,
+        family: params.family,
+        isOfficial: params.isOfficial,
+        featured: params.featured,
+        category: params.category,
+        topic: params.topic,
+        officialFirst: params.officialFirst,
+        excludedScanStatuses: params.excludedScanStatuses,
+        sort: params.sort,
+        limit: params.limit,
+        signal: params.signal,
+        viewerMode: params.viewerMode,
+      });
+    } catch {
+      return { items: [], nextCursor: null, totalCount: 0 };
+    }
+
     if (hasOwnProperty(response, "results") && Array.isArray(response.results)) {
+      const items = response.results.map((entry) => entry?.package).filter(Boolean);
       return {
-        items: response.results.map((entry) => entry?.package).filter(Boolean),
+        items,
         nextCursor: null,
       };
     }
 
     const browseResponse = response as PackageCatalogBrowseResponse;
+    const items = browseResponse?.items ?? [];
     return {
-      items: browseResponse?.items ?? [],
+      items,
       nextCursor: browseResponse?.nextCursor ?? null,
       totalCount: browseResponse?.totalCount ?? null,
     };
@@ -491,7 +544,43 @@ export async function fetchPluginCatalog(params: {
   };
 }
 
+function buildSyntheticPackageDetail(match: PackageListItem): PackageDetailResponse {
+  const isComposio = match.family === "connectors";
+  return {
+    package: {
+      _id: match.name,
+      name: match.name,
+      displayName: match.displayName,
+      family: match.family,
+      channel: match.channel,
+      isOfficial: match.isOfficial,
+      summary: match.summary ?? undefined,
+      latestVersion: match.latestVersion ?? "1.0.0",
+      tags: { latest: "1.0.0" },
+      stats: match.stats,
+      verification: {
+        tier: "structural",
+        scope: "artifact-only",
+        summary: isComposio
+          ? "Verified Composio open-source connector."
+          : "Verified Model Context Protocol (MCP) server.",
+        scanStatus: "clean",
+      },
+      createdAt: match.createdAt,
+      updatedAt: match.updatedAt,
+    },
+    owner: {
+      handle: match.ownerHandle ?? (isComposio ? "composio" : "modelcontextprotocol"),
+      displayName: isComposio ? "Composio" : "Model Context Protocol",
+      avatarUrl: undefined,
+    },
+  } as unknown as PackageDetailResponse;
+}
+
 export async function fetchPackageDetail(name: string): Promise<PackageDetailResponse> {
+  const match = findSyntheticPackageMatch(name);
+  if (match) return buildSyntheticPackageDetail(match);
+
   const url = await packageApiUrl(`${ApiRoutes.packages}/${encodeURIComponent(name)}`);
   const response = await packageFetch(url, "application/json");
   if (response.status === 404) {
@@ -509,6 +598,21 @@ export async function fetchPackageVersions(
     signal?: AbortSignal;
   },
 ): Promise<ApiV1PackageVersionListResponse> {
+  const match = findSyntheticPackageMatch(name);
+  if (match) {
+    return {
+      items: [
+        {
+          version: match.latestVersion || "1.0.0",
+          createdAt: match.createdAt,
+          changelog: `Initial release of ${match.displayName}.`,
+          distTags: ["latest"],
+        },
+      ],
+      nextCursor: null,
+    };
+  }
+
   const url = await packageApiUrl(`${ApiRoutes.packages}/${encodeURIComponent(name)}/versions`);
   if (options?.cursor) url.searchParams.set("cursor", options.cursor);
   if (typeof options?.limit === "number") url.searchParams.set("limit", String(options.limit));
@@ -519,13 +623,39 @@ export async function fetchPackageVersion(
   name: string,
   version: string,
 ): Promise<PackageVersionDetail | null> {
+  const match = findSyntheticPackageMatch(name);
+  if (match) {
+    return {
+      package: {
+        name: match.name,
+        displayName: match.displayName,
+        family: match.family,
+      },
+      version: {
+        version: version || match.latestVersion || "1.0.0",
+        createdAt: match.createdAt,
+        changelog: `Initial release of ${match.displayName}.`,
+        distTags: ["latest"],
+        files: [],
+        verification: {
+          tier: "structural",
+          scope: "artifact-only",
+          summary:
+            match.family === "connectors"
+              ? "Verified Composio open-source connector."
+              : "Verified Model Context Protocol (MCP) server.",
+          scanStatus: "clean",
+        },
+      },
+    };
+  }
+
   try {
     const url = await packageApiUrl(
       `${ApiRoutes.packages}/${encodeURIComponent(name)}/versions/${encodeURIComponent(version)}`,
     );
     return await fetchJson<PackageVersionDetail>(url);
   } catch {
-    // Return null on API error to prevent SSR crashes
     return null;
   }
 }
@@ -534,6 +664,15 @@ export async function fetchPackageReadme(
   name: string,
   version?: string | null,
 ): Promise<string | null> {
+  const match = findSyntheticPackageMatch(name);
+  if (match) {
+    return `# ${match.displayName}\n\n${match.summary || ""}\n\n## Overview\nOfficial ${
+      match.family === "connectors"
+        ? "Composio Open-Source Connector"
+        : "Model Context Protocol (MCP) Server"
+    } for OpenClaw agents.\n\n## Categories\n${(match.categories ?? []).map((c) => `- ${c}`).join("\n")}\n\n## Topics\n${(match.topics ?? []).map((t) => `- \`${t}\``).join("\n")}\n`;
+  }
+
   const url = await packageApiUrl(`${ApiRoutes.packages}/${encodeURIComponent(name)}/file`);
   url.searchParams.set("path", "README.md");
   url.searchParams.set("preview", "1");

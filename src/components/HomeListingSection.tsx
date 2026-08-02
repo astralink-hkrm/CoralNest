@@ -457,6 +457,24 @@ export function HomeListingSection({ initialListing = null }: HomeListingSection
             >
               Plugins
             </button>
+            <Link
+              to="/connectors"
+              className="home-v2-listing-kind-btn clawhub-segmented-btn oc-segmented-item"
+            >
+              Connectors
+            </Link>
+            <Link
+              to="/mcp"
+              className="home-v2-listing-kind-btn clawhub-segmented-btn oc-segmented-item"
+            >
+              MCP
+            </Link>
+            <Link
+              to="/persona"
+              className="home-v2-listing-kind-btn clawhub-segmented-btn oc-segmented-item"
+            >
+              Personas
+            </Link>
           </div>
         </div>
       </div>

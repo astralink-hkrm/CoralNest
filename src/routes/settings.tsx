@@ -43,8 +43,8 @@ import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { EmptyState } from "../components/EmptyState";
 import { copyText } from "../components/InstallCopyButton";
+import { Container } from "../components/layout/Container";
 import { MarketplaceIcon } from "../components/MarketplaceIcon";
-import { SignInPrompt } from "../components/SignInPrompt";
 import { SettingsSkeleton } from "../components/skeletons/ProtectedPageSkeletons";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Badge } from "../components/ui/badge";
@@ -521,10 +521,14 @@ export function Settings() {
 
   if (!isAuthenticated || !me) {
     return (
-      <SignInPrompt
-        title="Sign in to access settings"
-        description="Manage your profile, organizations, and API access."
-      />
+      <main className="py-10">
+        <Container size="narrow">
+          <EmptyState
+            title="Sign in to access settings"
+            description="Manage your profile, organizations, and API access."
+          />
+        </Container>
+      </main>
     );
   }
 

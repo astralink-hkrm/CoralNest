@@ -8,6 +8,12 @@ export function familyLabel(family: PackageFamily) {
       return "Bundle Plugin";
     case "claw":
       return "Claw";
+    case "mcp":
+      return "MCP";
+    case "persona":
+      return "Persona";
+    case "connectors":
+      return "Connector";
     default:
       return "Skill";
   }

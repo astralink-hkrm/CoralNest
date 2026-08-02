@@ -21,7 +21,7 @@ export type PublicCorpusPluginRow = {
   summary?: string;
   categories?: string[];
   topics?: string[];
-  family?: "skill" | "code-plugin" | "bundle-plugin";
+  family?: "skill" | "code-plugin" | "bundle-plugin" | "mcp" | "persona";
   channel?: "official" | "community" | "private";
   sourceRepoHost?: string | null;
   createdAt?: number;

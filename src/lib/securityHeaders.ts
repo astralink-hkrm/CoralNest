@@ -44,9 +44,9 @@ export function createContentSecurityPolicy(
     // eval support with Function(). Keep inline scripts nonce-gated, but allow eval until those
     // helpers are split out of the browser bundle.
     `script-src 'self' 'nonce-${scriptNonce}' 'unsafe-eval'`,
-    "style-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https:",
-    "font-src 'self' data:",
+    "font-src 'self' data: https://fonts.gstatic.com",
     `connect-src ${connectSources.join(" ")}`,
     "object-src 'none'",
     "base-uri 'self'",

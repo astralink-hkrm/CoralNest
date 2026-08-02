@@ -11,7 +11,7 @@ sidebarTitle: "ClawHub"
 
 # ClawHub
 
-ClawHub is the public registry for OpenClaw skills and plugins.
+ClawHub is the public registry for OpenClaw skills, plugins, MCP servers, and personas.
 
 - Use native `openclaw` commands to search, install, and update skills and to install plugins from ClawHub.
 - Use the separate `clawhub` CLI for registry auth, publishing, and delete/undelete workflows.
@@ -47,15 +47,20 @@ pnpm add -g clawhub
 
 ## What ClawHub hosts
 
-| Surface        | What it stores                                               | Typical command                              |
-| -------------- | ------------------------------------------------------------ | -------------------------------------------- |
-| Skills         | Versioned text bundles with `SKILL.md` plus supporting files | `openclaw skills install @openclaw/demo`     |
-| Code plugins   | OpenClaw plugin packages with compatibility metadata         | `openclaw plugins install clawhub:<package>` |
-| Bundle plugins | Packaged plugin bundles for OpenClaw distribution            | `clawhub package publish <source>`           |
+| Surface        | What it stores                                                 | Typical command                                     |
+| -------------- | -------------------------------------------------------------- | --------------------------------------------------- |
+| Skills         | Versioned text bundles with `SKILL.md` plus supporting files   | `openclaw skills install @openclaw/demo`            |
+| Code plugins   | OpenClaw plugin packages with compatibility metadata           | `openclaw plugins install clawhub:<package>`        |
+| Bundle plugins | Packaged plugin bundles for OpenClaw distribution              | `clawhub package publish <source>`                  |
+| MCP servers    | MCP server manifests with transport, command/URL and tool info | `clawhub package publish <source> --family mcp`     |
+| Personas       | Reusable persona manifests with identity, traits, instructions | `clawhub package publish <source> --family persona` |
 
 ClawHub tracks semver versions, tags such as `latest`, changelogs, files,
 downloads, stars, and security scan summaries. Public pages show current registry
 state so users can inspect a skill or plugin before installing it.
+
+See [MCP server packages](./mcp.md) and [Persona packages](./persona.md) for how to
+author and publish those package types.
 
 ## Native OpenClaw flows
 

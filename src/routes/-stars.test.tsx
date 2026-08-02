@@ -88,7 +88,7 @@ describe("Stars", () => {
     const { container } = render(<Stars />);
 
     expect(screen.getByText("Sign in to see your bookmarks")).toBeTruthy();
-    expect(screen.getByRole("button", { name: /sign in/i })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /sign in/i })).toBeNull();
     expect(container.querySelector(".lucide-bookmark")).toBeTruthy();
     expect(container.querySelector(".lucide-star")).toBeNull();
   });

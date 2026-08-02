@@ -34,9 +34,9 @@ import {
   CatalogMetadataFields,
   parseCatalogTopicsInput,
 } from "../components/CatalogMetadataFields";
+import { EmptyState } from "../components/EmptyState";
 import { copyText } from "../components/InstallCopyButton";
 import { Container } from "../components/layout/Container";
-import { SignInPrompt } from "../components/SignInPrompt";
 import { ImportGitHubSkeleton } from "../components/skeletons/ProtectedPageSkeletons";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardTitle } from "../components/ui/card";
@@ -628,10 +628,14 @@ export function ImportGitHub() {
 
   if (!isAuthenticated || !me) {
     return (
-      <SignInPrompt
-        title="Sign in to import and publish skills"
-        description="You need to be signed in to import skills from GitHub."
-      />
+      <main className="py-10">
+        <Container size="narrow">
+          <EmptyState
+            title="Sign in to import and publish skills"
+            description="You need to be signed in to import skills from GitHub."
+          />
+        </Container>
+      </main>
     );
   }
 

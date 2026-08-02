@@ -126,18 +126,18 @@ function publicRouteCases(): PublicRouteCase[] {
       },
     },
     {
-      label: "official browse",
-      path: () => "/official",
+      label: "connectors browse",
+      path: () => "/connectors",
       assert: async (page) => {
-        await expect(page.getByRole("heading", { name: /^Official/ })).toBeVisible();
+        await expect(page.getByRole("heading", { name: /^Connectors/ })).toBeVisible();
       },
     },
     {
       label: "publishers browse redirect",
       path: () => "/publishers",
       assert: async (page) => {
-        await expect(page).toHaveURL(/\/official/);
-        await expect(page.getByRole("heading", { name: /^Official/ })).toBeVisible();
+        await expect(page).toHaveURL(/\/$/);
+        await expect(page.locator("body")).toContainText("ClawHub");
       },
     },
     {

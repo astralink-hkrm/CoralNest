@@ -315,6 +315,18 @@ export function HomeAppsSection() {
             Browse all skills
             <ArrowRight size={14} aria-hidden="true" />
           </Link>
+          <Link to="/mcp" className="home-v2-apps-see-all oc-action oc-action-ghost">
+            Browse MCP servers
+            <ArrowRight size={14} aria-hidden="true" />
+          </Link>
+          <Link to="/persona" className="home-v2-apps-see-all oc-action oc-action-ghost">
+            Browse personas
+            <ArrowRight size={14} aria-hidden="true" />
+          </Link>
+          <Link to="/connectors" className="home-v2-apps-see-all oc-action oc-action-ghost">
+            Browse connectors
+            <ArrowRight size={14} aria-hidden="true" />
+          </Link>
         </div>
       </div>
     </section>

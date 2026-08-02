@@ -320,7 +320,14 @@ async function getOptionalViewerUserIdForRequest(ctx: ActionCtx, request: Reques
   }
 }
 
-const PACKAGE_FAMILY_VALUES = ["skill", "code-plugin", "bundle-plugin"] as const;
+const PACKAGE_FAMILY_VALUES = [
+  "skill",
+  "code-plugin",
+  "bundle-plugin",
+  "mcp",
+  "persona",
+  "connectors",
+] as const;
 const PACKAGE_FAMILY_VALUES_WITH_CLAWS = [...PACKAGE_FAMILY_VALUES, "claw"] as const;
 
 function publicPackageFamilyValues() {
@@ -476,7 +483,7 @@ function parsePackageOfficialMigrationPhase(
 }
 
 type PackageListQueryArgs = {
-  family?: "skill" | "code-plugin" | "bundle-plugin" | "claw";
+  family?: "skill" | "code-plugin" | "bundle-plugin" | "claw" | "mcp" | "persona" | "connectors";
   channel?: "official" | "community" | "private";
   isOfficial?: boolean;
   highlightedOnly?: boolean;
@@ -536,6 +543,9 @@ type ReleaseLike = {
   compatibility?: Doc<"packageReleases">["compatibility"];
   pluginManifestSummary?: Doc<"packageReleases">["pluginManifestSummary"];
   clawManifestSummary?: Doc<"packageReleases">["clawManifestSummary"];
+  mcpManifestSummary?: Doc<"packageReleases">["mcpManifestSummary"];
+  personaManifestSummary?: Doc<"packageReleases">["personaManifestSummary"];
+  connectorManifestSummary?: Doc<"packageReleases">["connectorManifestSummary"];
   verification?: Doc<"packageReleases">["verification"];
   extractedPackageJson?: Doc<"packageReleases">["extractedPackageJson"];
   sha256hash?: string;
@@ -843,7 +853,7 @@ async function resolvePackageTags(
 type CatalogListItem = {
   name: string;
   displayName: string;
-  family: "skill" | "code-plugin" | "bundle-plugin" | "claw";
+  family: "skill" | "code-plugin" | "bundle-plugin" | "claw" | "connectors";
   runtimeId?: string | null;
   channel: "official" | "community" | "private";
   isOfficial: boolean;
@@ -1176,7 +1186,7 @@ async function searchPackageCatalog(
   args: {
     query: string;
     limit: number;
-    family?: "skill" | "code-plugin" | "bundle-plugin" | "claw";
+    family?: "skill" | "code-plugin" | "bundle-plugin" | "claw" | "mcp" | "persona" | "connectors";
     channel?: "official" | "community" | "private";
     isOfficial?: boolean;
     highlightedOnly?: boolean;
@@ -4196,6 +4206,9 @@ export async function packagesGetRouterV1Handler(ctx: ActionCtx, request: Reques
           compatibility: result.version.compatibility ?? null,
           pluginManifestSummary: result.version.pluginManifestSummary ?? null,
           clawManifestSummary: result.version.clawManifestSummary ?? null,
+          mcpManifestSummary: result.version.mcpManifestSummary ?? null,
+          personaManifestSummary: result.version.personaManifestSummary ?? null,
+          connectorManifestSummary: result.version.connectorManifestSummary ?? null,
           verification,
           artifact: toReleaseArtifact(result.version, result.package.name),
           sha256hash: result.version.sha256hash ?? null,
@@ -4507,7 +4520,7 @@ type PublicPackageDocLike = {
   _id: Id<"packages">;
   name: string;
   displayName: string;
-  family: "skill" | "code-plugin" | "bundle-plugin" | "claw";
+  family: "skill" | "code-plugin" | "bundle-plugin" | "claw" | "connectors";
   tags: Record<string, Id<"packageReleases">>;
   latestReleaseId?: Id<"packageReleases">;
   channel: "official" | "community" | "private";
@@ -4531,6 +4544,9 @@ type PublicPackageDocLike = {
     npmFileCount?: number;
   };
   clawManifestSummary?: Doc<"packageReleases">["clawManifestSummary"];
+  mcpManifestSummary?: Doc<"packageReleases">["mcpManifestSummary"];
+  personaManifestSummary?: Doc<"packageReleases">["personaManifestSummary"];
+  connectorManifestSummary?: Doc<"packageReleases">["connectorManifestSummary"];
   stats?: { downloads: number; installs: number; stars: number; versions: number };
   createdAt: number;
   updatedAt: number;

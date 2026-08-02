@@ -150,7 +150,13 @@ type PackageExploreOptions = {
   json?: boolean;
 };
 
-type PublishablePackageFamily = "code-plugin" | "bundle-plugin" | "claw";
+type PublishablePackageFamily =
+  | "code-plugin"
+  | "bundle-plugin"
+  | "claw"
+  | "mcp"
+  | "persona"
+  | "connectors";
 
 type PackagePublishOptions = {
   family?: PublishablePackageFamily;
@@ -2192,6 +2198,14 @@ function familyLabel(family: PackageFamily) {
       return "Code Plugin";
     case "bundle-plugin":
       return "Bundle Plugin";
+    case "claw":
+      return "Claw";
+    case "mcp":
+      return "MCP";
+    case "persona":
+      return "Persona";
+    case "connectors":
+      return "Connector";
     default:
       return "Skill";
   }
@@ -2355,6 +2369,18 @@ function detectPackageFamily(
   if (typeof openclaw?.claw === "string") {
     return "claw";
   }
+  if (typeof openclaw?.mcp === "string") {
+    return "mcp";
+  }
+  if (typeof openclaw?.persona === "string") {
+    return "persona";
+  }
+  if (typeof openclaw?.connector === "string") {
+    return "connectors";
+  }
+  if (fileSet.has("mcp.json") || fileSet.has(".mcp.json")) return "mcp";
+  if (fileSet.has("persona.json") || fileSet.has("PERSONA.md")) return "persona";
+  if (fileSet.has("connector.json") || fileSet.has("connectors.json")) return "connectors";
   if (hasRealBundleManifest(fileSet)) return "bundle-plugin";
   if (fileSet.has("openclaw.plugin.json")) return "code-plugin";
   if (hasLooseBundleMarker(fileSet)) return "bundle-plugin";
@@ -2513,11 +2539,36 @@ async function preparePackagePublishPlan(
   if (!name) fail("--name required");
   if (!displayName) fail("--display-name required");
   if (!version) fail("--version required");
-  if (family !== "claw" && !fileSet.has("openclaw.plugin.json")) {
+  if (
+    family !== "claw" &&
+    family !== "mcp" &&
+    family !== "persona" &&
+    family !== "connectors" &&
+    !fileSet.has("openclaw.plugin.json")
+  ) {
     fail("openclaw.plugin.json required");
   }
-  if ((family === "code-plugin" || family === "claw") && !semver.valid(version)) {
-    fail(`--version must be valid semver for ${family === "claw" ? "Claws" : "code plugins"}`);
+  if (
+    (family === "code-plugin" ||
+      family === "claw" ||
+      family === "mcp" ||
+      family === "persona" ||
+      family === "connectors") &&
+    !semver.valid(version)
+  ) {
+    fail(
+      `--version must be valid semver for ${
+        family === "code-plugin"
+          ? "code plugins"
+          : family === "mcp"
+            ? "MCP servers"
+            : family === "persona"
+              ? "personas"
+              : family === "connectors"
+                ? "connectors"
+                : "Claws"
+      }`,
+    );
   }
   if (family === "code-plugin") {
     if (!fileSet.has("package.json")) fail("package.json required");

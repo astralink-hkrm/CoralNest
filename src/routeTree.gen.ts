@@ -25,15 +25,16 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as StarsRouteImport } from './routes/stars'
 import { Route as UploadRouteImport } from './routes/upload'
 import { Route as OwnerSlugRouteImport } from './routes/$owner/$slug'
-import { Route as AuthDocsRouteImport } from './routes/auth/docs'
 import { Route as CliAuthRouteImport } from './routes/cli/auth'
 import { Route as CliDeviceRouteImport } from './routes/cli/device'
-import { Route as OfficialIndexRouteImport } from './routes/official/index'
+import { Route as ConnectorsIndexRouteImport } from './routes/connectors/index'
+import { Route as McpIndexRouteImport } from './routes/mcp/index'
 import { Route as OrgsHandleRouteImport } from './routes/orgs/$handle'
 import { Route as PHandleRouteImport } from './routes/p/$handle'
 import { Route as PackagesIndexRouteImport } from './routes/packages/index'
 import { Route as PackagesNameRouteImport } from './routes/packages/$name'
 import { Route as PackagesNewRouteImport } from './routes/packages/new'
+import { Route as PersonaIndexRouteImport } from './routes/persona/index'
 import { Route as PluginsIndexRouteImport } from './routes/plugins/index'
 import { Route as PluginsNameRouteImport } from './routes/plugins/$name'
 import { Route as PluginsNewRouteImport } from './routes/plugins/new'
@@ -143,11 +144,6 @@ const OwnerSlugRoute = OwnerSlugRouteImport.update({
   path: '/$owner/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthDocsRoute = AuthDocsRouteImport.update({
-  id: '/auth/docs',
-  path: '/auth/docs',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CliAuthRoute = CliAuthRouteImport.update({
   id: '/cli/auth',
   path: '/cli/auth',
@@ -158,9 +154,14 @@ const CliDeviceRoute = CliDeviceRouteImport.update({
   path: '/cli/device',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OfficialIndexRoute = OfficialIndexRouteImport.update({
-  id: '/official/',
-  path: '/official/',
+const ConnectorsIndexRoute = ConnectorsIndexRouteImport.update({
+  id: '/connectors/',
+  path: '/connectors/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpIndexRoute = McpIndexRouteImport.update({
+  id: '/mcp/',
+  path: '/mcp/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrgsHandleRoute = OrgsHandleRouteImport.update({
@@ -186,6 +187,11 @@ const PackagesNameRoute = PackagesNameRouteImport.update({
 const PackagesNewRoute = PackagesNewRouteImport.update({
   id: '/packages/new',
   path: '/packages/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PersonaIndexRoute = PersonaIndexRouteImport.update({
+  id: '/persona/',
+  path: '/persona/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PluginsIndexRoute = PluginsIndexRouteImport.update({
@@ -356,7 +362,6 @@ export interface FileRoutesByFullPath {
   '/stars': typeof StarsRoute
   '/upload': typeof UploadRoute
   '/$owner/$slug': typeof OwnerSlugRouteWithChildren
-  '/auth/docs': typeof AuthDocsRoute
   '/cli/auth': typeof CliAuthRoute
   '/cli/device': typeof CliDeviceRoute
   '/orgs/$handle': typeof OrgsHandleRoute
@@ -369,8 +374,10 @@ export interface FileRoutesByFullPath {
   '/skills/publish': typeof SkillsPublishRoute
   '/u/$handle': typeof UHandleRoute
   '/user/$handle': typeof UserHandleRoute
-  '/official/': typeof OfficialIndexRoute
+  '/connectors/': typeof ConnectorsIndexRoute
+  '/mcp/': typeof McpIndexRoute
   '/packages/': typeof PackagesIndexRoute
+  '/persona/': typeof PersonaIndexRoute
   '/plugins/': typeof PluginsIndexRoute
   '/publishers/': typeof PublishersIndexRoute
   '/skills/': typeof SkillsIndexRoute
@@ -411,7 +418,6 @@ export interface FileRoutesByTo {
   '/stars': typeof StarsRoute
   '/upload': typeof UploadRoute
   '/$owner/$slug': typeof OwnerSlugRouteWithChildren
-  '/auth/docs': typeof AuthDocsRoute
   '/cli/auth': typeof CliAuthRoute
   '/cli/device': typeof CliDeviceRoute
   '/orgs/$handle': typeof OrgsHandleRoute
@@ -424,8 +430,10 @@ export interface FileRoutesByTo {
   '/skills/publish': typeof SkillsPublishRoute
   '/u/$handle': typeof UHandleRoute
   '/user/$handle': typeof UserHandleRoute
-  '/official': typeof OfficialIndexRoute
+  '/connectors': typeof ConnectorsIndexRoute
+  '/mcp': typeof McpIndexRoute
   '/packages': typeof PackagesIndexRoute
+  '/persona': typeof PersonaIndexRoute
   '/plugins': typeof PluginsIndexRoute
   '/publishers': typeof PublishersIndexRoute
   '/skills': typeof SkillsIndexRoute
@@ -467,7 +475,6 @@ export interface FileRoutesById {
   '/stars': typeof StarsRoute
   '/upload': typeof UploadRoute
   '/$owner/$slug': typeof OwnerSlugRouteWithChildren
-  '/auth/docs': typeof AuthDocsRoute
   '/cli/auth': typeof CliAuthRoute
   '/cli/device': typeof CliDeviceRoute
   '/orgs/$handle': typeof OrgsHandleRoute
@@ -480,8 +487,10 @@ export interface FileRoutesById {
   '/skills/publish': typeof SkillsPublishRoute
   '/u/$handle': typeof UHandleRoute
   '/user/$handle': typeof UserHandleRoute
-  '/official/': typeof OfficialIndexRoute
+  '/connectors/': typeof ConnectorsIndexRoute
+  '/mcp/': typeof McpIndexRoute
   '/packages/': typeof PackagesIndexRoute
+  '/persona/': typeof PersonaIndexRoute
   '/plugins/': typeof PluginsIndexRoute
   '/publishers/': typeof PublishersIndexRoute
   '/skills/': typeof SkillsIndexRoute
@@ -524,7 +533,6 @@ export interface FileRouteTypes {
     | '/stars'
     | '/upload'
     | '/$owner/$slug'
-    | '/auth/docs'
     | '/cli/auth'
     | '/cli/device'
     | '/orgs/$handle'
@@ -537,8 +545,10 @@ export interface FileRouteTypes {
     | '/skills/publish'
     | '/u/$handle'
     | '/user/$handle'
-    | '/official/'
+    | '/connectors/'
+    | '/mcp/'
     | '/packages/'
+    | '/persona/'
     | '/plugins/'
     | '/publishers/'
     | '/skills/'
@@ -579,7 +589,6 @@ export interface FileRouteTypes {
     | '/stars'
     | '/upload'
     | '/$owner/$slug'
-    | '/auth/docs'
     | '/cli/auth'
     | '/cli/device'
     | '/orgs/$handle'
@@ -592,8 +601,10 @@ export interface FileRouteTypes {
     | '/skills/publish'
     | '/u/$handle'
     | '/user/$handle'
-    | '/official'
+    | '/connectors'
+    | '/mcp'
     | '/packages'
+    | '/persona'
     | '/plugins'
     | '/publishers'
     | '/skills'
@@ -634,7 +645,6 @@ export interface FileRouteTypes {
     | '/stars'
     | '/upload'
     | '/$owner/$slug'
-    | '/auth/docs'
     | '/cli/auth'
     | '/cli/device'
     | '/orgs/$handle'
@@ -647,8 +657,10 @@ export interface FileRouteTypes {
     | '/skills/publish'
     | '/u/$handle'
     | '/user/$handle'
-    | '/official/'
+    | '/connectors/'
+    | '/mcp/'
     | '/packages/'
+    | '/persona/'
     | '/plugins/'
     | '/publishers/'
     | '/skills/'
@@ -690,7 +702,6 @@ export interface RootRouteChildren {
   StarsRoute: typeof StarsRoute
   UploadRoute: typeof UploadRoute
   OwnerSlugRoute: typeof OwnerSlugRouteWithChildren
-  AuthDocsRoute: typeof AuthDocsRoute
   CliAuthRoute: typeof CliAuthRoute
   CliDeviceRoute: typeof CliDeviceRoute
   OrgsHandleRoute: typeof OrgsHandleRoute
@@ -703,8 +714,10 @@ export interface RootRouteChildren {
   SkillsPublishRoute: typeof SkillsPublishRoute
   UHandleRoute: typeof UHandleRoute
   UserHandleRoute: typeof UserHandleRoute
-  OfficialIndexRoute: typeof OfficialIndexRoute
+  ConnectorsIndexRoute: typeof ConnectorsIndexRoute
+  McpIndexRoute: typeof McpIndexRoute
   PackagesIndexRoute: typeof PackagesIndexRoute
+  PersonaIndexRoute: typeof PersonaIndexRoute
   PluginsIndexRoute: typeof PluginsIndexRoute
   PublishersIndexRoute: typeof PublishersIndexRoute
   SkillsIndexRoute: typeof SkillsIndexRoute
@@ -830,13 +843,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OwnerSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/docs': {
-      id: '/auth/docs'
-      path: '/auth/docs'
-      fullPath: '/auth/docs'
-      preLoaderRoute: typeof AuthDocsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/cli/auth': {
       id: '/cli/auth'
       path: '/cli/auth'
@@ -851,11 +857,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CliDeviceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/official/': {
-      id: '/official/'
-      path: '/official'
-      fullPath: '/official/'
-      preLoaderRoute: typeof OfficialIndexRouteImport
+    '/connectors/': {
+      id: '/connectors/'
+      path: '/connectors'
+      fullPath: '/connectors/'
+      preLoaderRoute: typeof ConnectorsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp/': {
+      id: '/mcp/'
+      path: '/mcp'
+      fullPath: '/mcp/'
+      preLoaderRoute: typeof McpIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/orgs/$handle': {
@@ -891,6 +904,13 @@ declare module '@tanstack/react-router' {
       path: '/packages/new'
       fullPath: '/packages/new'
       preLoaderRoute: typeof PackagesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/persona/': {
+      id: '/persona/'
+      path: '/persona'
+      fullPath: '/persona/'
+      preLoaderRoute: typeof PersonaIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/plugins/': {
@@ -1184,7 +1204,6 @@ const rootRouteChildren: RootRouteChildren = {
   StarsRoute: StarsRoute,
   UploadRoute: UploadRoute,
   OwnerSlugRoute: OwnerSlugRouteWithChildren,
-  AuthDocsRoute: AuthDocsRoute,
   CliAuthRoute: CliAuthRoute,
   CliDeviceRoute: CliDeviceRoute,
   OrgsHandleRoute: OrgsHandleRoute,
@@ -1197,8 +1216,10 @@ const rootRouteChildren: RootRouteChildren = {
   SkillsPublishRoute: SkillsPublishRoute,
   UHandleRoute: UHandleRoute,
   UserHandleRoute: UserHandleRoute,
-  OfficialIndexRoute: OfficialIndexRoute,
+  ConnectorsIndexRoute: ConnectorsIndexRoute,
+  McpIndexRoute: McpIndexRoute,
   PackagesIndexRoute: PackagesIndexRoute,
+  PersonaIndexRoute: PersonaIndexRoute,
   PluginsIndexRoute: PluginsIndexRoute,
   PublishersIndexRoute: PublishersIndexRoute,
   SkillsIndexRoute: SkillsIndexRoute,

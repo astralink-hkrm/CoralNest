@@ -2,7 +2,9 @@ import { type inferred, type } from "arktype";
 import { ClawManifestSummarySchema } from "./claws.js";
 import { CliPublishFileSchema, PublishSourceSchema } from "./schemas.js";
 
-export const PackageFamilySchema = type('"skill"|"code-plugin"|"bundle-plugin"|"claw"');
+export const PackageFamilySchema = type(
+  '"skill"|"code-plugin"|"bundle-plugin"|"claw"|"mcp"|"persona"|"connectors"',
+);
 export type PackageFamily = (typeof PackageFamilySchema)[inferred];
 
 export const PackageChannelSchema = type('"official"|"community"|"private"');

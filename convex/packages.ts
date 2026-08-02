@@ -1,6 +1,12 @@
 import {
   ServerPackagePublishRequestSchema,
   validateClawPackageContents,
+  validateMcpManifest,
+  validatePersonaManifest,
+  validateConnectorManifest,
+  summarizeMcpManifest,
+  summarizePersonaManifest,
+  summarizeConnectorManifest,
   derivePluginCategoryTags,
   getCatalogTopicSlugs,
   getPackageScopeOwnerMismatch,
@@ -21,6 +27,9 @@ import {
   type PackageOfficialMigrationPhase,
   type ServerPackagePublishRequest,
   type PackageVerificationTier,
+  type McpManifest,
+  type PersonaManifest,
+  type ConnectorManifest,
 } from "clawhub-schema";
 import { getPage, type IndexKey } from "convex-helpers/server/pagination";
 import { paginationOptsValidator } from "convex/server";
@@ -1016,6 +1025,9 @@ type PublicPackageDoc = {
   verification?: Doc<"packages">["verification"];
   artifact?: PackageArtifactSummary;
   clawManifestSummary?: Doc<"packageReleases">["clawManifestSummary"];
+  mcpManifestSummary?: Doc<"packageReleases">["mcpManifestSummary"];
+  personaManifestSummary?: Doc<"packageReleases">["personaManifestSummary"];
+  connectorManifestSummary?: Doc<"packageReleases">["connectorManifestSummary"];
   scanStatus?: Doc<"packages">["scanStatus"];
   stats: Doc<"packages">["stats"];
   createdAt: number;
@@ -1226,6 +1238,18 @@ function toPublicPackage(
       pkg.family === "claw" && isPublishedPackageRelease(latestRelease)
         ? latestRelease.clawManifestSummary
         : undefined,
+    mcpManifestSummary:
+      pkg.family === "mcp" && isPublishedPackageRelease(latestRelease)
+        ? latestRelease.mcpManifestSummary
+        : undefined,
+    personaManifestSummary:
+      pkg.family === "persona" && isPublishedPackageRelease(latestRelease)
+        ? latestRelease.personaManifestSummary
+        : undefined,
+    connectorManifestSummary:
+      pkg.family === "connectors" && isPublishedPackageRelease(latestRelease)
+        ? latestRelease.connectorManifestSummary
+        : undefined,
     scanStatus,
     stats: pkg.stats,
     createdAt: pkg.createdAt,
@@ -1235,7 +1259,7 @@ function toPublicPackage(
 
 function toPublicPackageRelease(release: Doc<"packageReleases">, family: PackageFamily) {
   // Package family owns this boundary; optional release metadata must not select a looser projection.
-  if (family === "claw") {
+  if (family === "claw" || family === "mcp" || family === "persona" || family === "connectors") {
     const sourcePath = release.verification?.sourcePath ?? getReleaseSourcePath(release);
     return {
       _id: release._id,
@@ -1262,6 +1286,9 @@ function toPublicPackageRelease(release: Doc<"packageReleases">, family: Package
       npmUnpackedSize: release.npmUnpackedSize,
       npmFileCount: release.npmFileCount,
       clawManifestSummary: release.clawManifestSummary,
+      mcpManifestSummary: release.mcpManifestSummary,
+      personaManifestSummary: release.personaManifestSummary,
+      connectorManifestSummary: release.connectorManifestSummary,
       compatibility: release.compatibility,
       runtimeId: release.runtimeId,
       sourceRepo: release.sourceRepo,
@@ -4079,10 +4106,22 @@ export const listPageForViewerInternal = internalQuery({
         v.literal("code-plugin"),
         v.literal("bundle-plugin"),
         v.literal("claw"),
+        v.literal("mcp"),
+        v.literal("persona"),
+        v.literal("connectors"),
       ),
     ),
     families: v.optional(
-      v.array(v.union(v.literal("skill"), v.literal("code-plugin"), v.literal("bundle-plugin"))),
+      v.array(
+        v.union(
+          v.literal("skill"),
+          v.literal("code-plugin"),
+          v.literal("bundle-plugin"),
+          v.literal("mcp"),
+          v.literal("persona"),
+          v.literal("connectors"),
+        ),
+      ),
     ),
     channel: v.optional(
       v.union(v.literal("official"), v.literal("community"), v.literal("private")),
@@ -4820,6 +4859,9 @@ export const searchForViewerInternal = internalQuery({
         v.literal("code-plugin"),
         v.literal("bundle-plugin"),
         v.literal("claw"),
+        v.literal("mcp"),
+        v.literal("persona"),
+        v.literal("connectors"),
       ),
     ),
     channel: v.optional(
@@ -4901,10 +4943,11 @@ async function searchPackagesImpl(
     return results;
   }
 
-  const searchFamilies =
-    !args.family && !experimentalClawsEnabled()
-      ? ([...STABLE_PACKAGE_FAMILIES] as PackageFamily[])
-      : [args.family];
+  const searchFamilies = args.family
+    ? [args.family]
+    : experimentalClawsEnabled()
+      ? ([undefined] as const)
+      : ([...STABLE_PACKAGE_FAMILIES, "mcp", "persona", "connectors"] as PackageFamily[]);
   const buildSearchDigestQuery = (family: PackageFamily | undefined) =>
     topic
       ? buildPackageTopicDigestQuery(ctx, {
@@ -5006,7 +5049,7 @@ async function searchPackagesImpl(
             .order("desc")
             .paginate({ cursor: state.cursor, numItems: pageSize });
           state.pagesScanned += 1;
-          remainingScanBudget -= pageSize;
+          remainingScanBudget -= page.page.length;
           await collectDigestMatches(page.page);
           state.cursor = page.continueCursor;
           state.isDone = page.isDone;
@@ -8259,8 +8302,14 @@ async function publishPackageImpl(
   }
   const family = payload.family;
   const name = normalizePackageName(payload.name);
-  if (payload.family === "claw" && payload.name !== name) {
-    throw new ConvexError(`Claw package name must use canonical form ${name}`);
+  if (
+    (payload.family === "claw" ||
+      payload.family === "mcp" ||
+      payload.family === "persona" ||
+      payload.family === "connectors") &&
+    payload.name !== name
+  ) {
+    throw new ConvexError(`Package name must use canonical form ${name}`);
   }
   const version = assertPackageVersion(family, payload.version);
   const existingPackage = await runQueryRef<Doc<"packages"> | null>(
@@ -8407,7 +8456,14 @@ async function publishPackageImpl(
           label: "Claw package.json",
           strictUtf8: true,
         }
-      : undefined,
+      : family === "mcp" || family === "persona" || family === "connectors"
+        ? {
+            exactPath: true,
+            maxBytes: 256 * 1024,
+            label: `${family} package.json`,
+            strictUtf8: true,
+          }
+        : undefined,
   );
   const pluginManifestEntry = await readOptionalTextFile(
     ctx,
@@ -8448,6 +8504,77 @@ async function publishPackageImpl(
         strictUtf8: true,
       })
     : null;
+  const declaredMcpManifestPath =
+    family === "mcp" &&
+    packageJson &&
+    typeof packageJson.openclaw === "object" &&
+    packageJson.openclaw !== null &&
+    !Array.isArray(packageJson.openclaw) &&
+    typeof (packageJson.openclaw as Record<string, unknown>).mcp === "string"
+      ? ((packageJson.openclaw as Record<string, unknown>).mcp as string)
+      : undefined;
+  const mcpManifestEntry =
+    family === "mcp"
+      ? await readOptionalTextFile(
+          ctx,
+          files,
+          (path) => path === (declaredMcpManifestPath ?? "mcp.json") || path === ".mcp.json",
+          {
+            exactPath: true,
+            maxBytes: 1024 * 1024,
+            label: "MCP manifest",
+            strictUtf8: true,
+          },
+        )
+      : null;
+  const declaredPersonaManifestPath =
+    family === "persona" &&
+    packageJson &&
+    typeof packageJson.openclaw === "object" &&
+    packageJson.openclaw !== null &&
+    !Array.isArray(packageJson.openclaw) &&
+    typeof (packageJson.openclaw as Record<string, unknown>).persona === "string"
+      ? ((packageJson.openclaw as Record<string, unknown>).persona as string)
+      : undefined;
+  const personaManifestEntry =
+    family === "persona"
+      ? await readOptionalTextFile(
+          ctx,
+          files,
+          (path) => path === (declaredPersonaManifestPath ?? "persona.json"),
+          {
+            exactPath: true,
+            maxBytes: 1024 * 1024,
+            label: "Persona manifest",
+            strictUtf8: true,
+          },
+        )
+      : null;
+  const declaredConnectorManifestPath =
+    family === "connectors" &&
+    packageJson &&
+    typeof packageJson.openclaw === "object" &&
+    packageJson.openclaw !== null &&
+    !Array.isArray(packageJson.openclaw) &&
+    typeof (packageJson.openclaw as Record<string, unknown>).connector === "string"
+      ? ((packageJson.openclaw as Record<string, unknown>).connector as string)
+      : undefined;
+  const connectorManifestEntry =
+    family === "connectors"
+      ? await readOptionalTextFile(
+          ctx,
+          files,
+          (path) =>
+            path === (declaredConnectorManifestPath ?? "connector.json") ||
+            path === "connectors.json",
+          {
+            exactPath: true,
+            maxBytes: 1024 * 1024,
+            label: "Connector manifest",
+            strictUtf8: true,
+          },
+        )
+      : null;
   const pluginManifest = maybeParseJson(pluginManifestEntry?.text);
   const bundleManifest = maybeParseJson(bundleManifestEntry?.text);
   const storedPackageJson = toConvexSafeJsonValue(packageJson, {
@@ -8507,7 +8634,73 @@ async function publishPackageImpl(
     );
   }
   const validatedClaw = clawPackage?.ok ? clawPackage.value : undefined;
-  const icon = family === "claw" ? undefined : normalizePluginManifestIcon(pluginManifest);
+  let mcpSummary: ReturnType<typeof summarizeMcpManifest> | undefined;
+  let mcpManifest: McpManifest | undefined;
+  if (family === "mcp") {
+    if (!mcpManifestEntry) {
+      throw new ConvexError("MCP packages require an mcp.json manifest");
+    }
+    const mcpParsed = maybeParseJson(mcpManifestEntry.text);
+    if (!mcpParsed) {
+      throw new ConvexError("mcp.json must contain valid JSON");
+    }
+    const mcpValidated = validateMcpManifest(mcpParsed);
+    if (!mcpValidated.ok) {
+      throw new ConvexError(
+        `Invalid MCP manifest: ${mcpValidated.issues
+          .map((entry) => `${entry.path}: ${entry.message}`)
+          .join(" ")}`,
+      );
+    }
+    mcpManifest = mcpValidated.manifest;
+    mcpSummary = summarizeMcpManifest(mcpValidated.manifest);
+  }
+  let personaSummary: ReturnType<typeof summarizePersonaManifest> | undefined;
+  let personaManifest: PersonaManifest | undefined;
+  if (family === "persona") {
+    if (!personaManifestEntry) {
+      throw new ConvexError("Persona packages require a persona.json manifest");
+    }
+    const personaParsed = maybeParseJson(personaManifestEntry.text);
+    if (!personaParsed) {
+      throw new ConvexError("persona.json must contain valid JSON");
+    }
+    const personaValidated = validatePersonaManifest(personaParsed);
+    if (!personaValidated.ok) {
+      throw new ConvexError(
+        `Invalid Persona manifest: ${personaValidated.issues
+          .map((entry) => `${entry.path}: ${entry.message}`)
+          .join(" ")}`,
+      );
+    }
+    personaManifest = personaValidated.manifest;
+    personaSummary = summarizePersonaManifest(personaValidated.manifest);
+  }
+  let connectorSummary: ReturnType<typeof summarizeConnectorManifest> | undefined;
+  let connectorManifest: ConnectorManifest | undefined;
+  if (family === "connectors") {
+    if (!connectorManifestEntry) {
+      throw new ConvexError("Connector packages require a connector.json manifest");
+    }
+    const connectorParsed = maybeParseJson(connectorManifestEntry.text);
+    if (!connectorParsed) {
+      throw new ConvexError("connector.json must contain valid JSON");
+    }
+    const connectorValidated = validateConnectorManifest(connectorParsed);
+    if (!connectorValidated.ok) {
+      throw new ConvexError(
+        `Invalid Connector manifest: ${connectorValidated.issues
+          .map((entry) => `${entry.path}: ${entry.message}`)
+          .join(" ")}`,
+      );
+    }
+    connectorManifest = connectorValidated.manifest;
+    connectorSummary = summarizeConnectorManifest(connectorValidated.manifest);
+  }
+  const icon =
+    family === "claw" || family === "mcp" || family === "persona" || family === "connectors"
+      ? undefined
+      : normalizePluginManifestIcon(pluginManifest);
   if (family === "code-plugin") {
     const validation = validateOpenClawExternalCodePluginPackageContents(
       packageJson,
@@ -8569,6 +8762,12 @@ async function publishPackageImpl(
   const summary =
     validatedClaw?.summary.agent.description ||
     validatedClaw?.summary.agent.name ||
+    mcpSummary?.description ||
+    mcpSummary?.name ||
+    personaSummary?.description ||
+    personaSummary?.name ||
+    connectorSummary?.description ||
+    connectorSummary?.name ||
     summarizePackageForSearch({
       packageName: name,
       packageJson,
@@ -8580,7 +8779,7 @@ async function publishPackageImpl(
     const declaredCategories =
       payload.categories ?? normalizeStoredPluginCategoryOverride(existingPackage?.categories);
     categories =
-      family === "claw"
+      family === "claw" || family === "mcp" || family === "persona" || family === "connectors"
         ? (declaredCategories ?? [])
         : resolvePluginCategories({ declared: declaredCategories });
     normalizedTopics = normalizeCatalogTopics(payload.topics ?? existingPackage?.topics);
@@ -8597,6 +8796,9 @@ async function publishPackageImpl(
       pluginManifest,
       bundleManifest,
       clawManifest: validatedClaw?.manifest,
+      mcpManifest,
+      personaManifest,
+      connectorManifest,
       source: effectiveSource,
     },
     files,
@@ -8632,7 +8834,7 @@ async function publishPackageImpl(
     files.map((file) => ({ path: file.path, sha256: file.sha256 })),
   );
   const pluginManifestSummary =
-    family === "claw"
+    family === "claw" || family === "mcp" || family === "persona" || family === "connectors"
       ? undefined
       : derivePluginManifestSummary({
           pluginManifest:
@@ -8703,6 +8905,9 @@ async function publishPackageImpl(
     normalizedBundleManifest: family === "bundle-plugin" ? storedBundleManifest : undefined,
     pluginManifestSummary,
     clawManifestSummary: validatedClaw?.summary,
+    mcpManifestSummary: mcpSummary,
+    personaManifestSummary: personaSummary,
+    connectorManifestSummary: connectorSummary,
     source: effectiveSource,
   };
 
@@ -10623,7 +10828,12 @@ function resolvePackageReleaseTagsForPublish(params: {
     ? semver.valid(params.currentLatestVersion)
     : null;
   const candidateSemver = semver.valid(params.candidateVersion);
-  const latestUsesSemver = params.family === "code-plugin" || params.family === "claw";
+  const latestUsesSemver =
+    params.family === "code-plugin" ||
+    params.family === "claw" ||
+    params.family === "mcp" ||
+    params.family === "persona" ||
+    params.family === "connectors";
   // `latest` is reserved for the highest semver on versioned package families.
   // Callers default to this tag, so accepting it blindly would let backports roll the catalog back.
   const shouldPromoteLatest =
@@ -10656,7 +10866,13 @@ async function resolvePackageCurrentLatestForPublish(
 ) {
   const latestReleaseId = getPackageTagReleaseId(pkg, "latest");
   if (!latestReleaseId) return { exists: false, version: undefined };
-  if (pkg.family !== "code-plugin" && pkg.family !== "claw") {
+  if (
+    pkg.family !== "code-plugin" &&
+    pkg.family !== "claw" &&
+    pkg.family !== "mcp" &&
+    pkg.family !== "persona" &&
+    pkg.family !== "connectors"
+  ) {
     return { exists: true, version: pkg.latestVersionSummary?.version };
   }
 
@@ -10951,6 +11167,9 @@ export const insertReleaseInternal = internalMutation({
       v.literal("code-plugin"),
       v.literal("bundle-plugin"),
       v.literal("claw"),
+      v.literal("mcp"),
+      v.literal("persona"),
+      v.literal("connectors"),
     ),
     version: v.string(),
     publicationStatus: v.optional(v.union(v.literal("pending"), v.literal("published"))),
@@ -10996,6 +11215,9 @@ export const insertReleaseInternal = internalMutation({
     normalizedBundleManifest: v.optional(v.any()),
     pluginManifestSummary: v.optional(v.any()),
     clawManifestSummary: v.optional(v.any()),
+    mcpManifestSummary: v.optional(v.any()),
+    personaManifestSummary: v.optional(v.any()),
+    connectorManifestSummary: v.optional(v.any()),
     source: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
@@ -11241,6 +11463,9 @@ export const insertReleaseInternal = internalMutation({
       normalizedBundleManifest: args.normalizedBundleManifest,
       pluginManifestSummary: args.pluginManifestSummary,
       clawManifestSummary: args.clawManifestSummary,
+      mcpManifestSummary: args.mcpManifestSummary,
+      personaManifestSummary: args.personaManifestSummary,
+      connectorManifestSummary: args.connectorManifestSummary,
       compatibility: args.compatibility,
       runtimeId: args.runtimeId,
       sourceRepo: args.sourceRepo,

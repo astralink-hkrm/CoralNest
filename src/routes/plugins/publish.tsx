@@ -27,7 +27,6 @@ import {
   type PublisherOwnerMembership,
 } from "../../components/PublisherOwnerSelect";
 import { PublishFormSkeleton } from "../../components/PublishFormSkeleton";
-import { SignInButton } from "../../components/SignInButton";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
@@ -588,9 +587,7 @@ export function PublishPluginRoute() {
           <EmptyState
             title="Sign in to publish a plugin"
             description="You need to be signed in to publish plugins on ClawHub."
-          >
-            <SignInButton />
-          </EmptyState>
+          />
         </Container>
       </main>
     );

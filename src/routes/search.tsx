@@ -309,12 +309,12 @@ function SearchEmptyState({
   query: string;
 }) {
   const browseHref =
-    activeType === "plugins" ? "/plugins" : activeType === "creators" ? "/official" : "/skills";
+    activeType === "plugins" ? "/plugins" : activeType === "creators" ? "/" : "/skills";
   const browseLabel =
     activeType === "plugins"
       ? "Show all plugins"
       : activeType === "creators"
-        ? "Browse official organizations"
+        ? "Browse skills and plugins"
         : "Show all skills";
 
   return (

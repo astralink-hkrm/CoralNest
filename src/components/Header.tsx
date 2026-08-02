@@ -1,41 +1,24 @@
-import { useAuthActions } from "@convex-dev/auth/react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "convex/react";
 import {
   ArrowRight,
-  Bookmark,
   ExternalLink,
-  ChevronDown,
   Command,
-  LayoutDashboard,
   Loader2,
   Menu,
   Monitor,
   Moon,
   MoreHorizontal,
-  Plus,
   Search,
-  Settings,
   Sun,
-  UserRound,
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { api } from "../../convex/_generated/api";
-import {
-  getUserFacingAuthError,
-  isBannedAccountAuthError,
-  routeToBannedAccountPage,
-} from "../lib/authErrorMessage";
-import { gravatarUrl } from "../lib/gravatar";
 import { PRIMARY_NAV_ITEMS, SECONDARY_NAV_ITEMS } from "../lib/nav-items";
 import { buildPublisherProfileHref, buildSkillDetailHref } from "../lib/ownerRoute";
 import { buildPluginDetailHref, displayPluginPackageName } from "../lib/pluginRoutes";
 import { presentationTitle } from "../lib/presentationTitle";
 import { SITE_NAME } from "../lib/site";
 import { applyTheme, useThemeMode } from "../lib/theme";
-import { clearAuthError, setAuthError } from "../lib/useAuthError";
-import { useAuthStatus } from "../lib/useAuthStatus";
 import {
   isUnifiedNativeSkillResult,
   useUnifiedSearch,
@@ -45,12 +28,10 @@ import {
 } from "../lib/useUnifiedSearch";
 import { MarketplaceIcon } from "./MarketplaceIcon";
 import { OfficialBadge } from "./OfficialBadge";
-import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
@@ -91,14 +72,6 @@ function NavSearchShortcutKbd({ isApple }: { isApple: boolean }) {
   );
 }
 
-function GitHubLogo({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.16 1.18.92-.26 1.9-.38 2.88-.39.98 0 1.96.13 2.88.39 2.19-1.49 3.15-1.18 3.15-1.18.63 1.58.24 2.75.12 3.04.74.8 1.18 1.83 1.18 3.08 0 4.42-2.69 5.39-5.25 5.67.42.36.78 1.07.78 2.15 0 1.55-.01 2.8-.01 3.18 0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
-    </svg>
-  );
-}
-
 type TypeaheadSection = "skills" | "plugins" | "creators";
 
 type TypeaheadItem =
@@ -125,21 +98,9 @@ type TypeaheadItem =
     };
 
 export default function Header() {
-  const { isAuthenticated, isLoading, me } = useAuthStatus();
-  const { signIn, signOut } = useAuthActions();
   const { theme, mode, setMode } = useThemeMode();
   const navigate = useNavigate();
   const location = useLocation();
-
-  const avatar = me?.image ?? (me?.email ? gravatarUrl(me.email) : undefined);
-  const rawHandle = me?.handle ?? me?.displayName ?? "user";
-  const handle = rawHandle.length > 25 ? `${rawHandle.slice(0, 25)}…` : rawHandle;
-  const initial = (me?.displayName ?? me?.name ?? rawHandle).charAt(0).toUpperCase();
-  const isAuthResolving = isLoading || (isAuthenticated && me === undefined);
-  const profileHandle = useQuery(
-    api.publishers.getMyProfileHandle,
-    isAuthenticated && me ? {} : "skip",
-  );
   const [navSearchQuery, setNavSearchQuery] = useState("");
   const [typeaheadOpen, setTypeaheadOpen] = useState(false);
   const [typeaheadActiveIndex, setTypeaheadActiveIndex] = useState(0);
@@ -476,12 +437,10 @@ export default function Header() {
                       </SheetClose>
                     ))}
                   </div>
-                  {!isAuthResolving && !isAuthenticated ? (
-                    <div className="mobile-nav-section mobile-nav-appearance-section">
-                      <span className="mobile-nav-section-title">Appearance</span>
-                      <NavbarThemeSwitcher mode={mode} onSetMode={setThemeMode} />
-                    </div>
-                  ) : null}
+                  <div className="mobile-nav-section mobile-nav-appearance-section">
+                    <span className="mobile-nav-section-title">Appearance</span>
+                    <NavbarThemeSwitcher mode={mode} onSetMode={setThemeMode} />
+                  </div>
                 </SheetContent>
               </Sheet>
             </div>
@@ -611,128 +570,7 @@ export default function Header() {
                 <Search size={18} aria-hidden="true" />
               )}
             </button>
-            {isAuthResolving ? (
-              <div className="navbar-theme-switcher-skeleton" aria-hidden="true" />
-            ) : !isAuthenticated ? (
-              <NavbarThemeSwitcher mode={mode} onSetMode={setThemeMode} />
-            ) : null}
-            {isAuthenticated && me ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="user-trigger" type="button">
-                    {avatar ? (
-                      <img src={avatar} alt={me.displayName ?? me.name ?? "User avatar"} />
-                    ) : (
-                      <span className="user-menu-fallback">{initial}</span>
-                    )}
-                    <span className="user-trigger-handle truncate">@{handle}</span>
-                    <ChevronDown className="user-menu-chevron" size={16} />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="user-dropdown-content">
-                  {profileHandle ? (
-                    <DropdownMenuItem asChild>
-                      <Link
-                        to="/$slug"
-                        params={{ slug: profileHandle }}
-                        className="flex items-center gap-2"
-                      >
-                        <UserRound size={14} aria-hidden="true" />
-                        Profile
-                      </Link>
-                    </DropdownMenuItem>
-                  ) : null}
-                  <DropdownMenuItem asChild>
-                    <Link to="/dashboard" className="flex items-center gap-2">
-                      <LayoutDashboard size={14} aria-hidden="true" />
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to="/add"
-                      search={{ kind: "skill", ownerHandle: undefined, method: undefined }}
-                      className="flex items-center gap-2"
-                    >
-                      <Plus size={14} aria-hidden="true" />
-                      Add skill or plugin
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/stars" className="flex items-center gap-2">
-                      <Bookmark size={14} aria-hidden="true" />
-                      Bookmarks
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/settings" className="flex items-center gap-2">
-                      <Settings size={14} aria-hidden="true" />
-                      Settings
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <div className="user-dropdown-theme-row" role="group" aria-label="Theme">
-                    {THEME_MODE_ITEMS.map(({ mode: themeMode, label, Icon }) => (
-                      <DropdownMenuItem
-                        key={themeMode}
-                        aria-label={label}
-                        aria-current={mode === themeMode ? "true" : undefined}
-                        className="user-dropdown-theme-button"
-                        data-status={mode === themeMode ? "active" : undefined}
-                        title={label}
-                        onClick={() => setThemeMode(themeMode)}
-                      >
-                        <Icon size={15} aria-hidden="true" />
-                        <span className="sr-only">{label}</span>
-                      </DropdownMenuItem>
-                    ))}
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => void signOut()}>Sign out</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : isAuthResolving ? (
-              <div className="github-sign-in-button auth-loading-placeholder" aria-hidden="true" />
-            ) : (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  type="button"
-                  aria-label="Sign in with GitHub"
-                  className="github-sign-in-button"
-                  disabled={isLoading}
-                  onClick={() => {
-                    clearAuthError();
-                    void signIn("github", { redirectTo: "/dashboard" })
-                      .then((result) => {
-                        if (result?.signingIn === false && !result.redirect) {
-                          setAuthError("Sign in failed. Please try again.");
-                        }
-                      })
-                      .catch((error) => {
-                        const message = getUserFacingAuthError(
-                          error,
-                          "Sign in failed. Please try again.",
-                        );
-                        if (isBannedAccountAuthError(message)) {
-                          routeToBannedAccountPage();
-                          return;
-                        }
-                        setAuthError(message);
-                      });
-                  }}
-                >
-                  <GitHubLogo className="github-sign-in-logo" />
-                  <span className="sign-in-full-copy" aria-hidden="true">
-                    Sign in with GitHub
-                  </span>
-                  <span className="sign-in-compact-copy" aria-hidden="true">
-                    Sign in
-                  </span>
-                </Button>
-              </>
-            )}
+            <NavbarThemeSwitcher mode={mode} onSetMode={setThemeMode} />
           </div>
         </div>
 

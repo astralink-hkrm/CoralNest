@@ -1,6 +1,9 @@
 import { type } from "arktype";
 import { ClawManifestSummarySchema } from "./claws.js";
+import { ConnectorManifestSummarySchema } from "./connectors.js";
 import { DocsLinks } from "./docsLinks.js";
+import { McpManifestSummarySchema } from "./mcp.js";
+import { PersonaManifestSummarySchema } from "./persona.js";
 import { CliPublishFileSchema, PublishSourceSchema } from "./schemas.js";
 export const PACKAGE_TRENDING_LEADERBOARD_LIMIT = 200;
 export function normalizePackageOwnerHandle(handle) {
@@ -23,8 +26,8 @@ export function getPackageScopeOwnerMismatch(name, ownerHandle) {
         message: `Package scope "@${scope}" must match selected owner "@${selectedOwner}". Publish as "@${scope}" or rename this package to "@${selectedOwner}/${packageSlug}". More info: ${DocsLinks.clawhub.packageScopeFaq}`,
     };
 }
-export const PackageFamilySchema = type('"skill"|"code-plugin"|"bundle-plugin"|"claw"');
-export const PackagePublishFamilySchema = type('"skill"|"code-plugin"|"bundle-plugin"|"claw"');
+export const PackageFamilySchema = type('"skill"|"code-plugin"|"bundle-plugin"|"claw"|"mcp"|"persona"|"connectors"');
+export const PackagePublishFamilySchema = type('"skill"|"code-plugin"|"bundle-plugin"|"claw"|"mcp"|"persona"|"connectors"');
 export const PackageChannelSchema = type('"official"|"community"|"private"');
 export const PackageVerificationTierSchema = type('"structural"|"source-linked"|"provenance-verified"|"rebuild-verified"');
 export const PackageVerificationScopeSchema = type('"artifact-only"|"dependency-graph-aware"');
@@ -362,6 +365,9 @@ export const ApiV1PackageResponseSchema = type({
         compatibility: PackageCompatibilitySchema.or("null").optional(),
         pluginManifestSummary: PluginManifestSummarySchema.or("null").optional(),
         clawManifestSummary: ClawManifestSummarySchema.or("null").optional(),
+        mcpManifestSummary: McpManifestSummarySchema.or("null").optional(),
+        personaManifestSummary: PersonaManifestSummarySchema.or("null").optional(),
+        connectorManifestSummary: ConnectorManifestSummarySchema.or("null").optional(),
         verification: PackageVerificationSummarySchema.or("null").optional(),
         artifact: PackageArtifactSummarySchema.or("null").optional(),
         scanStatus: '"clean"|"suspicious"|"malicious"|"pending"|"not-run"?',
@@ -397,6 +403,9 @@ export const ApiV1PackageVersionResponseSchema = type({
         compatibility: PackageCompatibilitySchema.or("null").optional(),
         pluginManifestSummary: PluginManifestSummarySchema.or("null").optional(),
         clawManifestSummary: ClawManifestSummarySchema.or("null").optional(),
+        mcpManifestSummary: McpManifestSummarySchema.or("null").optional(),
+        personaManifestSummary: PersonaManifestSummarySchema.or("null").optional(),
+        connectorManifestSummary: ConnectorManifestSummarySchema.or("null").optional(),
         verification: PackageVerificationSummarySchema.or("null").optional(),
         artifact: PackageArtifactSummarySchema.or("null").optional(),
         // Deprecated compatibility hash for exact /download ZIP bytes; use artifact.sha256 for installs.

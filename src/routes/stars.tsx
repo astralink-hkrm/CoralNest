@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import type { Doc } from "../../convex/_generated/dataModel";
 import { EmptyState } from "../components/EmptyState";
-import { SignInPrompt } from "../components/SignInPrompt";
+import { Container } from "../components/layout/Container";
 import { StarsSkeleton } from "../components/skeletons/ProtectedPageSkeletons";
 import { SkillCard } from "../components/SkillCard";
 import { SkillListItem } from "../components/SkillListItem";
@@ -93,11 +93,15 @@ export function Stars() {
 
   if (!isAuthenticated || !me) {
     return (
-      <SignInPrompt
-        icon={Bookmark}
-        title="Sign in to see your bookmarks"
-        description="Bookmark skills for quick access later."
-      />
+      <main className="browse-page py-10">
+        <Container size="narrow">
+          <EmptyState
+            icon={Bookmark}
+            title="Sign in to see your bookmarks"
+            description="Bookmark skills for quick access later."
+          />
+        </Container>
+      </main>
     );
   }
 

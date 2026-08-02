@@ -2,7 +2,7 @@
 
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import type { AriaAttributes, ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -166,10 +166,6 @@ vi.mock("../lib/site", () => ({
   SITE_NAME: "ClawHub",
 }));
 
-vi.mock("../lib/gravatar", () => ({
-  gravatarUrl: vi.fn(),
-}));
-
 vi.mock("../lib/useUnifiedSearch", () => ({
   isUnifiedNativeSkillResult: (result: { type: string }) => result.type === "skill",
   useUnifiedSearch: (...args: unknown[]) => useUnifiedSearchMock(...args),
@@ -299,7 +295,7 @@ describe("Header", () => {
     ).toBeTruthy();
     expect(screen.getAllByText("Skills")).toHaveLength(1);
     expect(screen.getAllByText("Plugins")).toHaveLength(1);
-    expect(screen.getAllByText("Official")).toHaveLength(1);
+    expect(screen.getAllByText("Connectors")).toHaveLength(1);
     expect(screen.getAllByText("Docs")).toHaveLength(2);
     expect(screen.queryByText("About")).toBeNull();
     expect(screen.queryByText("Dashboard")).toBeNull();
@@ -311,93 +307,9 @@ describe("Header", () => {
     expect(screen.getAllByText("Home")).toHaveLength(1);
     expect(screen.getAllByText("Skills")).toHaveLength(2);
     expect(screen.getAllByText("Plugins")).toHaveLength(2);
-    expect(screen.getAllByText("Official")).toHaveLength(2);
+    expect(screen.getAllByText("Connectors")).toHaveLength(2);
     expect(screen.getAllByText("Docs")).toHaveLength(3);
     expect(screen.queryByText("About")).toBeNull();
-  });
-
-  it("renders theme mode controls as a compact row between Settings and Sign out", () => {
-    authStatusMock.mockReturnValue({
-      isAuthenticated: true,
-      isLoading: false,
-      me: {
-        displayName: "Patrick",
-        email: "patrick@example.com",
-        handle: "patrick",
-        image: null,
-        name: "Patrick",
-      },
-    });
-
-    render(<Header />);
-
-    expect(document.querySelector(".theme-mode-toggle")).toBeNull();
-    expect(screen.queryByText("Theme")).toBeNull();
-
-    const themeRow = document.querySelector(".user-dropdown-theme-row");
-    const settings = screen.getByText("Settings");
-    const signOut = screen.getByText("Sign out");
-
-    expect(themeRow).toBeTruthy();
-    expect(themeRow?.children).toHaveLength(3);
-    expect(settings.compareDocumentPosition(themeRow!) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
-    );
-    expect(themeRow!.compareDocumentPosition(signOut) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
-    );
-    expect(themeRow?.previousElementSibling?.tagName).toBe("HR");
-    expect(signOut.previousElementSibling?.tagName).toBe("HR");
-
-    expect(screen.getByLabelText("System theme").getAttribute("aria-current")).toBe("true");
-    expect(screen.getByLabelText("System theme").getAttribute("data-status")).toBe("active");
-    expect(screen.getByLabelText("Light theme").getAttribute("aria-current")).toBeNull();
-    fireEvent.click(screen.getByLabelText("Light theme"));
-    expect(setModeMock).toHaveBeenCalledWith("light");
-    fireEvent.click(screen.getByLabelText("Dark theme"));
-    expect(setModeMock).toHaveBeenCalledWith("dark");
-  });
-
-  it("renders the GitHub sign-in button with desktop and compact labels", () => {
-    render(<Header />);
-
-    const signInButton = screen.getByRole("button", { name: "Sign in with GitHub" });
-    expect(signInButton.className).toContain("github-sign-in-button");
-    const fullCopy = signInButton.querySelector(".sign-in-full-copy");
-    expect(fullCopy?.textContent).toBe("Sign in with GitHub");
-    expect(fullCopy?.childNodes).toHaveLength(1);
-    expect(signInButton.querySelector(".sign-in-with")).toBeNull();
-    expect(signInButton.querySelector(".sign-in-compact-copy")?.textContent).toBe("Sign in");
-  });
-
-  it("shows an auth error when the GitHub sign-in request does not start", async () => {
-    const { setAuthError } = await import("../lib/useAuthError");
-    signInMock.mockResolvedValue({ signingIn: false });
-
-    render(<Header />);
-
-    fireEvent.click(screen.getByRole("button", { name: "Sign in with GitHub" }));
-
-    expect(signInMock).toHaveBeenCalledWith("github", { redirectTo: "/dashboard" });
-    await waitFor(() => {
-      expect(setAuthError).toHaveBeenCalledWith("Sign in failed. Please try again.");
-    });
-  });
-
-  it("does not show an auth error when GitHub sign-in starts a redirect", async () => {
-    const { setAuthError } = await import("../lib/useAuthError");
-    signInMock.mockResolvedValue({
-      signingIn: false,
-      redirect: new URL("https://github.com/login/oauth/authorize"),
-    });
-
-    render(<Header />);
-
-    fireEvent.click(screen.getByRole("button", { name: "Sign in with GitHub" }));
-
-    expect(signInMock).toHaveBeenCalledWith("github", { redirectTo: "/dashboard" });
-    await Promise.resolve();
-    expect(setAuthError).not.toHaveBeenCalled();
   });
 
   it("keeps inline search and moves content nav into the compact menu", () => {
@@ -701,7 +613,7 @@ describe("Header", () => {
       .map((element) => element.textContent?.trim())
       .filter((label): label is string => Boolean(label));
 
-    expect(labels.slice(0, 5)).toEqual(["Home", "Skills", "Plugins", "Official", "Docs"]);
+    expect(labels.slice(0, 5)).toEqual(["Home", "Skills", "Plugins", "MCP", "Personas"]);
     expect(
       document.querySelector(".mobile-nav-appearance-section .navbar-theme-switcher"),
     ).toBeTruthy();
@@ -728,38 +640,7 @@ describe("Header", () => {
       .map((element) => element.textContent?.trim())
       .filter((label): label is string => Boolean(label));
 
-    expect(labels).toEqual(["Home", "Skills", "Plugins", "Official", "Docs"]);
-  });
-
-  it("links profile and bookmarks from the signed-in avatar menu", () => {
-    profileHandleMock.mockReturnValue("patrick-profile");
-    authStatusMock.mockReturnValue({
-      isAuthenticated: true,
-      isLoading: false,
-      me: {
-        displayName: "Patrick",
-        email: "patrick@example.com",
-        handle: "patrick",
-        image: null,
-        name: "Patrick",
-      },
-    });
-
-    render(<Header />);
-
-    const profile = screen.getByText("Profile");
-    const dashboard = screen.getAllByText("Dashboard").at(-1)!;
-
-    expect(profile.closest("a")?.getAttribute("href")).toBe("/patrick-profile");
-    expect(profile.compareDocumentPosition(dashboard) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
-    );
-    const bookmarksLink = screen.getByText("Bookmarks").closest("a");
-    expect(bookmarksLink?.getAttribute("href")).toBe("/stars");
-    expect(bookmarksLink?.querySelector(".lucide-bookmark")).toBeTruthy();
-    expect(bookmarksLink?.querySelector(".lucide-star")).toBeNull();
-    expect(screen.getAllByText("Dashboard").length).toBeGreaterThan(0);
-    expect(screen.getByText("Settings")).toBeTruthy();
+    expect(labels).toEqual(["Home", "Skills", "Plugins", "MCP", "Personas", "Connectors", "Docs"]);
   });
 
   it("shows compact official badges beside official typeahead publishers", () => {

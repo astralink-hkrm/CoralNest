@@ -193,6 +193,10 @@ async function buildEntry(
     } satisfies ExperimentalClawFeedEntry;
   }
 
+  // Personal-family (mcp/persona/connectors) packages are served by the package API's
+  // family browse surfaces, not the plugin/experimental-claw catalog feeds.
+  if (pkg.family === "mcp" || pkg.family === "persona" || pkg.family === "connectors") return null;
+
   return {
     type: "plugin",
     id,

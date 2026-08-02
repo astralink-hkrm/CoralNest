@@ -709,7 +709,7 @@ export function PublisherProfilePage({
             icon={Building2}
             title="Publisher not found"
             description="This publisher doesn't exist or may have been removed."
-            action={{ label: "Browse official organizations", href: "/official" }}
+            action={{ label: "Browse skills and plugins", href: "/" }}
           />
         </Container>
       </main>

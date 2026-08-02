@@ -60,8 +60,19 @@ export const PRIMARY_NAV_ITEMS: NavItem[] = [
     activePathPrefixes: ["/plugin/"],
   },
   {
-    label: "Official",
-    to: PublicRegistryPaths.official,
+    label: "Connectors",
+    to: PublicRegistryPaths.connectors,
+    activePathPrefixes: ["/connectors/"],
+  },
+  {
+    label: "MCP",
+    to: PublicRegistryPaths.mcp,
+    activePathPrefixes: ["/mcp/"],
+  },
+  {
+    label: "Personas",
+    to: PublicRegistryPaths.persona,
+    activePathPrefixes: ["/persona/"],
   },
 ];
 
@@ -69,13 +80,7 @@ export const PRIMARY_NAV_ITEMS: NavItem[] = [
 // Secondary nav items (desktop secondary tabs + mobile dropdown section)
 // ---------------------------------------------------------------------------
 
-export const SECONDARY_NAV_ITEMS: NavItem[] = [
-  {
-    label: "Docs",
-    href: CLAWHUB_DOCS_URL,
-    activePathPrefixes: ["/docs"],
-  },
-];
+export const SECONDARY_NAV_ITEMS: NavItem[] = [];
 
 // ---------------------------------------------------------------------------
 // Footer sections
@@ -116,7 +121,9 @@ export const FOOTER_NAV_SECTIONS: FooterNavSection[] = [
     items: [
       { kind: "link", label: "Skills", to: PublicRegistryPaths.skills, search: SKILLS_SEARCH },
       { kind: "link", label: "Plugins", to: PublicRegistryPaths.plugins },
-      { kind: "link", label: "Official", to: PublicRegistryPaths.official },
+      { kind: "link", label: "Connectors", to: PublicRegistryPaths.connectors },
+      { kind: "link", label: "MCP", to: PublicRegistryPaths.mcp },
+      { kind: "link", label: "Personas", to: PublicRegistryPaths.persona },
       {
         kind: "link",
         label: "Audits",
@@ -126,41 +133,10 @@ export const FOOTER_NAV_SECTIONS: FooterNavSection[] = [
     ],
   },
   {
-    title: "Publish",
-    items: [
-      {
-        kind: "link",
-        label: "Publish Skill",
-        to: PublicRegistryPaths.publishSkill,
-        search: { updateSlug: undefined },
-      },
-      {
-        kind: "link",
-        label: "Publish Plugin",
-        to: PublicRegistryPaths.publishPlugin,
-        search: {
-          ownerHandle: undefined,
-          name: undefined,
-          displayName: undefined,
-          family: undefined,
-          nextVersion: undefined,
-          sourceRepo: undefined,
-        },
-      },
-      {
-        kind: "link",
-        label: "Create org",
-        to: "/settings",
-        search: { view: "organizations" },
-      },
-    ],
-  },
-  {
     title: "Ecosystem",
     items: [
       { kind: "external", label: "Overview", href: OPENCLAW_ECOSYSTEM_URL },
       { kind: "external", label: "OpenClaw", href: OPENCLAW_SITE_URL },
-      { kind: "external", label: "Docs", href: "https://docs.openclaw.ai/" },
       { kind: "external", label: "Blog", href: OPENCLAW_BLOG_CLAWHUB_URL },
     ],
   },

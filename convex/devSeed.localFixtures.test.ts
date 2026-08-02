@@ -248,6 +248,7 @@ describe("devSeed local fixtures", () => {
         return {
           ok: true,
           seeded: ["local-moderation-fixtures"],
+          ownerUserId: "user:fixture-owner",
           skipped: [],
           storageIdsToDelete: ["storage:old"],
         };
@@ -256,14 +257,24 @@ describe("devSeed local fixtures", () => {
 
     const result = await seedLocalFixturesHandler(ctx as never, { reset: true });
 
-    expect(mutationCalls).toHaveLength(1);
+    expect(mutationCalls).toHaveLength(2);
     expect(mutationCalls[0]?.args).toMatchObject({
       reset: true,
+    });
+    expect(mutationCalls[1]?.args).toMatchObject({
+      reset: true,
+      ownerUserId: "user:fixture-owner",
     });
     expect(result).toEqual(
       expect.objectContaining({
         ok: true,
-        results: [expect.objectContaining({ slug: "local-moderation-fixtures" })],
+        results: [
+          expect.objectContaining({ slug: "local-moderation-fixtures" }),
+          expect.objectContaining({
+            slug: "family-presentation-fixtures",
+            seeded: ["local-moderation-fixtures"],
+          }),
+        ],
       }),
     );
     expect((result as { results: unknown[] }).results[0]).not.toHaveProperty("storageIdsToDelete");

@@ -32,17 +32,16 @@ describe("Footer", () => {
     const { container } = render(<Footer />);
 
     const columns = container.querySelectorAll(".footer-col");
-    expect(columns).toHaveLength(4);
+    expect(columns).toHaveLength(3);
 
     const browse = screen.getByRole("heading", { name: "Browse" }).closest(".footer-col");
-    const publish = screen.getByRole("heading", { name: "Publish" }).closest(".footer-col");
     const ecosystem = screen.getByRole("heading", { name: "Ecosystem" }).closest(".footer-col");
     const community = screen.getByRole("heading", { name: "Community" }).closest(".footer-col");
 
     expect(browse).not.toBeNull();
-    expect(publish).not.toBeNull();
     expect(ecosystem).not.toBeNull();
     expect(community).not.toBeNull();
+    expect(screen.queryByRole("heading", { name: "Publish" })).toBeNull();
     expect(screen.queryByRole("heading", { name: "Platform" })).toBeNull();
 
     expect(
@@ -55,16 +54,8 @@ describe("Footer", () => {
         .getByRole("link", { name: "Plugins" })
         .getAttribute("href"),
     ).toBe("/plugins");
-    expect(
-      within(publish as HTMLElement)
-        .getByRole("link", { name: "Publish Skill" })
-        .getAttribute("href"),
-    ).toBe("/skills/publish");
-    expect(
-      within(publish as HTMLElement)
-        .getByRole("link", { name: "Publish Plugin" })
-        .getAttribute("href"),
-    ).toBe("/plugins/publish");
+    expect(screen.queryByRole("link", { name: "Publish Skill" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Publish Plugin" })).toBeNull();
     expect(
       within(community as HTMLElement)
         .getByRole("link", { name: "GitHub" })

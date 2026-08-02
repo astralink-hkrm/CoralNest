@@ -42,10 +42,6 @@ vi.mock("../../components/layout/Container", () => ({
   Container: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock("../../components/SignInButton", () => ({
-  SignInButton: () => null,
-}));
-
 vi.mock("../../components/skeletons/ProtectedPageSkeletons", () => ({
   AuthFlowSkeleton: () => null,
 }));
