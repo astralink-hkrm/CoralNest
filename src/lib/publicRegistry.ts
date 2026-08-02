@@ -26,7 +26,7 @@ export const PUBLIC_REGISTRY_SURFACES = [
   {
     label: "Plugins and packages",
     path: PublicRegistryPaths.plugins,
-    summary: "Browse and search OpenClaw plugin package records.",
+    summary: "Browse and search plugin package records on CoralNest.",
   },
   {
     label: "MCP servers",
@@ -46,7 +46,7 @@ export const PUBLIC_REGISTRY_SURFACES = [
   {
     label: "Search",
     path: PublicRegistryPaths.search,
-    summary: "Search the public ClawHub catalog.",
+    summary: "Search the public CoralNest catalog.",
   },
   {
     label: "Security audits",
@@ -61,7 +61,7 @@ export const PUBLIC_REGISTRY_SURFACES = [
   {
     label: "Publish a plugin",
     path: PublicRegistryPaths.publishPlugin,
-    summary: "Publish an OpenClaw plugin package.",
+    summary: "Publish a plugin package on CoralNest.",
   },
 ] as const;
 

@@ -10,17 +10,16 @@ import {
   OPENCLAW_CLAWHUB_DOCS_URL,
   OPENCLAW_ECOSYSTEM_URL,
   OPENCLAW_LOGO_URL,
-  OPENCLAW_SITE_URL,
 } from "../lib/nav-items";
 
-const FOOTER_BRAND_MARK_SRC = "/logo-transparent.png";
+const FOOTER_BRAND_MARK_SRC = "/logo.svg";
 const FOOTER_EASTER_ASCII = [
-  "....:: clawhub/openclaw ::....  skills plugins publishers trust signals",
+  "....:: coralnest/ecosystem ::....  skills plugins connectors mcp personas",
   ">>> install scan publish verify    @@ gateway @@ registry @@ agents @@",
-  "  30 skills 12 plugins    /api/v1/skills   /owners   /audit   /ship",
+  "  30 skills 12 plugins 15 connectors   /api/v1/packages   /owners   /ship",
   ":::: signed manifests ::::: moderated releases ::::: version history ::::",
   "  hooks runners slash-commands skill.md templates scanners review-bots",
-  "openclaw ecosystem    crabbox clickclack crawler packs gateway plugins",
+  "coralnest ecosystem    crabbox clickclack crawler packs gateway plugins",
   "---- downloads installs stars lineage ownership docs package integrity",
   "  safe browse paths   official gateways   publisher handles   org trust",
 ];
@@ -201,7 +200,7 @@ export function Footer() {
 
   const year = new Date().getFullYear();
   const ecosystemProjects = FOOTER_ECOSYSTEM_PROJECTS.filter(
-    (project) => project.label !== "ClawHub",
+    (project) => project.label !== "CoralNest",
   );
 
   return (
@@ -219,10 +218,10 @@ export function Footer() {
                 loading="lazy"
                 decoding="async"
               />
-              <span className="footer-v2-brand-name">ClawHub</span>
+              <span className="footer-v2-brand-name">CoralNest</span>
             </Link>
             <p className="footer-v2-brand-tagline">
-              Skills and plugins for OpenClaw agents. Part of the wider OpenClaw ecosystem.
+              Skills, plugins, connectors, and MCP servers for AI agents.
             </p>
             <a
               className="footer-v2-eco-link"
@@ -353,22 +352,8 @@ export function Footer() {
           <p className="footer-v2-copy">
             © {year}{" "}
             <Link to="/" className="footer-v2-copy-link">
-              ClawHub
+              CoralNest
             </Link>
-            {" / "}
-            <a
-              className="footer-v2-copy-link"
-              href={OPENCLAW_SITE_URL}
-              target="_blank"
-              rel="noreferrer"
-            >
-              an OpenClaw project
-              <ArrowUpRight
-                className="footer-col-link-external-icon footer-v2-copy-link-icon"
-                size={12}
-                aria-hidden="true"
-              />
-            </a>
           </p>
           <p className="footer-v2-meta">
             {FOOTER_PLATFORM_LINKS.map((link, index) => (

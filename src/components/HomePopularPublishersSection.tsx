@@ -11,7 +11,7 @@ const HOME_OFFICIAL_CREATOR_LIMIT = 12;
 
 function OfficialCreatorCard({ publisher }: { publisher: PublicPublisherSummary }) {
   const name = publisher.displayName.trim() || publisher.handle;
-  const bio = publisher.bio?.trim() || "Official creator on ClawHub.";
+  const bio = publisher.bio?.trim() || "Official creator on CoralNest.";
   const downloads = publisher.stats.downloads;
 
   return (

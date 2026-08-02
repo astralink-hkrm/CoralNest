@@ -20,7 +20,6 @@ import {
   type HomePluginShortcut,
   type HomeSkillApp,
 } from "../lib/homeApps";
-import { OPENCLAW_LOGO_URL } from "../lib/nav-items";
 import { buildPluginDetailHref } from "../lib/pluginRoutes";
 
 function homeAppsTileLogoClassName(id: string) {
@@ -222,10 +221,10 @@ const workflowHeaderTiles: ReadonlyArray<{
     className: "is-slack",
   },
   {
-    label: "OpenClaw",
-    src: OPENCLAW_LOGO_URL,
+    label: "CoralNest",
+    src: "/logo.svg",
     className: "is-openclaw",
-    badge: "Exfoliate!",
+    badge: "Ecosystem",
   },
 ];
 
@@ -260,11 +259,11 @@ export function HomeAppsSection() {
         <div className="home-v2-apps-workflow-header">
           <div className="home-v2-apps-workflow-copy oc-section-heading">
             <h2 id="home-v2-apps-title" className="oc-section-title">
-              Skills for the apps you already use
+              Packages for the apps you already use
             </h2>
             <p className="oc-section-copy">
-              Ready-made skills and gateway plugins that plug OpenClaw straight into your everyday
-              tools.
+              Ready-made skills, plugins, and connectors that plug AI agents straight into your
+              everyday tools.
             </p>
           </div>
           <div className="home-v2-apps-workflow-tiles" aria-hidden="true">

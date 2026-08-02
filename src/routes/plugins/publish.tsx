@@ -999,7 +999,7 @@ export function PublishPluginRoute() {
                         }
                         if (family === "code-plugin" && codePluginFieldIssues.length > 0) {
                           toast.error(
-                            `Missing required OpenClaw package metadata: ${codePluginFieldIssues.join(", ")}`,
+                            `Missing required package metadata: ${codePluginFieldIssues.join(", ")}`,
                           );
                           return;
                         }

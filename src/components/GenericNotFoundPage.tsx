@@ -15,8 +15,8 @@ export function GenericNotFoundPage() {
         </div>
 
         <img
-          src="/404-lobster-detective.jpg"
-          alt="A lobster detective inspecting an empty 404 package crate."
+          src="/404-coral-explorer.png"
+          alt="An oceanic coral reef discovery scene."
           className="aspect-[16/9] w-full max-w-[920px] rounded-[var(--r-md)] border border-[color:var(--line)] object-cover object-left shadow-[var(--shadow-hover)]"
           loading="lazy"
         />

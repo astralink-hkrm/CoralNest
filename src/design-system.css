@@ -6,11 +6,32 @@
 @import "@openclaw/carapace/compat/clawhub.css";
 
 /*
- * Temporary aliases for legacy ClawHub styles that have not yet moved to the
- * canonical token names. Values live here so old selectors cannot drift into
- * a second theme system while the route CSS is migrated incrementally.
+ * CoralNest Canonical Design System — Deep Ocean Blue & Olive Green Tokens
  */
 :root {
+  /* Page & Surface background layers */
+  --oc-bg-page: #070f1e;
+  --oc-bg-surface: #0f223d;
+  --oc-bg-elevated: #162e4d;
+  --oc-surface-card: #0f223d;
+  --oc-surface-interactive: #162e4d;
+  --oc-surface-interactive-hover: #1e3a5f;
+
+  /* Deep Ocean Blue Primary & Accent Colors */
+  --oc-accent-primary: #0284c7;
+  --oc-accent-primary-hover: #38bdf8;
+  --oc-accent-secondary: #6b8e23;
+  --oc-surface-accent-soft: rgba(2, 132, 199, 0.18);
+  --oc-surface-secondary-soft: rgba(85, 107, 47, 0.25);
+  --oc-border-accent: #0284c7;
+  --oc-text-on-accent: #ffffff;
+
+  /* Olive & Emerald Green Glow Accent */
+  --coral-olive-green: #6b8e23;
+  --coral-emerald-green: #10b981;
+  --coral-ocean-blue: #0284c7;
+
+  /* Legacy aliases for old ClawHub CSS rules */
   --accent-soft: var(--oc-surface-accent-soft);
   --card-border: var(--oc-border-subtle);
   --color-muted: var(--oc-text-muted);

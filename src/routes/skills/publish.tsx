@@ -1239,11 +1239,11 @@ export function Upload() {
               </div>
               <div className="flex flex-col gap-1 text-sm text-[color:var(--ink-soft)]">
                 <p>
-                  All skills published on ClawHub are licensed under {PLATFORM_SKILL_LICENSE}.{" "}
+                  All skills published on CoralNest are licensed under {PLATFORM_SKILL_LICENSE}.{" "}
                   {PLATFORM_SKILL_LICENSE_SUMMARY}
                 </p>
                 <p>
-                  ClawHub does not support paid skills, per-skill pricing, or paywalled releases.
+                  CoralNest does not support paid skills, per-skill pricing, or paywalled releases.
                 </p>
               </div>
               <div className="flex flex-col gap-2">

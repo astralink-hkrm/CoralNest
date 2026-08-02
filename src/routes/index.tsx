@@ -32,10 +32,12 @@ function SkillsHome() {
         <div className="home-v2-hero-bg" aria-hidden="true" />
 
         <h1 className="home-v2-headline oc-hero-title">
-          <span className="home-v2-action-word home-v2-static-headline">Claws for your Claws</span>
+          <span className="home-v2-action-word home-v2-static-headline">CoralNest</span>
         </h1>
 
-        <p className="home-v2-sub oc-hero-lede">Discover skills and plugins from top creators</p>
+        <p className="home-v2-sub oc-hero-lede">
+          Discover skills, plugins, connectors, and MCP servers for your AI agents
+        </p>
       </section>
 
       <HomeListingSection initialListing={initialListing} />

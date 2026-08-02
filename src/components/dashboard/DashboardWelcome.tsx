@@ -36,12 +36,12 @@ export function DashboardWelcome({ ownerHandle, publisherSelector }: DashboardWe
               <Plug className="h-4 w-4" />
             </span>
             <span className="dashboard-welcome-icon-tile dashboard-welcome-icon-tile--brand">
-              <img src="/logo-transparent.png" alt="" draggable={false} />
+              <img src="/logo.svg" alt="" draggable={false} />
             </span>
           </span>
-          <h1 className="dashboard-welcome-title">Welcome to ClawHub</h1>
+          <h1 className="dashboard-welcome-title">Welcome to CoralNest</h1>
           <p className="dashboard-welcome-body">
-            Publish your first skill or plugin for others to discover and use.
+            Publish your first skill, plugin, or connector for others to discover and use.
           </p>
         </div>
 
@@ -49,7 +49,7 @@ export function DashboardWelcome({ ownerHandle, publisherSelector }: DashboardWe
           <Button asChild size="lg" variant="primary">
             <Link to="/add" search={addSearchParams({ ownerHandle })}>
               <Plus className="h-4 w-4" aria-hidden="true" />
-              Add skill or plugin
+              Add package
             </Link>
           </Button>
         </div>
@@ -57,9 +57,9 @@ export function DashboardWelcome({ ownerHandle, publisherSelector }: DashboardWe
         <div className="dashboard-welcome-explore">
           <span className="dashboard-welcome-explore-label">
             <Compass className="h-3.5 w-3.5" aria-hidden="true" />
-            Or explore ClawHub
+            Or explore CoralNest
           </span>
-          <nav className="dashboard-welcome-explore-links" aria-label="Explore ClawHub">
+          <nav className="dashboard-welcome-explore-links" aria-label="Explore CoralNest">
             <Link to="/skills" search={emptySkillsSearch}>
               Skills
             </Link>

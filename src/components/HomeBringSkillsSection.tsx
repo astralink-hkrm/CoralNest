@@ -186,12 +186,12 @@ export function HomeBringSkillsSection() {
       <ByosRevealBackdrop />
       <div className="home-v2-byos-content">
         <header className="home-v2-byos-head oc-section-heading">
-          <span className="home-v2-byos-eyebrow oc-eyebrow">ClawHub CLI</span>
+          <span className="home-v2-byos-eyebrow oc-eyebrow">CoralNest CLI</span>
           <h2 id="home-v2-byos-title" className="home-v2-byos-title oc-section-title">
-            Bring your skills to ClawHub
+            Bring your packages to CoralNest
           </h2>
           <p className="home-v2-byos-lede oc-section-copy">
-            Publish and sync your skills to ClawHub, your way.
+            Publish and sync your skills, plugins, and connectors to CoralNest.
           </p>
         </header>
 
