@@ -4,34 +4,17 @@ import type { PointerEvent } from "react";
 import { useState } from "react";
 import { InstallCopyButton } from "./InstallCopyButton";
 
-const BYOS_ASCII = [
-  "....:: clawhub/openclaw ::....  skills plugins publishers trust signals",
-  ">>> install scan publish verify    @@ gateway @@ registry @@ agents @@",
-  "  30 skills 12 plugins    /api/v1/skills   /owners   /audit   /ship",
-  ":::: signed manifests ::::: moderated releases ::::: version history ::::",
-  "  hooks runners slash-commands skill.md templates scanners review-bots",
-  "openclaw ecosystem    crabbox clickclack crawler packs gateway plugins",
-  "---- downloads installs stars lineage ownership docs package integrity",
-  "  safe browse paths   official gateways   publisher handles   org trust",
-];
-const BYOS_ASCII_FIELD = Array.from({ length: 56 }, (_, row) => {
-  const a = BYOS_ASCII[row % BYOS_ASCII.length];
-  const b = BYOS_ASCII[(row + 3) % BYOS_ASCII.length];
-  const c = BYOS_ASCII[(row + 5) % BYOS_ASCII.length];
-  const d = BYOS_ASCII[(row + 1) % BYOS_ASCII.length];
-  const e = BYOS_ASCII[(row + 6) % BYOS_ASCII.length];
-  return `${a}   ${b}   ${c}   ${d}   ${e}`;
-}).join("\n");
-
 // Same composition as the footer easter egg, rendered full-bleed with a static
 // image stack plus the pointer-tracked ASCII glow that reveals on hover.
 function ByosRevealBackdrop() {
   return (
     <div className="home-v2-byos-reveal" aria-hidden="true">
-      <div className="home-v2-byos-reveal-image home-v2-byos-reveal-image--base" />
+      <img
+        src="/coral-bg.jpg"
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover opacity-20 filter brightness-90 saturate-125"
+      />
       <div className="home-v2-byos-reveal-scrim" />
-      <pre className="home-v2-byos-reveal-ascii">{BYOS_ASCII_FIELD}</pre>
-      <div className="home-v2-byos-reveal-image home-v2-byos-reveal-image--top" />
     </div>
   );
 }

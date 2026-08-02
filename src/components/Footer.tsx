@@ -3,13 +3,9 @@ import { ArrowUpRight, ChevronDown } from "lucide-react";
 import type { PointerEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import {
-  FOOTER_ECOSYSTEM_PROJECTS,
   FOOTER_NAV_SECTIONS,
   FOOTER_PLATFORM_LINKS,
-  type FooterEcosystemProject,
   OPENCLAW_CLAWHUB_DOCS_URL,
-  OPENCLAW_ECOSYSTEM_URL,
-  OPENCLAW_LOGO_URL,
 } from "../lib/nav-items";
 
 const FOOTER_BRAND_MARK_SRC = "/logo.svg";
@@ -59,48 +55,6 @@ function FooterSocialIcon({ icon }: { icon: "github" | "discord" }) {
     >
       <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
     </svg>
-  );
-}
-
-function FooterEcoMark({
-  project,
-  decorative = false,
-}: {
-  project: FooterEcosystemProject;
-  decorative?: boolean;
-}) {
-  const className = "footer-v2-eco-mark";
-  const content = (
-    <>
-      <span className="footer-v2-eco-mark-logo" aria-hidden="true">
-        <img src={project.logoUrl} alt="" width={28} height={28} loading="lazy" decoding="async" />
-      </span>
-      <span className="footer-v2-eco-mark-label">{project.label}</span>
-    </>
-  );
-
-  if (decorative) {
-    return <span className={className}>{content}</span>;
-  }
-
-  if (project.internal) {
-    return (
-      <Link to={project.href} className={className} title={project.blurb}>
-        {content}
-      </Link>
-    );
-  }
-
-  return (
-    <a
-      className={className}
-      href={project.href}
-      target="_blank"
-      rel="noreferrer"
-      title={project.blurb}
-    >
-      {content}
-    </a>
   );
 }
 
@@ -199,9 +153,6 @@ export function Footer() {
   };
 
   const year = new Date().getFullYear();
-  const ecosystemProjects = FOOTER_ECOSYSTEM_PROJECTS.filter(
-    (project) => project.label !== "CoralNest",
-  );
 
   return (
     <footer className="site-footer site-footer-v2" role="contentinfo">
@@ -296,55 +247,6 @@ export function Footer() {
                 </div>
               );
             })}
-          </div>
-        </div>
-
-        <div className="footer-v2-eco" aria-label="OpenClaw ecosystem">
-          <p className="footer-v2-eco-label">
-            Built alongside{" "}
-            <span className="footer-v2-eco-label-accent">
-              <img
-                src={OPENCLAW_LOGO_URL}
-                alt=""
-                width={14}
-                height={14}
-                loading="lazy"
-                decoding="async"
-              />
-              the OpenClaw ecosystem
-            </span>
-          </p>
-          <div className="footer-v2-eco-marquee">
-            <div className="footer-v2-eco-marks">
-              <span className="footer-v2-eco-sequence">
-                {ecosystemProjects.map((project) => (
-                  <FooterEcoMark key={project.label} project={project} />
-                ))}
-                <span className="footer-v2-eco-all">
-                  <a
-                    className="footer-v2-eco-mark footer-v2-eco-mark-all"
-                    href={OPENCLAW_ECOSYSTEM_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <span className="footer-v2-eco-mark-label">All projects</span>
-                    <ArrowUpRight size={13} aria-hidden="true" />
-                  </a>
-                </span>
-              </span>
-              <span
-                className="footer-v2-eco-sequence footer-v2-eco-sequence-clone"
-                aria-hidden="true"
-              >
-                {ecosystemProjects.map((project) => (
-                  <FooterEcoMark key={project.label} project={project} decorative />
-                ))}
-                <span className="footer-v2-eco-mark footer-v2-eco-mark-all">
-                  <span className="footer-v2-eco-mark-label">All projects</span>
-                  <ArrowUpRight size={13} aria-hidden="true" />
-                </span>
-              </span>
-            </div>
           </div>
         </div>
 

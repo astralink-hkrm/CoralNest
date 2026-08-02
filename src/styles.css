@@ -355,6 +355,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-size: var(--fs-base);
   letter-spacing: -0.01em;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url("/coral-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.12;
+  pointer-events: none;
 }
 
 html {
@@ -21335,12 +21349,12 @@ a.search-empty-action {
   --hv2-text: #eaeaea;
   --hv2-text-secondary: #b2b2b8;
   --hv2-text-tertiary: #82828a;
-  --hv2-accent: #d4453a;
-  --hv2-accent-fill: rgba(212, 69, 58, 0.1);
-  --hv2-accent-fill-hover: rgba(212, 69, 58, 0.16);
-  --hv2-accent-glow: rgba(212, 69, 58, 0.06);
-  --hv2-accent-border: rgba(212, 69, 58, 0.3);
-  --hv2-accent-border-hover: rgba(212, 69, 58, 0.5);
+  --hv2-accent: #0284c7;
+  --hv2-accent-fill: rgba(2, 132, 199, 0.12);
+  --hv2-accent-fill-hover: rgba(2, 132, 199, 0.22);
+  --hv2-accent-glow: rgba(2, 132, 199, 0.2);
+  --hv2-accent-border: rgba(2, 132, 199, 0.35);
+  --hv2-accent-border-hover: rgba(2, 132, 199, 0.6);
   --hv2-green: #3dab5e;
   --hv2-green-fill: rgba(61, 171, 94, 0.08);
   --hv2-green-border: rgba(61, 171, 94, 0.25);
@@ -23655,7 +23669,7 @@ a.search-empty-action {
   --hv2-text: #eaeaea;
   --hv2-text-secondary: #b2b2b8;
   --hv2-text-tertiary: #82828a;
-  --hv2-accent: #d4453a;
+  --hv2-accent: #0284c7;
   /* Easter egg hidden for now — no reveal depth reserved below the footer. */
   --footer-easter-depth: 0px;
   position: relative;
@@ -24075,7 +24089,7 @@ a.search-empty-action {
 
 .site-footer-v2 .footer-v2-eco-link:hover,
 .site-footer-v2 .footer-v2-eco-link:focus-visible {
-  color: var(--hv2-accent, #d4453a);
+  color: var(--hv2-accent, #0284c7);
 }
 
 .site-footer-v2 .footer-v2-main {
@@ -24926,12 +24940,12 @@ a.search-empty-action {
   --hv2-text: #eaeaea;
   --hv2-text-secondary: #b2b2b8;
   --hv2-text-tertiary: #82828a;
-  --hv2-accent: #d4453a;
-  --hv2-accent-fill: rgba(212, 69, 58, 0.1);
-  --hv2-accent-fill-hover: rgba(212, 69, 58, 0.16);
-  --hv2-accent-glow: rgba(212, 69, 58, 0.06);
-  --hv2-accent-border: rgba(212, 69, 58, 0.3);
-  --hv2-accent-border-hover: rgba(212, 69, 58, 0.5);
+  --hv2-accent: #0284c7;
+  --hv2-accent-fill: rgba(2, 132, 199, 0.12);
+  --hv2-accent-fill-hover: rgba(2, 132, 199, 0.22);
+  --hv2-accent-glow: rgba(2, 132, 199, 0.2);
+  --hv2-accent-border: rgba(2, 132, 199, 0.35);
+  --hv2-accent-border-hover: rgba(2, 132, 199, 0.6);
   --hv2-green: #3dab5e;
   --hv2-green-fill: rgba(61, 171, 94, 0.08);
   --hv2-green-border: rgba(61, 171, 94, 0.25);
@@ -25049,8 +25063,9 @@ a.search-empty-action {
   content: "";
   position: absolute;
   inset: 0;
-  background: url("/home-hero-claw.webp") center top / cover no-repeat;
-  filter: brightness(0.75);
+  background: url("/coral-bg.jpg") center top / cover no-repeat;
+  opacity: 0.18;
+  filter: brightness(0.9) saturate(1.2);
 }
 
 /* Headline */

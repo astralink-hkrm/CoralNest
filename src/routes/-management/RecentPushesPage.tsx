@@ -15,7 +15,7 @@ export function RecentPushesPage({
     <div className="management-view">
       <h2 className="section-title text-[1.2rem] m-0">Recent pushes</h2>
       <p className="section-subtitle m-0 mt-1">
-        The latest skill versions published across ClawHub.
+        The latest skill versions published across CoralNest.
       </p>
       <div className="management-list">
         {!recentVersions ? (

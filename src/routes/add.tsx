@@ -104,7 +104,7 @@ export function AddPage() {
         <Container size="narrow">
           <EmptyState
             title="Sign in required"
-            description="Use the ClawHub CLI to publish or manage skills and plugins."
+            description="Use the CoralNest CLI to publish or manage skills and plugins."
           />
         </Container>
       </main>
