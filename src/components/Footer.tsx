@@ -8,7 +8,7 @@ import {
   OPENCLAW_CLAWHUB_DOCS_URL,
 } from "../lib/nav-items";
 
-const FOOTER_BRAND_MARK_SRC = "/logo.svg";
+const FOOTER_BRAND_MARK_SRC = "/coral-logo.png";
 const FOOTER_EASTER_ASCII = [
   "....:: coralnest/ecosystem ::....  skills plugins connectors mcp personas",
   ">>> install scan publish verify    @@ gateway @@ registry @@ agents @@",

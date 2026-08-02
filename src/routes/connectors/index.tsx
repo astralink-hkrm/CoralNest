@@ -14,6 +14,7 @@ import {
   BrowseViewToggle,
   useBrowseSearchDisclosure,
 } from "../../components/BrowseControls";
+import { CoralPageWrapper } from "../../components/CoralPageWrapper";
 import { PluginListItem } from "../../components/PluginListItem";
 import { BrowseResultsSkeleton } from "../../components/skeletons/BrowseResultsSkeleton";
 import { Button } from "../../components/ui/button";
@@ -236,35 +237,37 @@ export const Route = createFileRoute("/connectors/")({
 
 function ConnectorsIndexPending() {
   return (
-    <main className="browse-page browse-page-borderless-header">
-      <div className="browse-page-header">
-        <h1 className="browse-title">Connectors</h1>
-      </div>
-      <BrowseControls>
-        <BrowseControlsRow>
-          <BrowseTabs
-            ariaLabel="Sort order"
-            options={CONNECTORS_BROWSE_TABS}
-            value="recommended"
-            onChange={() => {}}
-          />
-          <BrowseActions>
-            <BrowseSearchTrigger
-              open={false}
-              onOpen={() => {}}
-              label="Search connectors"
-              disabled
-            />
-            <BrowseViewToggle view="list" onToggle={() => {}} />
-          </BrowseActions>
-        </BrowseControlsRow>
-      </BrowseControls>
-      <div className="browse-layout">
-        <div className="browse-results">
-          <BrowseResultsSkeleton label="Connector" />
+    <CoralPageWrapper pageType="connectors">
+      <main className="browse-page browse-page-borderless-header">
+        <div className="browse-page-header">
+          <h1 className="browse-title">Connectors</h1>
         </div>
-      </div>
-    </main>
+        <BrowseControls>
+          <BrowseControlsRow>
+            <BrowseTabs
+              ariaLabel="Sort order"
+              options={CONNECTORS_BROWSE_TABS}
+              value="recommended"
+              onChange={() => {}}
+            />
+            <BrowseActions>
+              <BrowseSearchTrigger
+                open={false}
+                onOpen={() => {}}
+                label="Search connectors"
+                disabled
+              />
+              <BrowseViewToggle view="list" onToggle={() => {}} />
+            </BrowseActions>
+          </BrowseControlsRow>
+        </BrowseControls>
+        <div className="browse-layout">
+          <div className="browse-results">
+            <BrowseResultsSkeleton label="Connector" />
+          </div>
+        </div>
+      </main>
+    </CoralPageWrapper>
   );
 }
 
@@ -497,103 +500,105 @@ function ConnectorsIndex() {
   }, [canLoadMore, loadMore]);
 
   return (
-    <main className="browse-page browse-page-borderless-header">
-      <div className="browse-page-header">
-        <div className="browse-page-header-main">
-          <h1 className="browse-title">
-            Connectors
-            {formattedCount ? (
-              <>
-                {" "}
-                <span className="browse-count">{formattedCount}</span>
-              </>
-            ) : null}
-          </h1>
+    <CoralPageWrapper pageType="connectors">
+      <main className="browse-page browse-page-borderless-header">
+        <div className="browse-page-header">
+          <div className="browse-page-header-main">
+            <h1 className="browse-title">
+              Connectors
+              {formattedCount ? (
+                <>
+                  {" "}
+                  <span className="browse-count">{formattedCount}</span>
+                </>
+              ) : null}
+            </h1>
+          </div>
         </div>
-      </div>
-      <BrowseControls>
-        <BrowseControlsRow>
-          <BrowseTabs
-            ariaLabel="Sort order"
-            options={CONNECTORS_BROWSE_TABS}
-            value={activeBrowseTab}
-            onChange={handleBrowseTabChange}
-          />
-          <BrowseActions>
-            <BrowseSearchTrigger
-              open={browseSearch.open}
-              onOpen={browseSearch.openSearch}
-              label="Search connectors"
+        <BrowseControls>
+          <BrowseControlsRow>
+            <BrowseTabs
+              ariaLabel="Sort order"
+              options={CONNECTORS_BROWSE_TABS}
+              value={activeBrowseTab}
+              onChange={handleBrowseTabChange}
             />
-            <BrowseViewToggle view={view} onToggle={handleToggleView} />
-          </BrowseActions>
-          <BrowseSearchPanel open={browseSearch.open}>
-            <BrowseSearchInput
-              inputRef={searchInputRef}
-              label="Connector search"
-              placeholder="Search connectors..."
-              value={query}
-              onChange={handleQueryChange}
-              onClear={browseSearch.closeSearch}
-              onSubmit={handleSearchSubmit}
-              closeLabel="Close search"
-            />
-          </BrowseSearchPanel>
-        </BrowseControlsRow>
-      </BrowseControls>
-      <div className="browse-layout">
-        <div className="browse-results">
-          {isLoading ? (
-            <BrowseResultsSkeleton label="Connector" variant={effectiveView} />
-          ) : apiError ? (
-            <div className="empty-state">
-              <PackageSearch size={22} className="empty-state-icon" aria-hidden="true" />
-              <p className="empty-state-title">Unable to load connectors</p>
-              <p className="empty-state-body">
-                The connector catalog is temporarily unavailable. Please try again later.
-              </p>
-            </div>
-          ) : rateLimited ? (
-            <div className="empty-state">
-              <PackageSearch size={22} className="empty-state-icon" aria-hidden="true" />
-              <p className="empty-state-title">Connector catalog is temporarily unavailable</p>
-              <p className="empty-state-body">Try again {formatRetryDelay(retryAfterSeconds)}.</p>
-            </div>
-          ) : visibleItems.length === 0 ? (
-            <div className="empty-state">
-              <p className="empty-state-title">No connectors found</p>
-              <p className="empty-state-body">Try a different search term or remove filters.</p>
-            </div>
-          ) : effectiveView === "grid" ? (
-            <div className="grid browse-results-grid">
-              {visibleItems.map((item) => (
-                <PluginListItem key={item.name} item={item} variant="card" />
-              ))}
-            </div>
-          ) : (
-            <div className="browse-list-stack">
-              <div className="browse-list-head" aria-hidden="true">
-                <span className="browse-list-head-icon-spacer" />
-                <span className="browse-list-head-label">Connector</span>
-                <span className="browse-list-head-label browse-list-head-stat">Popularity</span>
+            <BrowseActions>
+              <BrowseSearchTrigger
+                open={browseSearch.open}
+                onOpen={browseSearch.openSearch}
+                label="Search connectors"
+              />
+              <BrowseViewToggle view={view} onToggle={handleToggleView} />
+            </BrowseActions>
+            <BrowseSearchPanel open={browseSearch.open}>
+              <BrowseSearchInput
+                inputRef={searchInputRef}
+                label="Connector search"
+                placeholder="Search connectors..."
+                value={query}
+                onChange={handleQueryChange}
+                onClear={browseSearch.closeSearch}
+                onSubmit={handleSearchSubmit}
+                closeLabel="Close search"
+              />
+            </BrowseSearchPanel>
+          </BrowseControlsRow>
+        </BrowseControls>
+        <div className="browse-layout">
+          <div className="browse-results">
+            {isLoading ? (
+              <BrowseResultsSkeleton label="Connector" variant={effectiveView} />
+            ) : apiError ? (
+              <div className="empty-state">
+                <PackageSearch size={22} className="empty-state-icon" aria-hidden="true" />
+                <p className="empty-state-title">Unable to load connectors</p>
+                <p className="empty-state-body">
+                  The connector catalog is temporarily unavailable. Please try again later.
+                </p>
               </div>
-              <div className="results-list">
+            ) : rateLimited ? (
+              <div className="empty-state">
+                <PackageSearch size={22} className="empty-state-icon" aria-hidden="true" />
+                <p className="empty-state-title">Connector catalog is temporarily unavailable</p>
+                <p className="empty-state-body">Try again {formatRetryDelay(retryAfterSeconds)}.</p>
+              </div>
+            ) : visibleItems.length === 0 ? (
+              <div className="empty-state">
+                <p className="empty-state-title">No connectors found</p>
+                <p className="empty-state-body">Try a different search term or remove filters.</p>
+              </div>
+            ) : effectiveView === "grid" ? (
+              <div className="grid browse-results-grid">
                 {visibleItems.map((item) => (
-                  <PluginListItem key={item.name} item={item} variant="list" />
+                  <PluginListItem key={item.name} item={item} variant="card" />
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="browse-list-stack">
+                <div className="browse-list-head" aria-hidden="true">
+                  <span className="browse-list-head-icon-spacer" />
+                  <span className="browse-list-head-label">Connector</span>
+                  <span className="browse-list-head-label browse-list-head-stat">Popularity</span>
+                </div>
+                <div className="results-list">
+                  {visibleItems.map((item) => (
+                    <PluginListItem key={item.name} item={item} variant="list" />
+                  ))}
+                </div>
+              </div>
+            )}
 
-          {!isLoading && !hasQuery && (nextCursor || isLoadingMore) ? (
-            <div ref={loadMoreRef} className="mt-5 flex justify-center">
-              <Button variant="primary" type="button" onClick={loadMore} disabled={isLoadingMore}>
-                {isLoadingMore ? "Loading..." : "Load more"}
-              </Button>
-            </div>
-          ) : null}
+            {!isLoading && !hasQuery && (nextCursor || isLoadingMore) ? (
+              <div ref={loadMoreRef} className="mt-5 flex justify-center">
+                <Button variant="primary" type="button" onClick={loadMore} disabled={isLoadingMore}>
+                  {isLoadingMore ? "Loading..." : "Load more"}
+                </Button>
+              </div>
+            ) : null}
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </CoralPageWrapper>
   );
 }

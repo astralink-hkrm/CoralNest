@@ -17,6 +17,7 @@ import {
   BrowseViewToggle,
   useBrowseSearchDisclosure,
 } from "../../components/BrowseControls";
+import { CoralPageWrapper } from "../../components/CoralPageWrapper";
 import { convexHttp } from "../../convex/client";
 import { formatBrowseCount } from "../../lib/browseCount";
 import {
@@ -229,96 +230,98 @@ export function SkillsIndex() {
   );
 
   return (
-    <main className="browse-page browse-page-borderless-header skills-browse-page">
-      <div className="browse-page-header">
-        <div className="browse-page-header-main">
-          <h1 className="browse-title">
-            Skills
-            {formattedCount ? (
-              <>
-                {" "}
-                <span className="browse-count">{formattedCount}</span>
-              </>
-            ) : null}
-          </h1>
+    <CoralPageWrapper pageType="skills">
+      <main className="browse-page browse-page-borderless-header skills-browse-page">
+        <div className="browse-page-header">
+          <div className="browse-page-header-main">
+            <h1 className="browse-title">
+              Skills
+              {formattedCount ? (
+                <>
+                  {" "}
+                  <span className="browse-count">{formattedCount}</span>
+                </>
+              ) : null}
+            </h1>
+          </div>
         </div>
-      </div>
-      <BrowseControls>
-        <BrowseControlsRow>
-          <BrowseTabs
-            ariaLabel="Skill view"
-            options={viewOptions}
-            value={activeView}
-            onChange={(value) => {
-              if (value) handleViewChange(value);
-            }}
-          />
-          <BrowseControlsDivider />
-          <BrowseActions>
-            <BrowseSearchTrigger
-              open={browseSearch.open}
-              onOpen={browseSearch.openSearch}
-              label="Search skills"
+        <BrowseControls>
+          <BrowseControlsRow>
+            <BrowseTabs
+              ariaLabel="Skill view"
+              options={viewOptions}
+              value={activeView}
+              onChange={(value) => {
+                if (value) handleViewChange(value);
+              }}
             />
-            {activeView === "trending" ? null : (
-              <BrowseCategorySelect
-                categories={SKILL_CATEGORIES}
-                value={model.activeCategory}
-                onChange={handleCategoryChange}
-                responsive
+            <BrowseControlsDivider />
+            <BrowseActions>
+              <BrowseSearchTrigger
+                open={browseSearch.open}
+                onOpen={browseSearch.openSearch}
+                label="Search skills"
               />
-            )}
-            <BrowseViewToggle view={model.view} onToggle={model.onToggleView} />
-          </BrowseActions>
-          <BrowseSearchPanel open={browseSearch.open}>
-            <BrowseSearchInput
-              inputRef={searchInputRef}
-              label="skill search"
-              placeholder="Search skills..."
-              value={model.query}
-              onChange={model.onQueryChange}
-              onClear={browseSearch.closeSearch}
-              closeLabel="Close search"
+              {activeView === "trending" ? null : (
+                <BrowseCategorySelect
+                  categories={SKILL_CATEGORIES}
+                  value={model.activeCategory}
+                  onChange={handleCategoryChange}
+                  responsive
+                />
+              )}
+              <BrowseViewToggle view={model.view} onToggle={model.onToggleView} />
+            </BrowseActions>
+            <BrowseSearchPanel open={browseSearch.open}>
+              <BrowseSearchInput
+                inputRef={searchInputRef}
+                label="skill search"
+                placeholder="Search skills..."
+                value={model.query}
+                onChange={model.onQueryChange}
+                onClear={browseSearch.closeSearch}
+                closeLabel="Close search"
+              />
+            </BrowseSearchPanel>
+          </BrowseControlsRow>
+          {activeView === "trending" ? null : (
+            <BrowseTopicChips
+              topics={categoryTopics ?? []}
+              activeTopic={activeTopic}
+              onChange={handleTopicChange}
+              loading={Boolean(model.activeCategory && categoryTopics === undefined)}
             />
-          </BrowseSearchPanel>
-        </BrowseControlsRow>
-        {activeView === "trending" ? null : (
-          <BrowseTopicChips
-            topics={categoryTopics ?? []}
-            activeTopic={activeTopic}
-            onChange={handleTopicChange}
-            loading={Boolean(model.activeCategory && categoryTopics === undefined)}
-          />
-        )}
-      </BrowseControls>
-      <div
-        className={`browse-layout${activeView === "trending" ? "" : " browse-layout-with-sidebar"}`}
-      >
-        {activeView === "trending" ? null : (
-          <BrowseCategorySidebar
-            ariaLabel="Skill categories"
-            categories={SKILL_CATEGORIES}
-            value={model.activeCategory}
-            onChange={handleCategoryChange}
-          />
-        )}
-        <div className="browse-results">
-          <SkillsResults
-            isLoadingSkills={model.isLoadingSkills}
-            sorted={model.sorted}
-            view={model.view}
-            listDoneLoading={!model.isLoadingSkills && !model.canLoadMore && !model.isLoadingMore}
-            hasQuery={model.hasQuery}
-            canLoadMore={model.canLoadMore}
-            isLoadingMore={model.isLoadingMore}
-            canAutoLoad={model.canAutoLoad}
-            loadMoreRef={model.loadMoreRef}
-            loadMore={model.loadMore}
-            catalogTab={model.catalogTab}
-            trendingState={model.trendingState}
-          />
+          )}
+        </BrowseControls>
+        <div
+          className={`browse-layout${activeView === "trending" ? "" : " browse-layout-with-sidebar"}`}
+        >
+          {activeView === "trending" ? null : (
+            <BrowseCategorySidebar
+              ariaLabel="Skill categories"
+              categories={SKILL_CATEGORIES}
+              value={model.activeCategory}
+              onChange={handleCategoryChange}
+            />
+          )}
+          <div className="browse-results">
+            <SkillsResults
+              isLoadingSkills={model.isLoadingSkills}
+              sorted={model.sorted}
+              view={model.view}
+              listDoneLoading={!model.isLoadingSkills && !model.canLoadMore && !model.isLoadingMore}
+              hasQuery={model.hasQuery}
+              canLoadMore={model.canLoadMore}
+              isLoadingMore={model.isLoadingMore}
+              canAutoLoad={model.canAutoLoad}
+              loadMoreRef={model.loadMoreRef}
+              loadMore={model.loadMore}
+              catalogTab={model.catalogTab}
+              trendingState={model.trendingState}
+            />
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </CoralPageWrapper>
   );
 }

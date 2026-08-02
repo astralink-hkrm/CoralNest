@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { CoralPageWrapper } from "../components/CoralPageWrapper";
 import { HomeAppsSection } from "../components/HomeAppsSection";
 import { HomeBringSkillsSection } from "../components/HomeBringSkillsSection";
 import { HomeListingSection } from "../components/HomeListingSection";
@@ -24,26 +25,30 @@ function SkillsHome() {
   const initialListing = Route.useLoaderData();
 
   return (
-    <main className="home-v2-main oc-app-surface">
-      <HomeV2FoldBottomFade />
+    <CoralPageWrapper pageType="home">
+      <main className="home-v2-main oc-app-surface">
+        <HomeV2FoldBottomFade />
 
-      {/* ═══ HERO ═══ */}
-      <section className="home-v2-hero oc-hero">
-        <div className="home-v2-hero-bg" aria-hidden="true" />
+        {/* ═══ HERO ═══ */}
+        <section className="home-v2-hero oc-hero">
+          <div className="home-v2-hero-bg" aria-hidden="true" />
 
-        <h1 className="home-v2-headline oc-hero-title">
-          <span className="home-v2-action-word home-v2-static-headline">CoralNest</span>
-        </h1>
+          <h1 className="home-v2-headline oc-hero-title">
+            <span className="home-v2-action-word home-v2-static-headline">CoralNest</span>
+          </h1>
 
-        <p className="home-v2-sub oc-hero-lede">
-          Discover skills, plugins, connectors, and MCP servers for your AI agents
-        </p>
-      </section>
+          <p className="home-v2-sub oc-hero-lede">
+            Discover skills, plugins, connectors, and MCP servers for your AI agents
+          </p>
+        </section>
 
-      <HomeListingSection initialListing={initialListing} />
-      <HomePopularPublishersSection />
-      <HomeAppsSection />
-      <HomeBringSkillsSection />
-    </main>
+        <HomeListingSection initialListing={initialListing} />
+        <HomePopularPublishersSection />
+        <HomeAppsSection />
+        <HomeBringSkillsSection />
+      </main>
+    </CoralPageWrapper>
   );
 }
+
+export default SkillsHome;

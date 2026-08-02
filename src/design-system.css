@@ -17,19 +17,49 @@
   --oc-surface-interactive: #162e4d;
   --oc-surface-interactive-hover: #1e3a5f;
 
-  /* Deep Ocean Blue Primary & Accent Colors */
-  --oc-accent-primary: #0284c7;
-  --oc-accent-primary-hover: #38bdf8;
+  /* Coral Red Primary & Accent Colors */
+  --oc-accent-primary: #da3633;
+  --oc-accent-primary-hover: #f85149;
   --oc-accent-secondary: #6b8e23;
-  --oc-surface-accent-soft: rgba(2, 132, 199, 0.18);
+  --oc-surface-accent-soft: rgba(218, 54, 51, 0.18);
   --oc-surface-secondary-soft: rgba(85, 107, 47, 0.25);
-  --oc-border-accent: #0284c7;
+  --oc-border-accent: #da3633;
   --oc-text-on-accent: #ffffff;
 
   /* Olive & Emerald Green Glow Accent */
   --coral-olive-green: #6b8e23;
   --coral-emerald-green: #10b981;
   --coral-ocean-blue: #0284c7;
+  
+  /* Coral Theme Color Variations - Deep Shades */
+  --coral-orange: #ff6b35;
+  --coral-orange-dark: #e55a2b;
+  --coral-red: #dc2626;
+  --coral-red-dark: #b91c1c;
+  --coral-purple: #663399;
+  --coral-purple-dark: #4a1a5c;
+  --coral-pink: #d63384;
+  --coral-pink-dark: #ab2968;
+  --coral-blue: #0284c7;
+  --coral-blue-dark: #0369a1;
+  --coral-olive: #6b8e23;
+  --coral-olive-dark: #556b2f;
+  
+  /* Coral Background Gradient Combinations */
+  --coral-bg-orange: radial-gradient(ellipse 60% 40% at 48% 0%, color-mix(in srgb, var(--coral-orange) 15%, transparent) 0%, transparent 65%);
+  --coral-bg-red: radial-gradient(ellipse 58% 38% at 52% 2%, color-mix(in srgb, var(--coral-red) 14%, transparent) 0%, transparent 68%);
+  --coral-bg-purple: radial-gradient(ellipse 58% 38% at 52% 2%, color-mix(in srgb, var(--coral-purple) 12%, transparent) 0%, transparent 68%);
+  --coral-bg-pink: radial-gradient(ellipse 56% 36% at 46% 4%, color-mix(in srgb, var(--coral-pink) 14%, transparent) 0%, transparent 62%);
+  --coral-bg-blue: radial-gradient(ellipse 54% 34% at 50% 0%, color-mix(in srgb, var(--coral-blue) 16%, transparent) 0%, transparent 66%);
+  --coral-bg-olive: radial-gradient(ellipse 52% 32% at 48% 2%, color-mix(in srgb, var(--coral-olive) 13%, transparent) 0%, transparent 64%);
+
+  /* Coral Logo Background for Pages */
+  --coral-logo-bg-blue: url('/coral-logo.png');
+  --coral-logo-bg-purple: url('/coral-logo-purple.png');
+  --coral-logo-bg-orange: url('/coral-logo-orange.png');
+  --coral-logo-bg-red: url('/coral-logo-red.png');
+  --coral-logo-bg-pink: url('/coral-logo-pink.png');
+  --coral-logo-bg-olive: url('/coral-logo-olive.png');
 
   /* Legacy aliases for old ClawHub CSS rules */
   --accent-soft: var(--oc-surface-accent-soft);
@@ -234,4 +264,156 @@
     --diff-removed: var(--oc-diff-removed);
     --diff-removed-strong: var(--oc-diff-removed-strong);
   }
+}
+
+/*
+ * Coral Page Background System - Full Height Logo Backgrounds
+ */
+.coral-page-wrapper {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.coral-page-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background: var(--oc-bg-page);
+  overflow: hidden;
+}
+
+.coral-logo-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.coral-logo-large {
+  width: 400px;
+  height: 400px;
+  object-fit: contain;
+  filter: blur(1px);
+}
+
+.coral-logo-text {
+  margin-top: 2rem;
+  font-size: 3.5rem;
+  font-weight: 700;
+  font-family: var(--oc-font-display);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+/* Page-specific coral backgrounds */
+[data-coral-page="home"] .coral-page-bg {
+  background: var(--oc-bg-page);
+  background-image: var(--coral-bg-blue);
+}
+
+[data-coral-page="home"] .coral-logo-text {
+  background: linear-gradient(135deg, var(--coral-blue), var(--coral-blue-dark));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+[data-coral-page="skills"] .coral-page-bg {
+  background: var(--oc-bg-page);
+  background-image: var(--coral-bg-blue);
+}
+
+[data-coral-page="skills"] .coral-logo-text {
+  background: linear-gradient(135deg, var(--coral-blue), var(--coral-blue-dark));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+[data-coral-page="plugins"] .coral-page-bg {
+  background: var(--oc-bg-page);
+  background-image: var(--coral-bg-purple);
+}
+
+[data-coral-page="plugins"] .coral-logo-text {
+  background: linear-gradient(135deg, var(--coral-purple), var(--coral-purple-dark));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+[data-coral-page="connectors"] .coral-page-bg {
+  background: var(--oc-bg-page);
+  background-image: var(--coral-bg-orange);
+}
+
+[data-coral-page="connectors"] .coral-logo-text {
+  background: linear-gradient(135deg, var(--coral-orange), var(--coral-orange-dark));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+[data-coral-page="creators"] .coral-page-bg {
+  background: var(--oc-bg-page);
+  background-image: var(--coral-bg-pink);
+}
+
+[data-coral-page="creators"] .coral-logo-text {
+  background: linear-gradient(135deg, var(--coral-pink), var(--coral-pink-dark));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+[data-coral-page="mcp"] .coral-page-bg {
+  background: var(--oc-bg-page);
+  background-image: var(--coral-bg-olive);
+}
+
+[data-coral-page="mcp"] .coral-logo-text {
+  background: linear-gradient(135deg, var(--coral-olive), var(--coral-olive-dark));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .coral-logo-large {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .coral-logo-text {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .coral-logo-large {
+    width: 240px;
+    height: 240px;
+  }
+  
+  .coral-logo-text {
+    font-size: 2rem;
+  }
+}
+
+/* Ensure content appears above the background */
+.coral-page-wrapper > * {
+  position: relative;
+  z-index: 1;
 }

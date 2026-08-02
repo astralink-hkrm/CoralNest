@@ -41,7 +41,7 @@ const THEME_MODE_ITEMS = [
   { mode: "light", label: "Light theme", Icon: Sun },
   { mode: "dark", label: "Dark theme", Icon: Moon },
 ] as const;
-const CLAWHUB_BRAND_MARK_SRC = "/logo.svg";
+const CLAWHUB_BRAND_MARK_SRC = "/coral-logo.png";
 
 function useAppleSearchShortcut() {
   const [isApple, setIsApple] = useState(true);

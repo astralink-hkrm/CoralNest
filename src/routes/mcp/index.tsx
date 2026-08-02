@@ -14,6 +14,7 @@ import {
   BrowseViewToggle,
   useBrowseSearchDisclosure,
 } from "../../components/BrowseControls";
+import { CoralPageWrapper } from "../../components/CoralPageWrapper";
 import { PluginListItem } from "../../components/PluginListItem";
 import { BrowseResultsSkeleton } from "../../components/skeletons/BrowseResultsSkeleton";
 import { Button } from "../../components/ui/button";
@@ -232,35 +233,37 @@ export const Route = createFileRoute("/mcp/")({
 
 function McpIndexPending() {
   return (
-    <main className="browse-page browse-page-borderless-header">
-      <div className="browse-page-header">
-        <h1 className="browse-title">MCP</h1>
-      </div>
-      <BrowseControls>
-        <BrowseControlsRow>
-          <BrowseTabs
-            ariaLabel="Sort order"
-            options={MCP_BROWSE_TABS}
-            value="recommended"
-            onChange={() => {}}
-          />
-          <BrowseActions>
-            <BrowseSearchTrigger
-              open={false}
-              onOpen={() => {}}
-              label="Search MCP servers"
-              disabled
-            />
-            <BrowseViewToggle view="list" onToggle={() => {}} />
-          </BrowseActions>
-        </BrowseControlsRow>
-      </BrowseControls>
-      <div className="browse-layout">
-        <div className="browse-results">
-          <BrowseResultsSkeleton label="MCP server" />
+    <CoralPageWrapper pageType="mcp">
+      <main className="browse-page browse-page-borderless-header">
+        <div className="browse-page-header">
+          <h1 className="browse-title">MCP</h1>
         </div>
-      </div>
-    </main>
+        <BrowseControls>
+          <BrowseControlsRow>
+            <BrowseTabs
+              ariaLabel="Sort order"
+              options={MCP_BROWSE_TABS}
+              value="recommended"
+              onChange={() => {}}
+            />
+            <BrowseActions>
+              <BrowseSearchTrigger
+                open={false}
+                onOpen={() => {}}
+                label="Search MCP servers"
+                disabled
+              />
+              <BrowseViewToggle view="list" onToggle={() => {}} />
+            </BrowseActions>
+          </BrowseControlsRow>
+        </BrowseControls>
+        <div className="browse-layout">
+          <div className="browse-results">
+            <BrowseResultsSkeleton label="MCP server" />
+          </div>
+        </div>
+      </main>
+    </CoralPageWrapper>
   );
 }
 
@@ -493,112 +496,114 @@ function McpIndex() {
   }, [canLoadMore, loadMore]);
 
   return (
-    <main className="browse-page browse-page-borderless-header">
-      <div className="browse-page-header">
-        <div className="browse-page-header-main">
-          <h1 className="browse-title">
-            MCP
-            {formattedCount ? (
-              <>
-                {" "}
-                <span className="browse-count">{formattedCount}</span>
-              </>
-            ) : null}
-          </h1>
+    <CoralPageWrapper pageType="mcp">
+      <main className="browse-page browse-page-borderless-header">
+        <div className="browse-page-header">
+          <div className="browse-page-header-main">
+            <h1 className="browse-title">
+              MCP
+              {formattedCount ? (
+                <>
+                  {" "}
+                  <span className="browse-count">{formattedCount}</span>
+                </>
+              ) : null}
+            </h1>
+          </div>
         </div>
-      </div>
-      <BrowseControls>
-        <BrowseControlsRow>
-          <BrowseTabs
-            ariaLabel="Sort order"
-            options={MCP_BROWSE_TABS}
-            value={activeBrowseTab}
-            onChange={handleBrowseTabChange}
-          />
-          <BrowseActions>
-            <BrowseSearchTrigger
-              open={browseSearch.open}
-              onOpen={browseSearch.openSearch}
-              label="Search MCP servers"
+        <BrowseControls>
+          <BrowseControlsRow>
+            <BrowseTabs
+              ariaLabel="Sort order"
+              options={MCP_BROWSE_TABS}
+              value={activeBrowseTab}
+              onChange={handleBrowseTabChange}
             />
-            <BrowseViewToggle view={view} onToggle={handleToggleView} />
-          </BrowseActions>
-          <BrowseSearchPanel open={browseSearch.open}>
-            <BrowseSearchInput
-              inputRef={searchInputRef}
-              label="MCP search"
-              placeholder="Search MCP servers..."
-              value={query}
-              onChange={handleQueryChange}
-              onClear={browseSearch.closeSearch}
-              onSubmit={handleSearchSubmit}
-              closeLabel="Close search"
-            />
-          </BrowseSearchPanel>
-        </BrowseControlsRow>
-      </BrowseControls>
-      <div className="browse-layout">
-        <div className="browse-results">
-          {isLoading ? (
-            <BrowseResultsSkeleton label="MCP server" variant={effectiveView} />
-          ) : apiError ? (
-            <div className="empty-state">
-              <PackageSearch size={22} className="empty-state-icon" aria-hidden="true" />
-              <p className="empty-state-title">Unable to load MCP servers</p>
-              <p className="empty-state-body">
-                The MCP catalog is temporarily unavailable. Please try again later.
-              </p>
-            </div>
-          ) : rateLimited ? (
-            <div className="empty-state">
-              <PackageSearch size={22} className="empty-state-icon" aria-hidden="true" />
-              <p className="empty-state-title">MCP catalog is temporarily unavailable</p>
-              <p className="empty-state-body">Try again {formatRetryDelay(retryAfterSeconds)}.</p>
-            </div>
-          ) : visibleItems.length === 0 ? (
-            <div className="empty-state">
-              <p className="empty-state-title">No MCP servers found</p>
-              <p className="empty-state-body">Try a different search term or remove filters.</p>
-              <Button asChild size="sm" className="mt-4">
-                <Link
-                  to="/add"
-                  search={{ kind: "plugin", ownerHandle: undefined, method: undefined }}
-                >
-                  <Plus className="h-4 w-4" aria-hidden="true" />
-                  Add an MCP server
-                </Link>
-              </Button>
-            </div>
-          ) : effectiveView === "grid" ? (
-            <div className="grid browse-results-grid">
-              {visibleItems.map((item) => (
-                <PluginListItem key={item.name} item={item} variant="card" />
-              ))}
-            </div>
-          ) : (
-            <div className="browse-list-stack">
-              <div className="browse-list-head" aria-hidden="true">
-                <span className="browse-list-head-icon-spacer" />
-                <span className="browse-list-head-label">MCP server</span>
-                <span className="browse-list-head-label browse-list-head-stat">Popularity</span>
+            <BrowseActions>
+              <BrowseSearchTrigger
+                open={browseSearch.open}
+                onOpen={browseSearch.openSearch}
+                label="Search MCP servers"
+              />
+              <BrowseViewToggle view={view} onToggle={handleToggleView} />
+            </BrowseActions>
+            <BrowseSearchPanel open={browseSearch.open}>
+              <BrowseSearchInput
+                inputRef={searchInputRef}
+                label="MCP search"
+                placeholder="Search MCP servers..."
+                value={query}
+                onChange={handleQueryChange}
+                onClear={browseSearch.closeSearch}
+                onSubmit={handleSearchSubmit}
+                closeLabel="Close search"
+              />
+            </BrowseSearchPanel>
+          </BrowseControlsRow>
+        </BrowseControls>
+        <div className="browse-layout">
+          <div className="browse-results">
+            {isLoading ? (
+              <BrowseResultsSkeleton label="MCP server" variant={effectiveView} />
+            ) : apiError ? (
+              <div className="empty-state">
+                <PackageSearch size={22} className="empty-state-icon" aria-hidden="true" />
+                <p className="empty-state-title">Unable to load MCP servers</p>
+                <p className="empty-state-body">
+                  The MCP catalog is temporarily unavailable. Please try again later.
+                </p>
               </div>
-              <div className="results-list">
+            ) : rateLimited ? (
+              <div className="empty-state">
+                <PackageSearch size={22} className="empty-state-icon" aria-hidden="true" />
+                <p className="empty-state-title">MCP catalog is temporarily unavailable</p>
+                <p className="empty-state-body">Try again {formatRetryDelay(retryAfterSeconds)}.</p>
+              </div>
+            ) : visibleItems.length === 0 ? (
+              <div className="empty-state">
+                <p className="empty-state-title">No MCP servers found</p>
+                <p className="empty-state-body">Try a different search term or remove filters.</p>
+                <Button asChild size="sm" className="mt-4">
+                  <Link
+                    to="/add"
+                    search={{ kind: "plugin", ownerHandle: undefined, method: undefined }}
+                  >
+                    <Plus className="h-4 w-4" aria-hidden="true" />
+                    Add an MCP server
+                  </Link>
+                </Button>
+              </div>
+            ) : effectiveView === "grid" ? (
+              <div className="grid browse-results-grid">
                 {visibleItems.map((item) => (
-                  <PluginListItem key={item.name} item={item} variant="list" />
+                  <PluginListItem key={item.name} item={item} variant="card" />
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="browse-list-stack">
+                <div className="browse-list-head" aria-hidden="true">
+                  <span className="browse-list-head-icon-spacer" />
+                  <span className="browse-list-head-label">MCP server</span>
+                  <span className="browse-list-head-label browse-list-head-stat">Popularity</span>
+                </div>
+                <div className="results-list">
+                  {visibleItems.map((item) => (
+                    <PluginListItem key={item.name} item={item} variant="list" />
+                  ))}
+                </div>
+              </div>
+            )}
 
-          {!isLoading && !hasQuery && (nextCursor || isLoadingMore) ? (
-            <div ref={loadMoreRef} className="mt-5 flex justify-center">
-              <Button variant="primary" type="button" onClick={loadMore} disabled={isLoadingMore}>
-                {isLoadingMore ? "Loading..." : "Load more"}
-              </Button>
-            </div>
-          ) : null}
+            {!isLoading && !hasQuery && (nextCursor || isLoadingMore) ? (
+              <div ref={loadMoreRef} className="mt-5 flex justify-center">
+                <Button variant="primary" type="button" onClick={loadMore} disabled={isLoadingMore}>
+                  {isLoadingMore ? "Loading..." : "Load more"}
+                </Button>
+              </div>
+            ) : null}
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </CoralPageWrapper>
   );
 }

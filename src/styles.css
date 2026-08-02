@@ -359,16 +359,7 @@ body {
 }
 
 body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background-image: url("/coral-bg.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: 0.12;
-  pointer-events: none;
+  display: none;
 }
 
 html {
@@ -21349,12 +21340,12 @@ a.search-empty-action {
   --hv2-text: #eaeaea;
   --hv2-text-secondary: #b2b2b8;
   --hv2-text-tertiary: #82828a;
-  --hv2-accent: #0284c7;
-  --hv2-accent-fill: rgba(2, 132, 199, 0.12);
-  --hv2-accent-fill-hover: rgba(2, 132, 199, 0.22);
-  --hv2-accent-glow: rgba(2, 132, 199, 0.2);
-  --hv2-accent-border: rgba(2, 132, 199, 0.35);
-  --hv2-accent-border-hover: rgba(2, 132, 199, 0.6);
+  --hv2-accent: #da3633;
+  --hv2-accent-fill: rgba(218, 54, 51, 0.12);
+  --hv2-accent-fill-hover: rgba(218, 54, 51, 0.22);
+  --hv2-accent-glow: rgba(218, 54, 51, 0.2);
+  --hv2-accent-border: rgba(218, 54, 51, 0.35);
+  --hv2-accent-border-hover: rgba(218, 54, 51, 0.6);
   --hv2-green: #3dab5e;
   --hv2-green-fill: rgba(61, 171, 94, 0.08);
   --hv2-green-border: rgba(61, 171, 94, 0.25);
@@ -23669,7 +23660,7 @@ a.search-empty-action {
   --hv2-text: #eaeaea;
   --hv2-text-secondary: #b2b2b8;
   --hv2-text-tertiary: #82828a;
-  --hv2-accent: #0284c7;
+  --hv2-accent: #da3633;
   /* Easter egg hidden for now — no reveal depth reserved below the footer. */
   --footer-easter-depth: 0px;
   position: relative;
@@ -24940,12 +24931,12 @@ a.search-empty-action {
   --hv2-text: #eaeaea;
   --hv2-text-secondary: #b2b2b8;
   --hv2-text-tertiary: #82828a;
-  --hv2-accent: #0284c7;
-  --hv2-accent-fill: rgba(2, 132, 199, 0.12);
-  --hv2-accent-fill-hover: rgba(2, 132, 199, 0.22);
-  --hv2-accent-glow: rgba(2, 132, 199, 0.2);
-  --hv2-accent-border: rgba(2, 132, 199, 0.35);
-  --hv2-accent-border-hover: rgba(2, 132, 199, 0.6);
+  --hv2-accent: #da3633;
+  --hv2-accent-fill: rgba(218, 54, 51, 0.12);
+  --hv2-accent-fill-hover: rgba(218, 54, 51, 0.22);
+  --hv2-accent-glow: rgba(218, 54, 51, 0.2);
+  --hv2-accent-border: rgba(218, 54, 51, 0.35);
+  --hv2-accent-border-hover: rgba(218, 54, 51, 0.6);
   --hv2-green: #3dab5e;
   --hv2-green-fill: rgba(61, 171, 94, 0.08);
   --hv2-green-border: rgba(61, 171, 94, 0.25);
@@ -25064,8 +25055,11 @@ a.search-empty-action {
   position: absolute;
   inset: 0;
   background: url("/coral-bg.jpg") center top / cover no-repeat;
-  opacity: 0.18;
-  filter: brightness(0.9) saturate(1.2);
+  opacity: 0.35;
+  filter: brightness(0.95) contrast(1.1) saturate(1.2);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 15%, #000 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 15%, #000 70%, transparent 100%);
+  pointer-events: none;
 }
 
 /* Headline */

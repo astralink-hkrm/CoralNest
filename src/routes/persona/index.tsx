@@ -491,6 +491,14 @@ function PersonaIndex() {
 
   return (
     <main className="browse-page browse-page-borderless-header">
+      {/* Coral Logo Background */}
+      <div className="coral-page-bg" aria-hidden="true">
+        <div className="coral-logo-center">
+          <img src="/coral-logo.png" alt="" className="coral-logo-large" />
+          <div className="coral-logo-text">Personas</div>
+        </div>
+      </div>
+      
       <div className="browse-page-header">
         <div className="browse-page-header-main">
           <h1 className="browse-title">
