@@ -69,25 +69,25 @@ Common CLI operations for managing your CoralNest packages:
 
 ```bash
 # Authentication
-coralhub login
-coralhub whoami
-coralhub login --device
+coralnest login
+coralnest whoami
+coralnest login --device
 
 # Discovery & Catalog Exploration
-coralhub search "database automation"
-coralhub explore
-coralhub package inspect @coral/github-connector
+coralnest search "database automation"
+coralnest explore
+coralnest package inspect @coral/github-connector
 
 # Managing Local Packages & Skills
-coralhub install @coral/pdf-parser
-coralhub pin pdf-parser
-coralhub unpin pdf-parser
-coralhub update --all
-coralhub list
+coralnest install @coral/pdf-parser
+coralnest pin pdf-parser
+coralnest unpin pdf-parser
+coralnest update --all
+coralnest list
 
 # Publishing Packages & Skills
-coralhub skill publish ./my-skill
-coralhub package publish ./my-plugin
+coralnest skill publish ./my-skill
+coralnest package publish ./my-plugin
 ```
 
 ---

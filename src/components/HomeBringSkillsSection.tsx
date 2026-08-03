@@ -41,7 +41,7 @@ type PromptTab = {
 type AudienceTab = TerminalTab | PromptTab;
 
 const AGENT_PROMPT =
-  "Read docs.openclaw.ai/clawhub, verify my skills are publish-ready, then publish them to ClawHub and report the published URLs.";
+  "Read docs.coralnest.ai/coralnest, verify my skills are publish-ready, then publish them to CoralNest and report the published URLs.";
 
 const TABS: AudienceTab[] = [
   {
@@ -55,12 +55,12 @@ const TABS: AudienceTab[] = [
     id: "humans",
     label: "For humans",
     mode: "terminal",
-    termLabel: "clawhub — publish & sync",
+    termLabel: "coralnest — publish & sync",
     lines: [
-      { text: "npm i -g clawhub" },
-      { text: "clawhub login" },
-      { text: "clawhub skill publish ./my-skill --slug my-skill --version 1.0.0" },
-      { text: "clawhub package publish your-org/your-plugin" },
+      { text: "npm i -g coralnest" },
+      { text: "coralnest login" },
+      { text: "coralnest skill publish ./my-skill --slug my-skill --version 1.0.0" },
+      { text: "coralnest package publish your-org/your-plugin" },
     ],
   },
 ];
