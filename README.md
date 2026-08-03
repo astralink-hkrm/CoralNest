@@ -1,230 +1,157 @@
 <p align="center">
-  <img src="public/clawd-logo.png" alt="ClawHub" width="120">
+  <img src="public/coral-logo.png" alt="CoralNest Logo" width="140">
 </p>
 
-![ClawHub banner](docs/assets/readme-banner.jpg)
-
-<h1 align="center">ClawHub</h1>
+<h1 align="center">🪸 CoralNest</h1>
 
 <p align="center">
-  <a href="https://github.com/openclaw/clawhub/actions/workflows/ci.yml?branch=main"><img src="https://img.shields.io/github/actions/workflow/status/openclaw/clawhub/ci.yml?branch=main&style=for-the-badge" alt="CI status"></a>
-  <a href="https://discord.gg/clawd"><img src="https://img.shields.io/discord/1456350064065904867?label=Discord&logo=discord&logoColor=white&color=5865F2&style=for-the-badge" alt="Discord"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
+  <strong>The Premier Open Registry for AI Agent Skills, Plugins, Connectors, MCP Servers, and Personas</strong>
 </p>
-
-ClawHub is the **public skill registry for OpenClaw**: publish, version, and search text-based agent skills (a `SKILL.md` plus supporting files).
-It's designed for fast browsing + a CLI-friendly API, with moderation hooks and vector search.
-It also now exposes a native **OpenClaw package catalog** for code plugins and bundle plugins.
 
 <p align="center">
-  <a href="https://clawhub.ai">ClawHub</a> ·
-  <a href="VISION.md">Vision</a> ·
-  <a href="docs/clawhub.md">Docs</a> ·
-  <a href="CONTRIBUTING.md">Contributing</a> ·
-  <a href="https://discord.gg/clawd">Discord</a>
+  <img src="public/coral-bg.jpg" alt="CoralNest Banner" width="100%" style="border-radius: 12px; max-height: 280px; object-fit: cover;">
 </p>
 
-## What you can do with it
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-0284c7.svg?style=for-the-badge" alt="MIT License"></a>
+  <a href="https://bun.sh"><img src="https://img.shields.io/badge/Runtime-Bun-fbf0df?style=for-the-badge&logo=bun" alt="Bun"></a>
+  <a href="https://convex.dev"><img src="https://img.shields.io/badge/Backend-Convex-ff5252?style=for-the-badge" alt="Convex"></a>
+  <a href="https://typescriptlang.org"><img src="https://img.shields.io/badge/Language-TypeScript-3178c6?style=for-the-badge&logo=typescript" alt="TypeScript"></a>
+</p>
 
-- Browse skills + render their `SKILL.md`.
-- Publish new skill versions with changelogs + tags (including `latest`).
-- Rename an owned skill without breaking old links or installs.
-- Merge duplicate owned skills into one canonical slug.
-- Search via embeddings (vector index) instead of brittle keywords.
-- Star + comment; admins/mods can curate and approve skills.
-- Pin local skill installs so updates and force reinstalls cannot overwrite frozen copies.
-- Browse OpenClaw packages with family/trust/capability metadata.
-- Publish native code plugins and bundle plugins through `/packages` APIs and CLI flows.
+---
 
-## How it works (high level)
+## 🌊 Overview
 
-- Web app: TanStack Start (React, Vite/Nitro).
-- Backend: Convex (DB + file storage + HTTP actions) + Convex Auth (GitHub OAuth).
-- Search: OpenAI embeddings (`text-embedding-3-small`) + Convex vector search.
-- API schema + routes: `packages/schema` (`clawhub-schema`).
+**CoralNest** is a high-performance, unified public registry for modern AI agent ecosystems. It provides seamless discovery, versioning, vector search, and installation for text-based agent skills, native code plugins, API connectors, Model Context Protocol (MCP) servers, and agent personas.
 
-## CLI
+Whether you're developing autonomous agents, building custom toolchains, or hosting enterprise MCP servers, CoralNest provides a CLI-friendly API and a modern web interface powered by TanStack Start and Convex.
 
-Common CLI flows:
+---
 
-- Auth: `clawhub login`, `clawhub whoami`
-- Remote/headless auth: `clawhub login --device`
-- Discover: `clawhub search ...`, `clawhub explore`
-- Browse unified catalog (skills + plugins): `clawhub package explore`, `clawhub package inspect <name>`
-- Manage local installs: `clawhub install @openclaw/demo`, `clawhub pin <skill>`, `clawhub unpin <skill>`, `clawhub uninstall <skill>`, `clawhub list`, `clawhub update --all`
-- Inspect without installing: `clawhub inspect @openclaw/demo`
-- Publish skills: `clawhub skill publish <path>`
-- Publish plugins: `clawhub package publish <source>`
-- Code-plugin manifests must include `openclaw.compat.pluginApi` and `openclaw.build.openclawVersion`; see [`docs/cli.md`](docs/cli.md) for a minimal example.
-- Canonicalize owned skills: `clawhub skill rename <skill> <new-name>`, `clawhub skill merge <source> <target>`
+## 🎨 Ecosystem Registries & Color Identity
 
-Docs: [`docs/quickstart.md`](docs/quickstart.md), [`docs/cli.md`](docs/cli.md).
+CoralNest categorizes agent capabilities into five dedicated registries, each with distinct color branding:
 
-### Removal permissions
+| Registry | Icon Logo | Description |
+| :--- | :---: | :--- |
+| **Skills** | <img src="public/coral-logo-olive.png" width="28"> | Text-based prompt instructions, workflows, and `SKILL.md` packs |
+| **Plugins** | <img src="public/coral-logo-purple.png" width="28"> | Executable code modules, WASM bundles, and extension packages |
+| **Connectors** | <img src="public/coral-logo-orange.png" width="28"> | Third-party API integrations, webhook handlers, and auth tunnels |
+| **Personas** | <img src="public/coral-logo-pink.png" width="28"> | Agent identity profiles, prompt personas, and specialized system prompts |
+| **MCP Servers** | <img src="public/coral-logo-red.png" width="28"> | Model Context Protocol servers for extended real-time LLM tools |
 
-- `clawhub uninstall <skill>` only removes a local install on your machine.
-- Uploaded registry skills use soft-delete/restore (`clawhub delete <skill>` / `clawhub undelete <skill>` or API equivalents).
-- Soft-delete/restore is allowed for the skill or package owner, publisher owner/admin, moderators, and admins.
-- Packages use `clawhub package delete <name>` / `clawhub package undelete <name>`.
-- Hard delete is admin-only (management tools / ban flows).
-- Owner rename keeps the old slug as a redirect alias.
-- Owner merge hides the source listing and redirects the old slug to the canonical target.
+---
 
-## Telemetry
+## ✨ Key Features
 
-ClawHub tracks minimal **install telemetry** (to compute install counts) when you run `clawhub install` while logged in.
-Disable via:
+- **Unified Catalog**: Single entry point to browse, search, and inspect skills, plugins, connectors, MCP servers, and personas.
+- **Embedding & Vector Search**: OpenAI vector embeddings (`text-embedding-3-small`) combined with Convex vector search for semantic discovery.
+- **Version Control & Package History**: Publish new versions with semver tags (`latest`), changelogs, and atomic releases.
+- **Pin & Lock Installs**: Freeze local skill/plugin versions to prevent unwanted overwrites during auto-updates.
+- **Moderation & Security Verification**: Built-in automated security scanners, staff approval flows, and permission gating.
+- **CLI & REST API Integration**: CLI tool for quick terminal search, installation, version management, and remote device auth.
+
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend**: TanStack Start (React 19, Vite, Nitro server engine).
+- **Backend & Database**: [Convex](https://convex.dev) (Real-time DB, file storage, HTTP actions, Convex Auth).
+- **Search Engine**: Convex Vector Search + OpenAI Embeddings.
+- **Language & Tooling**: TypeScript (Strict ESM), Bun runtime, Biome & Oxlint.
+
+---
+
+## 💻 CLI Commands
+
+Common CLI operations for managing your CoralNest packages:
 
 ```bash
-export CLAWHUB_DISABLE_TELEMETRY=1
+# Authentication
+coralhub login
+coralhub whoami
+coralhub login --device
+
+# Discovery & Catalog Exploration
+coralhub search "database automation"
+coralhub explore
+coralhub package inspect @coral/github-connector
+
+# Managing Local Packages & Skills
+coralhub install @coral/pdf-parser
+coralhub pin pdf-parser
+coralhub unpin pdf-parser
+coralhub update --all
+coralhub list
+
+# Publishing Packages & Skills
+coralhub skill publish ./my-skill
+coralhub package publish ./my-plugin
 ```
 
-Details: [`docs/telemetry.md`](docs/telemetry.md).
+---
 
-## Repo layout
+## 🚀 Local Development Setup
 
-- `src/` — TanStack Start app (routes, components, styles).
-- `convex/` — schema + queries/mutations/actions + HTTP API routes.
-- `packages/schema/` — shared API types/routes for the CLI and app.
-- [`docs/`](docs/README.md) — publishable ClawHub public/operator docs for users, publishers, API clients, and deploy operators.
-- [`specs/`](specs/README.md) — product specs, plans, regression notes, and design history.
-- [`specs/spec.md`](specs/spec.md) — product + implementation spec (good first read for maintainers).
+### Prerequisites
+- [Bun](https://bun.sh/) (v1.1+)
+- Node.js 20+
 
-## Local dev
+### Step-by-Step Setup
 
-Prereqs: [Bun](https://bun.sh/) (Convex runs via `bunx`, no global install needed). The detached worktree path also requires [Worktrunk](https://github.com/max-sixty/worktrunk) (`wt`).
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/astralink-hkrm/CoralNest.git
+   cd CoralNest
+   ```
 
-```bash
-bun install
-cp .env.local.example .env.local
-# edit .env.local — see CONTRIBUTING.md for local Convex values
+2. **Install dependencies**:
+   ```bash
+   bun install
+   ```
 
-# terminal A: local Convex backend
-bunx convex dev
+3. **Configure Environment Variables**:
+   ```bash
+   cp .env.local.example .env.local
+   ```
 
-# terminal B: web app (port 3000)
-bun run dev
+4. **Start Local Backend (Convex)**:
+   ```bash
+   bunx convex dev
+   ```
 
-# detached/Codex worktree preview
-bun run setup:worktree
-bun run dev:worktree
-wt --yes url
+5. **Start Web App**:
+   ```bash
+   bun run dev
+   ```
+   *The app will be available at `http://localhost:3000` (or `http://localhost:3001`).*
 
-# seed local QA fixtures and the public corpus
-bun run seed:dev
+6. **Seed Test Fixtures & Sample Corpus**:
+   ```bash
+   bun run seed:dev
+   ```
+
+---
+
+## 📁 Repository Structure
+
+```
+CoralNest/
+├── src/                    # TanStack Start application (routes, components, styles)
+│   ├── components/         # Shared UI components (CoralPageWrapper, Header, Footer)
+│   ├── routes/             # Route pages (index, skills, plugins, connectors, mcp, persona)
+│   ├── design-system.css   # Carapace design tokens & typography
+│   └── styles.css          # Application layout styles
+├── convex/                 # Convex backend functions, schema, auth, and HTTP API
+├── packages/               # Workspace packages (clawhub CLI, admin tools, schema)
+├── public/                 # Static assets, coral logo variants, and background images
+├── docs/                   # Public documentation & guides
+└── specs/                  # Product specifications & architectural intent
 ```
 
-`bun run seed:dev` waits for the local Convex deployment, runs the dev fixture seed, and refreshes
-global stats. The fixtures are owned by `@local` and are safe to rerun after fixture or schema
-changes. For reset/manual commands and full setup instructions (env vars, GitHub OAuth, JWT keys,
-database seeding), see [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Environment
-
-- `VITE_CONVEX_URL`: Convex deployment URL (`https://<deployment>.convex.cloud`).
-- `VITE_CONVEX_SITE_URL`: Convex site URL (`https://<deployment>.convex.site`).
-- `CONVEX_SITE_URL`: same as `VITE_CONVEX_SITE_URL` (auth + cookies).
-- `SITE_URL`: App URL (local: `http://localhost:3000`).
-- `AUTH_GITHUB_ID` / `AUTH_GITHUB_SECRET`: GitHub OAuth App.
-- `JWT_PRIVATE_KEY` / `JWKS`: Convex Auth keys.
-- `OPENAI_API_KEY`: embeddings for search + indexing.
-
-## Nix plugins (nixmode skills)
-
-ClawHub can store a nix-clawdbot plugin pointer in SKILL frontmatter so the registry knows which
-Nix package bundle to install. A nix plugin is different from a regular skill pack: it bundles the
-skill pack, the CLI binary, and its config flags/requirements together.
-
-Add this to `SKILL.md`:
-
-```yaml
 ---
-name: peekaboo
-description: Capture and automate macOS UI with the Peekaboo CLI.
-metadata:
-  {
-    "clawdbot":
-      {
-        "nix":
-          {
-            "plugin": "github:clawdbot/nix-steipete-tools?dir=tools/peekaboo",
-            "systems": ["aarch64-darwin"],
-          },
-      },
-  }
----
-```
 
-Install via nix-clawdbot:
+## 📄 License
 
-```nix
-programs.clawdbot.plugins = [
-  { source = "github:clawdbot/nix-steipete-tools?dir=tools/peekaboo"; }
-];
-```
-
-You can also declare config requirements + an example snippet:
-
-```yaml
----
-name: padel
-description: Check padel court availability and manage bookings via Playtomic.
-metadata:
-  {
-    "clawdbot":
-      {
-        "config":
-          {
-            "requiredEnv": ["PADEL_AUTH_FILE"],
-            "stateDirs": [".config/padel"],
-            "example": "config = { env = { PADEL_AUTH_FILE = \\\"/run/agenix/padel-auth\\\"; }; };",
-          },
-      },
-  }
----
-```
-
-To show CLI help (recommended for nix plugins), include the `cli --help` output:
-
-```yaml
----
-name: padel
-description: Check padel court availability and manage bookings via Playtomic.
-metadata: { "clawdbot": { "cliHelp": "padel --help\\nUsage: padel [command]\\n" } }
----
-```
-
-`metadata.clawdbot` is preferred, but `metadata.clawdis` and `metadata.openclaw` are accepted as aliases.
-
-## Skill metadata
-
-Skills declare their runtime requirements (env vars, binaries, install specs) in the `SKILL.md` frontmatter. ClawHub's security analysis checks these declarations against actual skill behavior; medium review findings stay visible, and the suspicious filter is reserved for high-impact or malicious concerns.
-
-Full reference: [`docs/skill-format.md`](docs/skill-format.md#frontmatter-metadata)
-
-Quick example:
-
-```yaml
----
-name: my-skill
-description: Does a thing with an API.
-metadata:
-  openclaw:
-    requires:
-      env:
-        - MY_API_KEY
-      bins:
-        - curl
-    primaryEnv: MY_API_KEY
----
-```
-
-## Scripts
-
-```bash
-bun run dev
-bun run build
-bun run test
-bun run coverage
-bun run lint
-```
+Distributed under the MIT License. See [`LICENSE`](LICENSE) for details.
