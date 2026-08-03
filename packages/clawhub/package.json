@@ -1,20 +1,22 @@
 {
   "name": "clawhub",
   "version": "0.23.1",
-  "description": "ClawHub CLI \\u2014 install, update, search, and publish skills plus OpenClaw packages.",
-  "homepage": "https://clawhub.ai",
+  "description": "CoralNest CLI — install, update, search, and publish skills, plugins, connectors, MCP servers, and personas.",
+  "homepage": "https://coralnest.ai",
   "bugs": {
-    "url": "https://github.com/openclaw/clawhub/issues"
+    "url": "https://github.com/astralink-hkrm/CoralNest/issues"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/clawhub.git",
+    "url": "https://github.com/astralink-hkrm/CoralNest.git",
     "directory": "packages/clawhub"
   },
   "bin": {
-    "clawdhub": "bin/clawdhub.js",
-    "clawhub": "bin/clawdhub.js"
+    "coralnest": "bin/coralnest.js",
+    "coralhub": "bin/coralhub.js",
+    "clawhub": "bin/coralnest.js",
+    "clawdhub": "bin/coralnest.js"
   },
   "files": [
     "bin",

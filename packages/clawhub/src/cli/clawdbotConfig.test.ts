@@ -12,6 +12,8 @@ afterEach(() => {
   process.env = { ...originalEnv };
 });
 
+const cleanPath = (p: string) => p.replace(/\\/g, "/");
+
 describe("resolveClawdbotDefaultWorkspace", () => {
   it("resolves default workspace from agents.defaults and agents.list", async () => {
     const base = await mkdtemp(join(tmpdir(), "clawhub-clawdbot-default-"));
@@ -30,9 +32,9 @@ describe("resolveClawdbotDefaultWorkspace", () => {
 
     const config = `{
       agents: {
-        defaults: { workspace: "${workspaceMain}", },
+        defaults: { workspace: "${cleanPath(workspaceMain)}", },
         list: [
-          { id: 'main', workspace: "${workspaceList}", default: true },
+          { id: 'main', workspace: "${cleanPath(workspaceList)}", default: true },
         ],
       },
     }`;
@@ -58,8 +60,8 @@ describe("resolveClawdbotDefaultWorkspace", () => {
     const config = `{
       agents: {
         list: [
-          { id: 'main', workspace: "${workspaceMain}", default: true },
-          { id: 'work', workspace: "${workspaceWork}" },
+          { id: 'main', workspace: "${cleanPath(workspaceMain)}", default: true },
+          { id: 'work', workspace: "${cleanPath(workspaceWork)}" },
         ],
       },
     }`;
@@ -83,7 +85,7 @@ describe("resolveClawdbotDefaultWorkspace", () => {
     process.env.OPENCLAW_CONFIG_PATH = join(openclawStateDir, "openclaw.json");
 
     const config = `{
-      agent: { workspace: "${join(base, "workspace-main")}" },
+      agent: { workspace: "${cleanPath(join(base, "workspace-main"))}" },
     }`;
     await mkdir(join(base, "config"), { recursive: true });
     await writeFile(configPath, config, "utf8");
@@ -137,7 +139,7 @@ describe("resolveClawdbotDefaultWorkspace", () => {
     await mkdir(stateDir, { recursive: true });
     const config = `{
       agents: {
-        defaults: { workspace: "${workspace}", },
+        defaults: { workspace: "${cleanPath(workspace)}", },
       },
     }`;
     await writeFile(configPath, config, "utf8");
@@ -162,7 +164,7 @@ describe("resolveClawdbotDefaultWorkspace", () => {
     );
     await writeFile(
       openclawConfigPath,
-      `{ agents: { defaults: { workspace: "${workspace}" } } }`,
+      `{ agents: { defaults: { workspace: "${cleanPath(workspace)}" } } }`,
       "utf8",
     );
 

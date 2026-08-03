@@ -60,12 +60,14 @@ import { DEFAULT_REGISTRY, DEFAULT_SITE } from "./cli/registry.js";
 import type { GlobalOpts } from "./cli/types.js";
 import { fail, formatError } from "./cli/ui.js";
 
-const CLI_HELP_HEADER = styleTitle(`🦞 ClawHub CLI ${getCliBuildLabel()}`);
+const CLI_HELP_HEADER = styleTitle(`🪸 CoralNest CLI ${getCliBuildLabel()}`);
 const HELP_DESCRIPTION = "Display help for command";
 
 const program = new Command()
   .name("clawhub")
-  .description(styleEnvBlock("install, update, search, and publish skills plus OpenClaw packages."))
+  .alias("coralnest")
+  .alias("coralhub")
+  .description(styleEnvBlock("install, update, search, and publish skills, plugins, connectors, MCP servers, and personas."))
   .version(getCliVersion(), "-V, --cli-version", "Show CLI version")
   .helpOption("-h, --help", HELP_DESCRIPTION)
   .option("--workdir <dir>", "Working directory (default: cwd)")
@@ -79,7 +81,7 @@ const program = new Command()
   .addHelpText(
     "after",
     styleEnvBlock(
-      "\nEnv:\n  CLAWHUB_SITE\n  CLAWHUB_REGISTRY\n  CLAWHUB_WORKDIR\n  (CLAWDHUB_* supported)\n",
+      "\nEnv:\n  CORALNEST_SITE (or CORALHUB_SITE / CLAWHUB_SITE)\n  CORALNEST_REGISTRY (or CORALHUB_REGISTRY / CLAWHUB_REGISTRY)\n  CORALNEST_WORKDIR (or CORALHUB_WORKDIR / CLAWHUB_WORKDIR)\n",
     ),
   );
 
@@ -118,45 +120,48 @@ function validateTopLevelCommand(args: string[]) {
   if (!commandName) return;
   const knownCommands = new Set([
     "help",
-    ...program.commands.flatMap((command) => [command.name(), ...command.aliases()]),
+    "login",
+    "logout",
+    "whoami",
+    "token",
+    "search",
+    "explore",
+    "inspect",
+    "install",
+    "uninstall",
+    "update",
+    "list",
+    "pin",
+    "unpin",
+    "star",
+    "unstar",
+    "publish",
+    "skill",
+    "package",
+    "publisher",
+    "scan",
+    "sync",
+    "transfer",
   ]);
-  if (knownCommands.has(commandName)) return;
-  program.error(`error: unknown command '${commandName}'`, { code: "commander.unknownCommand" });
+  if (!knownCommands.has(commandName)) {
+    fail(`Unknown command "${commandName}". Run "coralnest --help" for available commands.`);
+  }
 }
 
 function hasTerminalGlobalFlag(args: string[]) {
-  return args.some(
-    (arg) => arg === "--help" || arg === "-h" || arg === "--cli-version" || arg === "-V",
-  );
+  return args.includes("-h") || args.includes("--help") || args.includes("-V") || args.includes("--cli-version");
 }
 
 function findFirstTopLevelOperand(args: string[]) {
   for (let index = 0; index < args.length; index += 1) {
-    const arg = args[index];
-    if (!arg) continue;
-    if (arg === "--") return args[index + 1];
-    if (arg.startsWith("--")) {
-      if (arg === "--workdir" || arg === "--dir" || arg === "--site" || arg === "--registry") {
-        index += 1;
-        continue;
-      }
-      if (
-        arg.startsWith("--workdir=") ||
-        arg.startsWith("--dir=") ||
-        arg.startsWith("--site=") ||
-        arg.startsWith("--registry=")
-      ) {
-        continue;
-      }
-      if (arg === "--help" || arg === "--cli-version") return undefined;
-      if (arg === "--no-input") continue;
-      return undefined;
+    const argument = args[index];
+    if (!argument) continue;
+    if (argument === "--workdir" || argument === "--dir" || argument === "--site" || argument === "--registry") {
+      index += 1;
+      continue;
     }
-    if (arg.startsWith("-")) {
-      if (arg === "-h" || arg === "-V") return undefined;
-      return undefined;
-    }
-    return arg;
+    if (argument.startsWith("-")) continue;
+    return argument;
   }
   return undefined;
 }
@@ -165,14 +170,25 @@ async function resolveGlobalOpts(): Promise<GlobalOpts> {
   const raw = program.opts<{ workdir?: string; dir?: string; site?: string; registry?: string }>();
   const workdir = await resolveWorkdir(raw.workdir);
   const dir = resolve(workdir, raw.dir ?? "skills");
-  const site = raw.site ?? process.env.CLAWHUB_SITE ?? process.env.CLAWDHUB_SITE ?? DEFAULT_SITE;
+  const site =
+    raw.site ??
+    process.env.CORALNEST_SITE ??
+    process.env.CORALHUB_SITE ??
+    process.env.CLAWHUB_SITE ??
+    process.env.CLAWDHUB_SITE ??
+    DEFAULT_SITE;
   const registrySource = raw.registry
     ? "cli"
-    : process.env.CLAWHUB_REGISTRY || process.env.CLAWDHUB_REGISTRY
+    : process.env.CORALNEST_REGISTRY ||
+        process.env.CORALHUB_REGISTRY ||
+        process.env.CLAWHUB_REGISTRY ||
+        process.env.CLAWDHUB_REGISTRY
       ? "env"
       : "default";
   const registry =
     raw.registry ??
+    process.env.CORALNEST_REGISTRY ??
+    process.env.CORALHUB_REGISTRY ??
     process.env.CLAWHUB_REGISTRY ??
     process.env.CLAWDHUB_REGISTRY ??
     DEFAULT_REGISTRY;
@@ -186,7 +202,11 @@ function isInputAllowed() {
 
 async function resolveWorkdir(explicit?: string) {
   if (explicit?.trim()) return resolve(explicit.trim());
-  const envWorkdir = process.env.CLAWHUB_WORKDIR?.trim() ?? process.env.CLAWDHUB_WORKDIR?.trim();
+  const envWorkdir =
+    process.env.CORALNEST_WORKDIR?.trim() ??
+    process.env.CORALHUB_WORKDIR?.trim() ??
+    process.env.CLAWHUB_WORKDIR?.trim() ??
+    process.env.CLAWDHUB_WORKDIR?.trim();
   if (envWorkdir) return resolve(envWorkdir);
 
   const cwd = resolve(process.cwd());
