@@ -424,7 +424,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 320px;
+  height: 420px;
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
@@ -435,28 +435,28 @@
   position: absolute;
   inset: 0;
   background: url("/coral-bg.jpg") center top / cover no-repeat;
-  opacity: 0.35;
+  opacity: 0.38;
   filter: brightness(0.95) contrast(1.1) saturate(1.2);
-  mask-image: linear-gradient(to bottom, #000 0%, #000 50%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 50%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
 }
 
-/* === CENTERED PAGE LOGO & TITLE BANNER (HERO SCALE, NO BACKGROUND BOX) === */
+/* === CENTERED PAGE LOGO & TITLE BANNER (HERO SCALE - MASSIVE LOGO & TITLE) === */
 .coral-section-header {
   position: relative;
   z-index: 2;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 48px;
-  padding-bottom: 32px;
+  padding-top: 56px;
+  padding-bottom: 40px;
 }
 
 .coral-section-header-inner {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 32px;
   padding: 0;
   background: transparent;
   border: none;
@@ -466,26 +466,26 @@
 }
 
 .coral-section-logo {
-  width: clamp(72px, 8vw, 104px);
-  height: clamp(72px, 8vw, 104px);
+  width: clamp(110px, 14vw, 160px);
+  height: clamp(110px, 14vw, 160px);
   object-fit: contain;
-  filter: drop-shadow(0 0 24px rgba(255, 255, 255, 0.25)) drop-shadow(0 6px 16px rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 0 32px rgba(255, 255, 255, 0.3)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.7));
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .coral-section-logo:hover {
-  transform: scale(1.06);
+  transform: scale(1.08);
 }
 
 .coral-section-title {
   font-family: var(--oc-font-display, "Bricolage Grotesque", sans-serif);
-  font-size: clamp(42px, 5.5vw, 68px);
+  font-size: clamp(56px, 7.5vw, 92px);
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
   color: #ffffff;
   margin: 0;
-  line-height: 1.05;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 255, 255, 0.15);
+  line-height: 1;
+  text-shadow: 0 6px 32px rgba(0, 0, 0, 0.85), 0 0 50px rgba(255, 255, 255, 0.2);
 }
 
 /* Hide duplicate sub-header title when main section header is shown */
