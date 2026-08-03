@@ -17,13 +17,13 @@
   --oc-surface-interactive: #162e4d;
   --oc-surface-interactive-hover: #1e3a5f;
 
-  /* Coral Red Primary & Accent Colors */
-  --oc-accent-primary: #da3633;
-  --oc-accent-primary-hover: #f85149;
+  /* Deep Ocean Blue Primary & Accent Colors */
+  --oc-accent-primary: #0284c7;
+  --oc-accent-primary-hover: #38bdf8;
   --oc-accent-secondary: #6b8e23;
-  --oc-surface-accent-soft: rgba(218, 54, 51, 0.18);
+  --oc-surface-accent-soft: rgba(2, 132, 199, 0.18);
   --oc-surface-secondary-soft: rgba(85, 107, 47, 0.25);
-  --oc-border-accent: #da3633;
+  --oc-border-accent: #0284c7;
   --oc-text-on-accent: #ffffff;
 
   /* Olive & Emerald Green Glow Accent */
@@ -441,44 +441,54 @@
   -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 50%, transparent 100%);
 }
 
-/* === CENTERED PAGE LOGO & TITLE BANNER === */
+/* === CENTERED PAGE LOGO & TITLE BANNER (HERO SCALE, NO BACKGROUND BOX) === */
 .coral-section-header {
   position: relative;
   z-index: 2;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 36px;
-  padding-bottom: 24px;
+  padding-top: 48px;
+  padding-bottom: 32px;
 }
 
 .coral-section-header-inner {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  padding: 10px 24px;
-  border-radius: var(--oc-radius-surface, 16px);
-  background: color-mix(in srgb, var(--oc-bg-surface) 65%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid color-mix(in srgb, var(--oc-border-subtle) 60%, transparent);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  gap: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .coral-section-logo {
-  width: 44px;
-  height: 44px;
+  width: clamp(72px, 8vw, 104px);
+  height: clamp(72px, 8vw, 104px);
   object-fit: contain;
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+  filter: drop-shadow(0 0 24px rgba(255, 255, 255, 0.25)) drop-shadow(0 6px 16px rgba(0, 0, 0, 0.6));
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.coral-section-logo:hover {
+  transform: scale(1.06);
 }
 
 .coral-section-title {
   font-family: var(--oc-font-display, "Bricolage Grotesque", sans-serif);
-  font-size: 28px;
+  font-size: clamp(42px, 5.5vw, 68px);
   font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--oc-text-primary, #ffffff);
+  letter-spacing: -0.03em;
+  color: #ffffff;
   margin: 0;
-  line-height: 1;
+  line-height: 1.05;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 255, 255, 0.15);
+}
+
+/* Hide duplicate sub-header title when main section header is shown */
+.coral-page-wrapper:has(.coral-section-header) .browse-page-header {
+  display: none;
 }

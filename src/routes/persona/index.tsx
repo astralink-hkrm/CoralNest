@@ -14,6 +14,7 @@ import {
   BrowseViewToggle,
   useBrowseSearchDisclosure,
 } from "../../components/BrowseControls";
+import { CoralPageWrapper } from "../../components/CoralPageWrapper";
 import { PluginListItem } from "../../components/PluginListItem";
 import { BrowseResultsSkeleton } from "../../components/skeletons/BrowseResultsSkeleton";
 import { Button } from "../../components/ui/button";
@@ -490,14 +491,8 @@ function PersonaIndex() {
   }, [canLoadMore, loadMore]);
 
   return (
-    <main className="browse-page browse-page-borderless-header">
-      {/* Coral Logo Background */}
-      <div className="coral-page-bg" aria-hidden="true">
-        <div className="coral-logo-center">
-          <img src="/coral-logo.png" alt="" className="coral-logo-large" />
-          <div className="coral-logo-text">Personas</div>
-        </div>
-      </div>
+    <CoralPageWrapper pageType="creators">
+      <main className="browse-page browse-page-borderless-header">
       
       <div className="browse-page-header">
         <div className="browse-page-header-main">
@@ -605,5 +600,6 @@ function PersonaIndex() {
         </div>
       </div>
     </main>
+    </CoralPageWrapper>
   );
 }

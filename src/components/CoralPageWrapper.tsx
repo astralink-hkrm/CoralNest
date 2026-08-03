@@ -41,7 +41,7 @@ export function CoralPageWrapper({
 function getCoralLogoSrc(pageType: string): string {
   switch (pageType) {
     case "skills":
-      return "/coral-logo.png";
+      return "/coral-logo-olive.png";
     case "plugins":
       return "/coral-logo-purple.png";
     case "connectors":
@@ -49,7 +49,7 @@ function getCoralLogoSrc(pageType: string): string {
     case "creators":
       return "/coral-logo-pink.png";
     case "mcp":
-      return "/coral-logo-olive.png";
+      return "/coral-logo-red.png";
     default:
       return "/coral-logo.png";
   }

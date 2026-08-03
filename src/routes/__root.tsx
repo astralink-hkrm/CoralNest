@@ -128,8 +128,15 @@ export const Route = createRootRoute({
         },
         {
           rel: "icon",
-          href: "/coral-logo.png",
+          href: "/favicon-32x32.png",
           type: "image/png",
+          sizes: "32x32",
+        },
+        {
+          rel: "icon",
+          href: "/favicon-16x16.png",
+          type: "image/png",
+          sizes: "16x16",
         },
         {
           rel: "icon",
@@ -143,7 +150,8 @@ export const Route = createRootRoute({
         },
         {
           rel: "apple-touch-icon",
-          href: "/coral-logo.png",
+          href: "/logo192.png",
+          sizes: "192x192",
         },
         {
           rel: "manifest",
