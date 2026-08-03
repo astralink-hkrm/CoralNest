@@ -31,13 +31,14 @@ const fetch = createStartHandler(async (ctx) => {
   return defaultStreamHandler(ctx);
 });
 
-type ServerEntry = { fetch: RequestHandler<Register> };
+type ServerEntry = { fetch: RequestHandler<Register>; idleTimeout?: number };
 
 function createServerEntry(entry: ServerEntry): ServerEntry {
   return {
     async fetch(...args) {
       return await entry.fetch(...args);
     },
+    idleTimeout: 60,
   };
 }
 

@@ -40,7 +40,7 @@
     "design:audit:codex": "bun scripts/design-audit/run-codex.ts",
     "design:audit:finalize": "bun scripts/design-audit/finalize.ts",
     "design:audit:source": "bun scripts/design-audit/source-check.ts",
-    "dev": "bun run llms:generate && bun --bun vite dev --port 3000",
+    "dev": "bun run llms:generate && bun vite dev --port 3000",
     "dev:workers": "bun scripts/dev-workers.ts",
     "dev:worktree": "wt --yes dev",
     "docs:list": "bun scripts/docs-list.ts",
