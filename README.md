@@ -100,6 +100,8 @@ coralnest package publish ./my-plugin
 
 ### Step-by-Step Setup
 
+After pulling this repo, run these commands in order:
+
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/astralink-hkrm/CoralNest.git
@@ -107,27 +109,31 @@ coralnest package publish ./my-plugin
    ```
 
 2. **Install dependencies**:
+   The repo ships an `only-allow` preinstall hook. If plain `bun install` fails on it, use:
    ```bash
-   bun install
+   bun install --ignore-scripts
    ```
 
 3. **Configure Environment Variables**:
    ```bash
    cp .env.local.example .env.local
    ```
+   You can run against the hosted public backend by filling in `VITE_CONVEX_URL`
+   (plus the matching `VITE_CONVEX_SITE_URL` / `CONVEX_SITE_URL`), or run a local
+   Convex deployment with `bunx convex dev`.
 
-4. **Start Local Backend (Convex)**:
+4. **Start Local Backend (Convex)** — only needed if you are NOT using the hosted backend:
    ```bash
-   bunx convex dev
+   bunx convex dev --typecheck=disable
    ```
 
 5. **Start Web App**:
    ```bash
    bun run dev
    ```
-   *The app will be available at `http://localhost:3000` (or `http://localhost:3001`).*
+   *The app will be available at `http://localhost:3000`.*
 
-6. **Seed Test Fixtures & Sample Corpus**:
+6. **Seed Test Fixtures & Sample Corpus** — local/dev fixtures only, never on production:
    ```bash
    bun run seed:dev
    ```

@@ -33,6 +33,13 @@ function SkillsHome() {
         <section className="home-v2-hero oc-hero">
           <div className="home-v2-hero-bg" aria-hidden="true" />
 
+          <img
+            src="/coral-logo.png"
+            alt="CoralNest"
+            className="home-v2-hero-logo"
+            draggable={false}
+          />
+
           <h1 className="home-v2-headline oc-hero-title">
             <span className="home-v2-action-word home-v2-static-headline">CoralNest</span>
           </h1>
