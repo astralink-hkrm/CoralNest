@@ -13,10 +13,10 @@
     "directory": "packages/clawhub"
   },
   "bin": {
-    "coralnest": "bin/coralnest.js",
-    "coralhub": "bin/coralhub.js",
+    "clawdhub": "bin/coralnest.js",
     "clawhub": "bin/coralnest.js",
-    "clawdhub": "bin/coralnest.js"
+    "coralhub": "bin/coralhub.js",
+    "coralnest": "bin/coralnest.js"
   },
   "files": [
     "bin",

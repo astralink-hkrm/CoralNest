@@ -33,13 +33,13 @@ Whether you're developing autonomous agents, building custom toolchains, or host
 
 CoralNest categorizes agent capabilities into five dedicated registries, each with distinct color branding:
 
-| Registry | Icon Logo | Description |
-| :--- | :---: | :--- |
-| **Skills** | <img src="public/coral-logo-olive.png" width="28"> | Text-based prompt instructions, workflows, and `SKILL.md` packs |
-| **Plugins** | <img src="public/coral-logo-purple.png" width="28"> | Executable code modules, WASM bundles, and extension packages |
-| **Connectors** | <img src="public/coral-logo-orange.png" width="28"> | Third-party API integrations, webhook handlers, and auth tunnels |
-| **Personas** | <img src="public/coral-logo-pink.png" width="28"> | Agent identity profiles, prompt personas, and specialized system prompts |
-| **MCP Servers** | <img src="public/coral-logo-red.png" width="28"> | Model Context Protocol servers for extended real-time LLM tools |
+| Registry        |                      Icon Logo                      | Description                                                              |
+| :-------------- | :-------------------------------------------------: | :----------------------------------------------------------------------- |
+| **Skills**      | <img src="public/coral-logo-olive.png" width="28">  | Text-based prompt instructions, workflows, and `SKILL.md` packs          |
+| **Plugins**     | <img src="public/coral-logo-purple.png" width="28"> | Executable code modules, WASM bundles, and extension packages            |
+| **Connectors**  | <img src="public/coral-logo-orange.png" width="28"> | Third-party API integrations, webhook handlers, and auth tunnels         |
+| **Personas**    |  <img src="public/coral-logo-pink.png" width="28">  | Agent identity profiles, prompt personas, and specialized system prompts |
+| **MCP Servers** |  <img src="public/coral-logo-red.png" width="28">   | Model Context Protocol servers for extended real-time LLM tools          |
 
 ---
 
@@ -95,6 +95,7 @@ coralnest package publish ./my-plugin
 ## 🚀 Local Development Setup
 
 ### Prerequisites
+
 - [Bun](https://bun.sh/) (v1.1+)
 - Node.js 20+
 
@@ -103,6 +104,7 @@ coralnest package publish ./my-plugin
 After pulling this repo, run these commands in order:
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/astralink-hkrm/CoralNest.git
    cd CoralNest
@@ -110,28 +112,34 @@ After pulling this repo, run these commands in order:
 
 2. **Install dependencies**:
    The repo ships an `only-allow` preinstall hook. If plain `bun install` fails on it, use:
+
    ```bash
    bun install --ignore-scripts
    ```
 
 3. **Configure Environment Variables**:
+
    ```bash
    cp .env.local.example .env.local
    ```
+
    You can run against the hosted public backend by filling in `VITE_CONVEX_URL`
    (plus the matching `VITE_CONVEX_SITE_URL` / `CONVEX_SITE_URL`), or run a local
    Convex deployment with `bunx convex dev`.
 
 4. **Start Local Backend (Convex)** — only needed if you are NOT using the hosted backend:
+
    ```bash
    bunx convex dev --typecheck=disable
    ```
 
 5. **Start Web App**:
+
    ```bash
    bun run dev
    ```
-   *The app will be available at `http://localhost:3000`.*
+
+   _The app will be available at `http://localhost:3000`._
 
 6. **Seed Test Fixtures & Sample Corpus** — local/dev fixtures only, never on production:
    ```bash
@@ -148,15 +156,15 @@ cross-origin requests and return JSON.
 
 ### Skill & package catalog
 
-| Endpoint | Description |
-| --- | --- |
-| `GET /api/v1/skills` | List/search skills (`q`, `limit`, `sort`, `family`) |
-| `GET /api/v1/skills/:name` | Fetch a single skill by name |
-| `GET /api/v1/trending` | Trending skills/plugins (`kind=skills\|plugins`) |
-| `GET /api/v1/packages` | Browse packages (`family`, `isOfficial`, `category`, `topic`) |
-| `GET /api/v1/plugins` | Browse native code & bundle plugins |
-| `GET /api/v1/packages/:name` | Fetch a package by name |
-| `GET /api/v1/packages/:name/download` | Download a package artifact |
+| Endpoint                              | Description                                                   |
+| ------------------------------------- | ------------------------------------------------------------- |
+| `GET /api/v1/skills`                  | List/search skills (`q`, `limit`, `sort`, `family`)           |
+| `GET /api/v1/skills/:name`            | Fetch a single skill by name                                  |
+| `GET /api/v1/trending`                | Trending skills/plugins (`kind=skills\|plugins`)              |
+| `GET /api/v1/packages`                | Browse packages (`family`, `isOfficial`, `category`, `topic`) |
+| `GET /api/v1/plugins`                 | Browse native code & bundle plugins                           |
+| `GET /api/v1/packages/:name`          | Fetch a package by name                                       |
+| `GET /api/v1/packages/:name/download` | Download a package artifact                                   |
 
 ### Connectors & MCP servers
 

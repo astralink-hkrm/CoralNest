@@ -282,8 +282,8 @@ describe("Header", () => {
     expect(document.querySelector(".navbar-top-links")).toBeNull();
     expect(document.querySelector(".navbar-tabs")).toBeNull();
     expect(document.querySelector(".theme-mode-toggle")).toBeNull();
-    expect(document.querySelector('.brand-mark-image[src="/logo-transparent.png"]')).toBeTruthy();
-    expect(within(topNav).getByText("Skills").closest("a")?.querySelector("svg")).toBeNull();
+    expect(document.querySelector('.brand-mark-image[src="/coral-logo-purple.png"]')).toBeTruthy();
+    expect(within(topNav).getByText("Flows").closest("a")?.querySelector("svg")).toBeNull();
     expect(within(topNav).getByText("Plugins").closest("a")?.querySelector("svg")).toBeNull();
     expect(
       topNav.querySelector(
@@ -293,7 +293,7 @@ describe("Header", () => {
     expect(
       topNav.querySelector('.navbar-calm-more-link[href="https://docs.openclaw.ai/clawhub/"]'),
     ).toBeTruthy();
-    expect(screen.getAllByText("Skills")).toHaveLength(1);
+    expect(screen.getAllByText("Flows")).toHaveLength(1);
     expect(screen.getAllByText("Plugins")).toHaveLength(1);
     expect(screen.getAllByText("Connectors")).toHaveLength(1);
     expect(screen.getAllByText("Docs")).toHaveLength(2);
@@ -305,7 +305,7 @@ describe("Header", () => {
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
 
     expect(screen.getAllByText("Home")).toHaveLength(1);
-    expect(screen.getAllByText("Skills")).toHaveLength(2);
+    expect(screen.getAllByText("Flows")).toHaveLength(2);
     expect(screen.getAllByText("Plugins")).toHaveLength(2);
     expect(screen.getAllByText("Connectors")).toHaveLength(2);
     expect(screen.getAllByText("Docs")).toHaveLength(3);
@@ -606,14 +606,14 @@ describe("Header", () => {
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
 
     expect(
-      document.querySelector('.mobile-nav-brand-mark-image[src="/logo-transparent.png"]'),
+      document.querySelector('.mobile-nav-brand-mark-image[src="/coral-logo-purple.png"]'),
     ).toBeTruthy();
 
     const labels = Array.from(document.querySelectorAll(".mobile-nav-section .mobile-nav-link"))
       .map((element) => element.textContent?.trim())
       .filter((label): label is string => Boolean(label));
 
-    expect(labels.slice(0, 5)).toEqual(["Home", "Skills", "Plugins", "MCP", "Personas"]);
+    expect(labels.slice(0, 5)).toEqual(["Home", "Flows", "Plugins", "Connectors", "MCP"]);
     expect(
       document.querySelector(".mobile-nav-appearance-section .navbar-theme-switcher"),
     ).toBeTruthy();
@@ -640,7 +640,7 @@ describe("Header", () => {
       .map((element) => element.textContent?.trim())
       .filter((label): label is string => Boolean(label));
 
-    expect(labels).toEqual(["Home", "Skills", "Plugins", "MCP", "Personas", "Connectors", "Docs"]);
+    expect(labels).toEqual(["Home", "Flows", "Plugins", "Connectors", "MCP", "Personas", "Docs"]);
   });
 
   it("shows compact official badges beside official typeahead publishers", () => {

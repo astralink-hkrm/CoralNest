@@ -52,6 +52,7 @@ import {
   listMcpV1Http,
   mcpGetRouterV1Http,
   transfersGetRouterV1Http,
+  listFlowsV1Http,
   banAppealContextV1Http,
   createPromotionV1Http,
   listPromotionsV1Http,
@@ -264,6 +265,12 @@ http.route({
   pathPrefix: `${ApiRoutes.mcp}/`,
   method: "GET",
   handler: mcpGetRouterV1Http,
+});
+
+http.route({
+  path: ApiRoutes.flows,
+  method: "GET",
+  handler: listFlowsV1Http,
 });
 
 http.route({

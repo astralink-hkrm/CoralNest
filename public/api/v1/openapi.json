@@ -399,6 +399,177 @@
           }
         }
       },
+      "FlowsListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlowsCatalogItem"
+            }
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "nextCursor": {
+            "type": "null"
+          },
+          "sources": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer"
+              },
+              "ok": {
+                "type": "integer"
+              },
+              "fallback": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "failed": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "total",
+              "ok",
+              "fallback",
+              "failed"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "totalCount",
+          "nextCursor",
+          "sources"
+        ]
+      },
+      "FlowsCatalogItem": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/FlowsSkillItem"
+          },
+          {
+            "$ref": "#/components/schemas/OpenFlowEntry"
+          }
+        ]
+      },
+      "FlowsSkillItem": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "skill"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ownerHandle": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "stats": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "createdAt": {
+            "type": "integer"
+          },
+          "updatedAt": {
+            "type": "integer"
+          }
+        }
+      },
+      "OpenFlowEntry": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "loop",
+              "graph"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "defaultTool": {
+            "type": "string"
+          },
+          "stepCount": {
+            "type": "integer"
+          },
+          "loopKinds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "repo": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            }
+          },
+          "updatedAt": {
+            "type": "integer"
+          }
+        }
+      },
       "PackageReadinessResponse": {
         "type": "object",
         "properties": {
@@ -1695,6 +1866,71 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GitHubSkillDownloadHandoff"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/flows": {
+      "get": {
+        "summary": "List agent flows catalog",
+        "description": "Lists a combined agent-flows catalog: a live preview of CoralNest skills plus open-source loop and graph flows fetched live from their upstream repositories. Anonymous public endpoint.",
+        "security": [
+          {}
+        ],
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "skills",
+                "loops",
+                "graphs"
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Flows catalog page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowsListResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlainTextError"
                 }
               }
             }

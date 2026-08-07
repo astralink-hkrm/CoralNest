@@ -28,6 +28,7 @@ import { Route as OwnerSlugRouteImport } from './routes/$owner/$slug'
 import { Route as CliAuthRouteImport } from './routes/cli/auth'
 import { Route as CliDeviceRouteImport } from './routes/cli/device'
 import { Route as ConnectorsIndexRouteImport } from './routes/connectors/index'
+import { Route as FlowsIndexRouteImport } from './routes/flows/index'
 import { Route as McpIndexRouteImport } from './routes/mcp/index'
 import { Route as OrgsHandleRouteImport } from './routes/orgs/$handle'
 import { Route as PHandleRouteImport } from './routes/p/$handle'
@@ -157,6 +158,11 @@ const CliDeviceRoute = CliDeviceRouteImport.update({
 const ConnectorsIndexRoute = ConnectorsIndexRouteImport.update({
   id: '/connectors/',
   path: '/connectors/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FlowsIndexRoute = FlowsIndexRouteImport.update({
+  id: '/flows/',
+  path: '/flows/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const McpIndexRoute = McpIndexRouteImport.update({
@@ -375,6 +381,7 @@ export interface FileRoutesByFullPath {
   '/u/$handle': typeof UHandleRoute
   '/user/$handle': typeof UserHandleRoute
   '/connectors/': typeof ConnectorsIndexRoute
+  '/flows/': typeof FlowsIndexRoute
   '/mcp/': typeof McpIndexRoute
   '/packages/': typeof PackagesIndexRoute
   '/persona/': typeof PersonaIndexRoute
@@ -431,6 +438,7 @@ export interface FileRoutesByTo {
   '/u/$handle': typeof UHandleRoute
   '/user/$handle': typeof UserHandleRoute
   '/connectors': typeof ConnectorsIndexRoute
+  '/flows': typeof FlowsIndexRoute
   '/mcp': typeof McpIndexRoute
   '/packages': typeof PackagesIndexRoute
   '/persona': typeof PersonaIndexRoute
@@ -488,6 +496,7 @@ export interface FileRoutesById {
   '/u/$handle': typeof UHandleRoute
   '/user/$handle': typeof UserHandleRoute
   '/connectors/': typeof ConnectorsIndexRoute
+  '/flows/': typeof FlowsIndexRoute
   '/mcp/': typeof McpIndexRoute
   '/packages/': typeof PackagesIndexRoute
   '/persona/': typeof PersonaIndexRoute
@@ -546,6 +555,7 @@ export interface FileRouteTypes {
     | '/u/$handle'
     | '/user/$handle'
     | '/connectors/'
+    | '/flows/'
     | '/mcp/'
     | '/packages/'
     | '/persona/'
@@ -602,6 +612,7 @@ export interface FileRouteTypes {
     | '/u/$handle'
     | '/user/$handle'
     | '/connectors'
+    | '/flows'
     | '/mcp'
     | '/packages'
     | '/persona'
@@ -658,6 +669,7 @@ export interface FileRouteTypes {
     | '/u/$handle'
     | '/user/$handle'
     | '/connectors/'
+    | '/flows/'
     | '/mcp/'
     | '/packages/'
     | '/persona/'
@@ -715,6 +727,7 @@ export interface RootRouteChildren {
   UHandleRoute: typeof UHandleRoute
   UserHandleRoute: typeof UserHandleRoute
   ConnectorsIndexRoute: typeof ConnectorsIndexRoute
+  FlowsIndexRoute: typeof FlowsIndexRoute
   McpIndexRoute: typeof McpIndexRoute
   PackagesIndexRoute: typeof PackagesIndexRoute
   PersonaIndexRoute: typeof PersonaIndexRoute
@@ -862,6 +875,13 @@ declare module '@tanstack/react-router' {
       path: '/connectors'
       fullPath: '/connectors/'
       preLoaderRoute: typeof ConnectorsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/flows/': {
+      id: '/flows/'
+      path: '/flows'
+      fullPath: '/flows/'
+      preLoaderRoute: typeof FlowsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mcp/': {
@@ -1217,6 +1237,7 @@ const rootRouteChildren: RootRouteChildren = {
   UHandleRoute: UHandleRoute,
   UserHandleRoute: UserHandleRoute,
   ConnectorsIndexRoute: ConnectorsIndexRoute,
+  FlowsIndexRoute: FlowsIndexRoute,
   McpIndexRoute: McpIndexRoute,
   PackagesIndexRoute: PackagesIndexRoute,
   PersonaIndexRoute: PersonaIndexRoute,

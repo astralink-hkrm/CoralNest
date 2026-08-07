@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useQuery } from "convex/react";
 import { useCallback, useRef } from "react";
 import { api } from "../../../convex/_generated/api";
@@ -90,6 +90,16 @@ export const Route = createFileRoute("/skills/")({
     topic: search.topic,
   }),
   loader: async ({ deps }): Promise<InitialSkillsSearchData> => await loadInitialSkillsSearch(deps),
+  beforeLoad: ({ search }) => {
+    throw redirect({
+      to: "/flows",
+      search: {
+        tab: "skills",
+        ...search,
+      } as never,
+      replace: true,
+    });
+  },
   component: SkillsIndex,
 });
 
@@ -262,14 +272,12 @@ export function SkillsIndex() {
                 onOpen={browseSearch.openSearch}
                 label="Search skills"
               />
-              {activeView === "trending" ? null : (
-                <BrowseCategorySelect
-                  categories={SKILL_CATEGORIES}
-                  value={model.activeCategory}
-                  onChange={handleCategoryChange}
-                  responsive
-                />
-              )}
+              <BrowseCategorySelect
+                categories={SKILL_CATEGORIES}
+                value={model.activeCategory}
+                onChange={handleCategoryChange}
+                responsive
+              />
               <BrowseViewToggle view={model.view} onToggle={model.onToggleView} />
             </BrowseActions>
             <BrowseSearchPanel open={browseSearch.open}>
@@ -284,26 +292,20 @@ export function SkillsIndex() {
               />
             </BrowseSearchPanel>
           </BrowseControlsRow>
-          {activeView === "trending" ? null : (
-            <BrowseTopicChips
-              topics={categoryTopics ?? []}
-              activeTopic={activeTopic}
-              onChange={handleTopicChange}
-              loading={Boolean(model.activeCategory && categoryTopics === undefined)}
-            />
-          )}
+          <BrowseTopicChips
+            topics={categoryTopics ?? []}
+            activeTopic={activeTopic}
+            onChange={handleTopicChange}
+            loading={Boolean(model.activeCategory && categoryTopics === undefined)}
+          />
         </BrowseControls>
-        <div
-          className={`browse-layout${activeView === "trending" ? "" : " browse-layout-with-sidebar"}`}
-        >
-          {activeView === "trending" ? null : (
-            <BrowseCategorySidebar
-              ariaLabel="Skill categories"
-              categories={SKILL_CATEGORIES}
-              value={model.activeCategory}
-              onChange={handleCategoryChange}
-            />
-          )}
+        <div className="browse-layout browse-layout-with-sidebar">
+          <BrowseCategorySidebar
+            ariaLabel="Skill categories"
+            categories={SKILL_CATEGORIES}
+            value={model.activeCategory}
+            onChange={handleCategoryChange}
+          />
           <div className="browse-results">
             <SkillsResults
               isLoadingSkills={model.isLoadingSkills}

@@ -49,10 +49,10 @@ const SKILLS_SEARCH = {
 
 export const PRIMARY_NAV_ITEMS: NavItem[] = [
   {
-    label: "Skills",
-    to: PublicRegistryPaths.skills,
+    label: "Flows",
+    to: PublicRegistryPaths.flows,
     search: SKILLS_SEARCH,
-    activePathPrefixes: ["/skill/"],
+    activePathPrefixes: ["/flows/", "/skill/", "/skills/"],
   },
   {
     label: "Plugins",
@@ -80,7 +80,12 @@ export const PRIMARY_NAV_ITEMS: NavItem[] = [
 // Secondary nav items (desktop secondary tabs + mobile dropdown section)
 // ---------------------------------------------------------------------------
 
-export const SECONDARY_NAV_ITEMS: NavItem[] = [];
+export const SECONDARY_NAV_ITEMS: NavItem[] = [
+  {
+    label: "Docs",
+    href: CLAWHUB_DOCS_URL,
+  },
+];
 
 // ---------------------------------------------------------------------------
 // Footer sections
@@ -119,7 +124,7 @@ export const FOOTER_NAV_SECTIONS: FooterNavSection[] = [
   {
     title: "Browse",
     items: [
-      { kind: "link", label: "Skills", to: PublicRegistryPaths.skills, search: SKILLS_SEARCH },
+      { kind: "link", label: "Flows", to: PublicRegistryPaths.flows, search: SKILLS_SEARCH },
       { kind: "link", label: "Plugins", to: PublicRegistryPaths.plugins },
       { kind: "link", label: "Connectors", to: PublicRegistryPaths.connectors },
       { kind: "link", label: "MCP", to: PublicRegistryPaths.mcp },

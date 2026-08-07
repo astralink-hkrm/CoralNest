@@ -4,6 +4,7 @@ export * from "./claws.js";
 export * from "./clawPackage.js";
 export * from "./catalogFeed.js";
 export * from "./experimentalClawFeed.js";
+export * from "./flows.js";
 export * from "./catalogMetadata.js";
 export * from "./connectors.js";
 export * from "./docsLinks.js";

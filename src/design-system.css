@@ -30,7 +30,7 @@
   --coral-olive-green: #6b8e23;
   --coral-emerald-green: #10b981;
   --coral-ocean-blue: #0284c7;
-  
+
   /* Coral Theme Color Variations - Deep Shades */
   --coral-orange: #ff6b35;
   --coral-orange-dark: #e55a2b;
@@ -44,22 +44,46 @@
   --coral-blue-dark: #0369a1;
   --coral-olive: #6b8e23;
   --coral-olive-dark: #556b2f;
-  
+
   /* Coral Background Gradient Combinations */
-  --coral-bg-orange: radial-gradient(ellipse 60% 40% at 48% 0%, color-mix(in srgb, var(--coral-orange) 15%, transparent) 0%, transparent 65%);
-  --coral-bg-red: radial-gradient(ellipse 58% 38% at 52% 2%, color-mix(in srgb, var(--coral-red) 14%, transparent) 0%, transparent 68%);
-  --coral-bg-purple: radial-gradient(ellipse 58% 38% at 52% 2%, color-mix(in srgb, var(--coral-purple) 12%, transparent) 0%, transparent 68%);
-  --coral-bg-pink: radial-gradient(ellipse 56% 36% at 46% 4%, color-mix(in srgb, var(--coral-pink) 14%, transparent) 0%, transparent 62%);
-  --coral-bg-blue: radial-gradient(ellipse 54% 34% at 50% 0%, color-mix(in srgb, var(--coral-blue) 16%, transparent) 0%, transparent 66%);
-  --coral-bg-olive: radial-gradient(ellipse 52% 32% at 48% 2%, color-mix(in srgb, var(--coral-olive) 13%, transparent) 0%, transparent 64%);
+  --coral-bg-orange: radial-gradient(
+    ellipse 60% 40% at 48% 0%,
+    color-mix(in srgb, var(--coral-orange) 15%, transparent) 0%,
+    transparent 65%
+  );
+  --coral-bg-red: radial-gradient(
+    ellipse 58% 38% at 52% 2%,
+    color-mix(in srgb, var(--coral-red) 14%, transparent) 0%,
+    transparent 68%
+  );
+  --coral-bg-purple: radial-gradient(
+    ellipse 58% 38% at 52% 2%,
+    color-mix(in srgb, var(--coral-purple) 12%, transparent) 0%,
+    transparent 68%
+  );
+  --coral-bg-pink: radial-gradient(
+    ellipse 56% 36% at 46% 4%,
+    color-mix(in srgb, var(--coral-pink) 14%, transparent) 0%,
+    transparent 62%
+  );
+  --coral-bg-blue: radial-gradient(
+    ellipse 54% 34% at 50% 0%,
+    color-mix(in srgb, var(--coral-blue) 16%, transparent) 0%,
+    transparent 66%
+  );
+  --coral-bg-olive: radial-gradient(
+    ellipse 52% 32% at 48% 2%,
+    color-mix(in srgb, var(--coral-olive) 13%, transparent) 0%,
+    transparent 64%
+  );
 
   /* Coral Logo Background for Pages */
-  --coral-logo-bg-blue: url('/coral-logo-purple.png');
-  --coral-logo-bg-purple: url('/coral-logo-purple.png');
-  --coral-logo-bg-orange: url('/coral-logo-purple.png');
-  --coral-logo-bg-red: url('/coral-logo-purple.png');
-  --coral-logo-bg-pink: url('/coral-logo-purple.png');
-  --coral-logo-bg-olive: url('/coral-logo-purple.png');
+  --coral-logo-bg-blue: url("/coral-logo-purple.png");
+  --coral-logo-bg-purple: url("/coral-logo-purple.png");
+  --coral-logo-bg-orange: url("/coral-logo-purple.png");
+  --coral-logo-bg-red: url("/coral-logo-purple.png");
+  --coral-logo-bg-pink: url("/coral-logo-purple.png");
+  --coral-logo-bg-olive: url("/coral-logo-purple.png");
 
   /* Legacy aliases for old ClawHub CSS rules */
   --accent-soft: var(--oc-surface-accent-soft);
@@ -395,7 +419,7 @@
     width: 300px;
     height: 300px;
   }
-  
+
   .coral-logo-text {
     font-size: 2.5rem;
   }
@@ -406,7 +430,7 @@
     width: 240px;
     height: 240px;
   }
-  
+
   .coral-logo-text {
     font-size: 2rem;
   }
@@ -485,7 +509,9 @@
   color: #ffffff;
   margin: 0;
   line-height: 1;
-  text-shadow: 0 6px 32px rgba(0, 0, 0, 0.85), 0 0 50px rgba(255, 255, 255, 0.2);
+  text-shadow:
+    0 6px 32px rgba(0, 0, 0, 0.85),
+    0 0 50px rgba(255, 255, 255, 0.2);
 }
 
 /* Hide duplicate sub-header title when main section header is shown */

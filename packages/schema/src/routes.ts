@@ -40,4 +40,5 @@ export const ApiRoutes = {
   skillsExport: "/api/v1/skills/export",
   connectors: "/api/v1/connectors",
   mcp: "/api/v1/mcp",
+  flows: "/api/v1/flows",
 } as const;

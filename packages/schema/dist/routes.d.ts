@@ -39,4 +39,5 @@ export declare const ApiRoutes: {
     readonly skillsExport: "/api/v1/skills/export";
     readonly connectors: "/api/v1/connectors";
     readonly mcp: "/api/v1/mcp";
+    readonly flows: "/api/v1/flows";
 };

@@ -7,6 +7,7 @@ import {
 } from "./httpApiV1/catalogFeedV1";
 import { contentRightsV1Handler } from "./httpApiV1/contentRightsV1";
 import { verifyDocsSessionV1Handler } from "./httpApiV1/docsSessionV1";
+import { listFlowsV1Handler } from "./httpApiV1/flowsV1";
 import {
   exportPluginsV1Handler,
   listBundlePluginsV1Handler,
@@ -110,6 +111,7 @@ export const connectorsGetRouterV1Http = httpAction(connectorsGetRouterV1Handler
 export const listMcpV1Http = httpAction(listMcpV1Handler);
 export const mcpGetRouterV1Http = httpAction(mcpGetRouterV1Handler);
 export const transfersGetRouterV1Http = httpAction(transfersGetRouterV1Handler);
+export const listFlowsV1Http = httpAction(listFlowsV1Handler);
 
 export const listPromotionsV1Http = httpAction(listPromotionsV1Handler);
 export const promotionsGetRouterV1Http = httpAction(promotionsGetRouterV1Handler);
@@ -165,6 +167,7 @@ export const __handlers = {
   listMcpV1Handler,
   mcpGetRouterV1Handler,
   transfersGetRouterV1Handler,
+  listFlowsV1Handler,
   whoamiV1Handler,
   usersGetRouterV1Handler,
   usersPostRouterV1Handler,

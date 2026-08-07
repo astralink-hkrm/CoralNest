@@ -67,7 +67,11 @@ const program = new Command()
   .name("clawhub")
   .alias("coralnest")
   .alias("coralhub")
-  .description(styleEnvBlock("install, update, search, and publish skills, plugins, connectors, MCP servers, and personas."))
+  .description(
+    styleEnvBlock(
+      "install, update, search, and publish skills, plugins, connectors, MCP servers, and personas.",
+    ),
+  )
   .version(getCliVersion(), "-V, --cli-version", "Show CLI version")
   .helpOption("-h, --help", HELP_DESCRIPTION)
   .option("--workdir <dir>", "Working directory (default: cwd)")
@@ -149,14 +153,24 @@ function validateTopLevelCommand(args: string[]) {
 }
 
 function hasTerminalGlobalFlag(args: string[]) {
-  return args.includes("-h") || args.includes("--help") || args.includes("-V") || args.includes("--cli-version");
+  return (
+    args.includes("-h") ||
+    args.includes("--help") ||
+    args.includes("-V") ||
+    args.includes("--cli-version")
+  );
 }
 
 function findFirstTopLevelOperand(args: string[]) {
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index];
     if (!argument) continue;
-    if (argument === "--workdir" || argument === "--dir" || argument === "--site" || argument === "--registry") {
+    if (
+      argument === "--workdir" ||
+      argument === "--dir" ||
+      argument === "--site" ||
+      argument === "--registry"
+    ) {
       index += 1;
       continue;
     }

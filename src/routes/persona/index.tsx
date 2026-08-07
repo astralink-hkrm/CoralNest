@@ -493,113 +493,112 @@ function PersonaIndex() {
   return (
     <CoralPageWrapper pageType="creators">
       <main className="browse-page browse-page-borderless-header">
-      
-      <div className="browse-page-header">
-        <div className="browse-page-header-main">
-          <h1 className="browse-title">
-            Personas
-            {formattedCount ? (
-              <>
-                {" "}
-                <span className="browse-count">{formattedCount}</span>
-              </>
-            ) : null}
-          </h1>
+        <div className="browse-page-header">
+          <div className="browse-page-header-main">
+            <h1 className="browse-title">
+              Personas
+              {formattedCount ? (
+                <>
+                  {" "}
+                  <span className="browse-count">{formattedCount}</span>
+                </>
+              ) : null}
+            </h1>
+          </div>
         </div>
-      </div>
-      <BrowseControls>
-        <BrowseControlsRow>
-          <BrowseTabs
-            ariaLabel="Sort order"
-            options={PERSONA_BROWSE_TABS}
-            value={activeBrowseTab}
-            onChange={handleBrowseTabChange}
-          />
-          <BrowseActions>
-            <BrowseSearchTrigger
-              open={browseSearch.open}
-              onOpen={browseSearch.openSearch}
-              label="Search personas"
+        <BrowseControls>
+          <BrowseControlsRow>
+            <BrowseTabs
+              ariaLabel="Sort order"
+              options={PERSONA_BROWSE_TABS}
+              value={activeBrowseTab}
+              onChange={handleBrowseTabChange}
             />
-            <BrowseViewToggle view={view} onToggle={handleToggleView} />
-          </BrowseActions>
-          <BrowseSearchPanel open={browseSearch.open}>
-            <BrowseSearchInput
-              inputRef={searchInputRef}
-              label="persona search"
-              placeholder="Search personas..."
-              value={query}
-              onChange={handleQueryChange}
-              onClear={browseSearch.closeSearch}
-              onSubmit={handleSearchSubmit}
-              closeLabel="Close search"
-            />
-          </BrowseSearchPanel>
-        </BrowseControlsRow>
-      </BrowseControls>
-      <div className="browse-layout">
-        <div className="browse-results">
-          {isLoading ? (
-            <BrowseResultsSkeleton label="Persona" variant={effectiveView} />
-          ) : apiError ? (
-            <div className="empty-state">
-              <PackageSearch size={22} className="empty-state-icon" aria-hidden="true" />
-              <p className="empty-state-title">Unable to load personas</p>
-              <p className="empty-state-body">
-                The persona catalog is temporarily unavailable. Please try again later.
-              </p>
-            </div>
-          ) : rateLimited ? (
-            <div className="empty-state">
-              <PackageSearch size={22} className="empty-state-icon" aria-hidden="true" />
-              <p className="empty-state-title">Persona catalog is temporarily unavailable</p>
-              <p className="empty-state-body">Try again {formatRetryDelay(retryAfterSeconds)}.</p>
-            </div>
-          ) : visibleItems.length === 0 ? (
-            <div className="empty-state">
-              <p className="empty-state-title">No personas found</p>
-              <p className="empty-state-body">Try a different search term or remove filters.</p>
-              <Button asChild size="sm" className="mt-4">
-                <Link
-                  to="/add"
-                  search={{ kind: "plugin", ownerHandle: undefined, method: undefined }}
-                >
-                  <Plus className="h-4 w-4" aria-hidden="true" />
-                  Add a persona
-                </Link>
-              </Button>
-            </div>
-          ) : effectiveView === "grid" ? (
-            <div className="grid browse-results-grid">
-              {visibleItems.map((item) => (
-                <PluginListItem key={item.name} item={item} variant="card" />
-              ))}
-            </div>
-          ) : (
-            <div className="browse-list-stack">
-              <div className="browse-list-head" aria-hidden="true">
-                <span className="browse-list-head-icon-spacer" />
-                <span className="browse-list-head-label">Persona</span>
-                <span className="browse-list-head-label browse-list-head-stat">Popularity</span>
+            <BrowseActions>
+              <BrowseSearchTrigger
+                open={browseSearch.open}
+                onOpen={browseSearch.openSearch}
+                label="Search personas"
+              />
+              <BrowseViewToggle view={view} onToggle={handleToggleView} />
+            </BrowseActions>
+            <BrowseSearchPanel open={browseSearch.open}>
+              <BrowseSearchInput
+                inputRef={searchInputRef}
+                label="persona search"
+                placeholder="Search personas..."
+                value={query}
+                onChange={handleQueryChange}
+                onClear={browseSearch.closeSearch}
+                onSubmit={handleSearchSubmit}
+                closeLabel="Close search"
+              />
+            </BrowseSearchPanel>
+          </BrowseControlsRow>
+        </BrowseControls>
+        <div className="browse-layout">
+          <div className="browse-results">
+            {isLoading ? (
+              <BrowseResultsSkeleton label="Persona" variant={effectiveView} />
+            ) : apiError ? (
+              <div className="empty-state">
+                <PackageSearch size={22} className="empty-state-icon" aria-hidden="true" />
+                <p className="empty-state-title">Unable to load personas</p>
+                <p className="empty-state-body">
+                  The persona catalog is temporarily unavailable. Please try again later.
+                </p>
               </div>
-              <div className="results-list">
+            ) : rateLimited ? (
+              <div className="empty-state">
+                <PackageSearch size={22} className="empty-state-icon" aria-hidden="true" />
+                <p className="empty-state-title">Persona catalog is temporarily unavailable</p>
+                <p className="empty-state-body">Try again {formatRetryDelay(retryAfterSeconds)}.</p>
+              </div>
+            ) : visibleItems.length === 0 ? (
+              <div className="empty-state">
+                <p className="empty-state-title">No personas found</p>
+                <p className="empty-state-body">Try a different search term or remove filters.</p>
+                <Button asChild size="sm" className="mt-4">
+                  <Link
+                    to="/add"
+                    search={{ kind: "plugin", ownerHandle: undefined, method: undefined }}
+                  >
+                    <Plus className="h-4 w-4" aria-hidden="true" />
+                    Add a persona
+                  </Link>
+                </Button>
+              </div>
+            ) : effectiveView === "grid" ? (
+              <div className="grid browse-results-grid">
                 {visibleItems.map((item) => (
-                  <PluginListItem key={item.name} item={item} variant="list" />
+                  <PluginListItem key={item.name} item={item} variant="card" />
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="browse-list-stack">
+                <div className="browse-list-head" aria-hidden="true">
+                  <span className="browse-list-head-icon-spacer" />
+                  <span className="browse-list-head-label">Persona</span>
+                  <span className="browse-list-head-label browse-list-head-stat">Popularity</span>
+                </div>
+                <div className="results-list">
+                  {visibleItems.map((item) => (
+                    <PluginListItem key={item.name} item={item} variant="list" />
+                  ))}
+                </div>
+              </div>
+            )}
 
-          {!isLoading && !hasQuery && (nextCursor || isLoadingMore) ? (
-            <div ref={loadMoreRef} className="mt-5 flex justify-center">
-              <Button variant="primary" type="button" onClick={loadMore} disabled={isLoadingMore}>
-                {isLoadingMore ? "Loading..." : "Load more"}
-              </Button>
-            </div>
-          ) : null}
+            {!isLoading && !hasQuery && (nextCursor || isLoadingMore) ? (
+              <div ref={loadMoreRef} className="mt-5 flex justify-center">
+                <Button variant="primary" type="button" onClick={loadMore} disabled={isLoadingMore}>
+                  {isLoadingMore ? "Loading..." : "Load more"}
+                </Button>
+              </div>
+            ) : null}
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
     </CoralPageWrapper>
   );
 }

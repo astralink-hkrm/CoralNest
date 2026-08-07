@@ -6,7 +6,8 @@ export const CLAWHUB_OPENAPI_URL = `${CLAWHUB_SITE_URL}/api/v1/openapi.json`;
 
 export const PublicRegistryPaths = {
   home: "/",
-  skills: "/skills",
+  skills: "/flows",
+  flows: "/flows",
   plugins: "/plugins",
   mcp: "/mcp",
   persona: "/persona",
@@ -19,9 +20,9 @@ export const PublicRegistryPaths = {
 
 export const PUBLIC_REGISTRY_SURFACES = [
   {
-    label: "Skills",
-    path: PublicRegistryPaths.skills,
-    summary: "Browse and search skill bundles centered on SKILL.md.",
+    label: "Flows & skills",
+    path: PublicRegistryPaths.flows,
+    summary: "Browse agent recipes: skills, loops, and graph architectures.",
   },
   {
     label: "Plugins and packages",

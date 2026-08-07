@@ -2,14 +2,14 @@ import { type ReactNode } from "react";
 
 interface CoralPageWrapperProps {
   children: ReactNode;
-  pageType?: "skills" | "plugins" | "connectors" | "creators" | "mcp" | "home";
+  pageType?: "skills" | "flows" | "plugins" | "connectors" | "creators" | "mcp" | "home";
   className?: string;
 }
 
-export function CoralPageWrapper({ 
-  children, 
+export function CoralPageWrapper({
+  children,
   pageType = "home",
-  className = ""
+  className = "",
 }: CoralPageWrapperProps) {
   const logoSrc = getCoralLogoSrc(pageType);
   const pageTitle = getPageTitle(pageType);
@@ -23,11 +23,7 @@ export function CoralPageWrapper({
       {pageType !== "home" && (
         <div className="coral-section-header">
           <div className="coral-section-header-inner">
-            <img 
-              src={logoSrc} 
-              alt={pageTitle}
-              className="coral-section-logo" 
-            />
+            <img src={logoSrc} alt={pageTitle} className="coral-section-logo" />
             <span className="coral-section-title">{pageTitle}</span>
           </div>
         </div>
@@ -41,6 +37,7 @@ export function CoralPageWrapper({
 function getCoralLogoSrc(pageType: string): string {
   switch (pageType) {
     case "skills":
+    case "flows":
     case "plugins":
     case "connectors":
     case "creators":
@@ -55,6 +52,8 @@ function getPageTitle(pageType: string): string {
   switch (pageType) {
     case "skills":
       return "Skills";
+    case "flows":
+      return "Flows";
     case "plugins":
       return "Plugins";
     case "connectors":
