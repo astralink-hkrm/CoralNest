@@ -5,7 +5,7 @@
 <h1 align="center">🪸 CoralNest</h1>
 
 <p align="center">
-  <strong>The Premier Open Registry for AI Agent Skills, Plugins, Connectors, MCP Servers, and Personas</strong>
+  <strong>The Premier Open Registry for AI Agent Flows, MCP Servers, Plugins, Connectors, and Personas</strong>
 </p>
 
 <p align="center">
@@ -23,32 +23,86 @@
 
 ## 🌊 Overview
 
-**CoralNest** is a high-performance, unified public registry for modern AI agent ecosystems. It provides seamless discovery, versioning, vector search, and installation for text-based agent skills, native code plugins, API connectors, Model Context Protocol (MCP) servers, and agent personas.
-
-Whether you're developing autonomous agents, building custom toolchains, or hosting enterprise MCP servers, CoralNest provides a CLI-friendly API and a modern web interface powered by TanStack Start and Convex.
+**CoralNest** is a high-performance, unified public registry and marketplace for modern AI agent ecosystems. It provides discovery, versioning, semantic vector search, and distribution for prompt-based agent flows, tool servers, native plugins, external API connectors, and pre-assembled agent personas.
 
 ---
 
-## 🎨 Ecosystem Registries & Color Identity
+## 🏗️ Architecture & Ecosystem Layers
 
-CoralNest categorizes agent capabilities into five dedicated registries, each with distinct color branding:
+CoralNest organizes agent capabilities into five dedicated registries, structured in the canonical navigation hierarchy:
 
-| Registry        |                      Icon Logo                      | Description                                                              |
-| :-------------- | :-------------------------------------------------: | :----------------------------------------------------------------------- |
-| **Skills**      | <img src="public/coral-logo-olive.png" width="28">  | Text-based prompt instructions, workflows, and `SKILL.md` packs          |
-| **Plugins**     | <img src="public/coral-logo-purple.png" width="28"> | Executable code modules, WASM bundles, and extension packages            |
-| **Connectors**  | <img src="public/coral-logo-orange.png" width="28"> | Third-party API integrations, webhook handlers, and auth tunnels         |
-| **Personas**    |  <img src="public/coral-logo-pink.png" width="28">  | Agent identity profiles, prompt personas, and specialized system prompts |
-| **MCP Servers** |  <img src="public/coral-logo-red.png" width="28">   | Model Context Protocol servers for extended real-time LLM tools          |
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                                PERSONAS                                  │
+│  The Complete "Freelancer" / Assembled Autonomous Agent Persona          │
+│  (Role, Personality, System Prompt, Boundary Rules, Identity)            │
+│                                                                          │
+│  ┌──────────────────────┐  ┌──────────────────────┐  ┌────────────────┐  │
+│  │        FLOWS         │  │   MCP & CONNECTORS   │  │    PLUGINS     │  │
+│  │ • Skills (Know-how)  │  │ • MCP Servers (Tools)│  │ • Pre-packaged │  │
+│  │ • Loops (Iteration)  │  │ • Connectors (APIs)  │  │   Tool & Skill │  │
+│  │ • Graphs (Routing)   │  │   (Access Credentials│   Bundles         │  │
+│  └──────────────────────┘  └──────────────────────┘  └────────────────┘  │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### 1. 🔄 Flows (`/flows`) — The Agent's Knowledge & Execution Workflows
+
+Flows are prompt-based recipes and execution methodologies that teach agents how to perform tasks:
+
+- **Skills (`SKILL.md`)**: Atomic prompt procedures, role guides, domain knowledge, and reference workflows (e.g. Code Reviewer, Database Optimizer, API Architect).
+- **Loops**: Iterative, closed-loop execution recipes (e.g., Plan $\rightarrow$ Execute $\rightarrow$ Verify $\rightarrow$ Self-Repair).
+- **Graphs**: Stateful multi-agent topologies, directed acyclic graphs (DAGs), decision trees, and routing logic across subagents.
+
+### 2. ⚡ Model Context Protocol — MCP (`/mcp`) — Local Tooling & System Resources
+
+- Standardized open-protocol servers providing real-time local toolkits, database query runners, filesystem managers, and terminal access to LLM agents via JSON-RPC.
+
+### 3. 🧩 Plugins (`/plugins`) — Installable Software Bundles
+
+- Versioned, installable software packages that bundle skills, MCP configs, CLI helpers, and environment hooks into a single distributable artifact.
+
+### 4. 🔌 Connectors (`/connectors`) — SaaS & External Cloud Pipelines
+
+- Managed SaaS pipelines bridging agents to third-party ecosystems (GitHub, Slack, Discord, Notion, Jira, Linear) with authenticated API credentials and webhooks.
+
+### 5. 🎭 Personas (`/persona`) — The Complete "Freelancer" Agent Packages
+
+- A ready-to-hire, fully assembled autonomous agent archetype. A Persona encapsulates a role, system instructions, personality, and pre-wired combinations of **Flows**, **MCP Servers**, and **Connectors**.
+
+---
+
+### 🧑‍💼 The "Freelancer" Talent Analogy
+
+| Real-World Freelancer Component      | CoralNest Registry Equivalent                                   |
+| :----------------------------------- | :-------------------------------------------------------------- |
+| **Knowledge & Skillset**             | **Skills** (procedures and instructions in `SKILL.md`)          |
+| **Work Methodology & Process**       | **Loops & Graphs** (how the agent iterates and makes decisions) |
+| **Hardware & Local Toolbelt**        | **MCP Servers** (local tools, terminal, filesystem, DB drivers) |
+| **Client Passwords & SaaS Access**   | **Connectors** (GitHub, Slack, Jira, Linear integrations)       |
+| **Pre-Packaged Toolkit**             | **Plugins** (distribution packages)                             |
+| **The Complete Specialist You Hire** | **Persona** (The fully configured, ready-to-work agent)         |
+
+---
+
+## 🎨 Registry Directory & Color Identity
+
+| Order | Registry        |                      Icon Logo                      | Description                                                             |
+| :---: | :-------------- | :-------------------------------------------------: | :---------------------------------------------------------------------- |
+| **1** | **Flows**       | <img src="public/coral-logo-olive.png" width="28">  | Skills (`SKILL.md`), iterative loops, and multi-agent graph topologies  |
+| **2** | **MCP Servers** |  <img src="public/coral-logo-red.png" width="28">   | Model Context Protocol servers for real-time local tools and resources  |
+| **3** | **Plugins**     | <img src="public/coral-logo-purple.png" width="28"> | Executable code modules, WASM bundles, and extension packages           |
+| **4** | **Connectors**  | <img src="public/coral-logo-orange.png" width="28"> | SaaS integrations, webhook handlers, and third-party auth tunnels       |
+| **5** | **Personas**    |  <img src="public/coral-logo-pink.png" width="28">  | Complete agent archetypes and system personas with pre-configured tools |
 
 ---
 
 ## ✨ Key Features
 
-- **Unified Catalog**: Single entry point to browse, search, and inspect skills, plugins, connectors, MCP servers, and personas.
-- **Embedding & Vector Search**: OpenAI vector embeddings (`text-embedding-3-small`) combined with Convex vector search for semantic discovery.
-- **Version Control & Package History**: Publish new versions with semver tags (`latest`), changelogs, and atomic releases.
-- **Pin & Lock Installs**: Freeze local skill/plugin versions to prevent unwanted overwrites during auto-updates.
+- **Unified Flow Hub**: Seamlessly browse Skills (with category filters and trending views), Loops, and Graphs on a unified surface.
+- **Embedding & Vector Search**: Vector embeddings combined with real-time vector search for semantic agent discovery.
+- **Version Control & Package History**: Publish releases with semver tags (`latest`), changelogs, and atomic releases.
+- **Pin & Lock Installs**: Freeze local skill/plugin versions to prevent breaking changes during auto-updates.
 - **Moderation & Security Verification**: Built-in automated security scanners, staff approval flows, and permission gating.
 - **CLI & REST API Integration**: CLI tool for quick terminal search, installation, version management, and remote device auth.
 
@@ -58,7 +112,7 @@ CoralNest categorizes agent capabilities into five dedicated registries, each wi
 
 - **Frontend**: TanStack Start (React 19, Vite, Nitro server engine).
 - **Backend & Database**: [Convex](https://convex.dev) (Real-time DB, file storage, HTTP actions, Convex Auth).
-- **Search Engine**: Convex Vector Search + OpenAI Embeddings.
+- **Search Engine**: Convex Vector Search + Embeddings.
 - **Language & Tooling**: TypeScript (Strict ESM), Bun runtime, Biome & Oxlint.
 
 ---
@@ -101,8 +155,6 @@ coralnest package publish ./my-plugin
 
 ### Step-by-Step Setup
 
-After pulling this repo, run these commands in order:
-
 1. **Clone the repository**:
 
    ```bash
@@ -111,7 +163,6 @@ After pulling this repo, run these commands in order:
    ```
 
 2. **Install dependencies**:
-   The repo ships an `only-allow` preinstall hook. If plain `bun install` fails on it, use:
 
    ```bash
    bun install --ignore-scripts
@@ -123,11 +174,7 @@ After pulling this repo, run these commands in order:
    cp .env.local.example .env.local
    ```
 
-   You can run against the hosted public backend by filling in `VITE_CONVEX_URL`
-   (plus the matching `VITE_CONVEX_SITE_URL` / `CONVEX_SITE_URL`), or run a local
-   Convex deployment with `bunx convex dev`.
-
-4. **Start Local Backend (Convex)** — only needed if you are NOT using the hosted backend:
+4. **Start Local Backend (Convex)** — only needed if running local Convex instance:
 
    ```bash
    bunx convex dev --typecheck=disable
@@ -141,7 +188,7 @@ After pulling this repo, run these commands in order:
 
    _The app will be available at `http://localhost:3000`._
 
-6. **Seed Test Fixtures & Sample Corpus** — local/dev fixtures only, never on production:
+6. **Seed Test Fixtures & Sample Corpus**:
    ```bash
    bun run seed:dev
    ```
@@ -150,42 +197,18 @@ After pulling this repo, run these commands in order:
 
 ## 🔌 Public API Access
 
-CoralNest exposes a keyless, read-only REST API for the hosted registry
-(`https://clawhub.ai/api/v1/...`). All public read endpoints support
-cross-origin requests and return JSON.
+CoralNest exposes a keyless, read-only REST API for the hosted registry (`https://clawhub.ai/api/v1/...`):
 
-### Skill & package catalog
-
-| Endpoint                              | Description                                                   |
-| ------------------------------------- | ------------------------------------------------------------- |
-| `GET /api/v1/skills`                  | List/search skills (`q`, `limit`, `sort`, `family`)           |
-| `GET /api/v1/skills/:name`            | Fetch a single skill by name                                  |
-| `GET /api/v1/trending`                | Trending skills/plugins (`kind=skills\|plugins`)              |
-| `GET /api/v1/packages`                | Browse packages (`family`, `isOfficial`, `category`, `topic`) |
-| `GET /api/v1/plugins`                 | Browse native code & bundle plugins                           |
-| `GET /api/v1/packages/:name`          | Fetch a package by name                                       |
-| `GET /api/v1/packages/:name/download` | Download a package artifact                                   |
-
-### Connectors & MCP servers
-
-Connectors are backed by Composio and MCP servers are open-source reference
-servers. Both catalogs are served from the public API:
-
-```bash
-# List Composio connectors (optional: ?q=slack&limit=10)
-curl https://clawhub.ai/api/v1/connectors
-
-# List open-source MCP servers
-curl https://clawhub.ai/api/v1/mcp
-
-# Fetch (or redirect to) a single entry
-curl https://clawhub.ai/api/v1/connectors/composio-slack
-curl https://clawhub.ai/api/v1/mcp/mcp-server-github
-```
-
-List responses use the same `{ items, totalCount, nextCursor }` envelope as
-the package catalog. Detail requests return the entry as JSON, or a `302`
-redirect to the entry's provider page (Composio) when one is configured.
+| Endpoint                   | Description                                                        |
+| :------------------------- | :----------------------------------------------------------------- |
+| `GET /api/v1/flows`        | List and filter flows by kind (`skills`, `loops`, `graphs`, `all`) |
+| `GET /api/v1/skills`       | List/search skills (`q`, `limit`, `sort`, `family`)                |
+| `GET /api/v1/skills/:name` | Fetch a single skill by name                                       |
+| `GET /api/v1/trending`     | Trending skills/plugins                                            |
+| `GET /api/v1/packages`     | Browse packages (`family`, `isOfficial`, `category`, `topic`)      |
+| `GET /api/v1/plugins`      | Browse native code & bundle plugins                                |
+| `GET /api/v1/connectors`   | List SaaS connectors                                               |
+| `GET /api/v1/mcp`          | List open-source MCP servers                                       |
 
 ---
 
@@ -195,7 +218,7 @@ redirect to the entry's provider page (Composio) when one is configured.
 CoralNest/
 ├── src/                    # TanStack Start application (routes, components, styles)
 │   ├── components/         # Shared UI components (CoralPageWrapper, Header, Footer)
-│   ├── routes/             # Route pages (index, skills, plugins, connectors, mcp, persona)
+│   ├── routes/             # Route pages (index, flows, mcp, plugins, connectors, persona)
 │   ├── design-system.css   # Carapace design tokens & typography
 │   └── styles.css          # Application layout styles
 ├── convex/                 # Convex backend functions, schema, auth, and HTTP API

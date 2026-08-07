@@ -613,7 +613,7 @@ describe("Header", () => {
       .map((element) => element.textContent?.trim())
       .filter((label): label is string => Boolean(label));
 
-    expect(labels.slice(0, 5)).toEqual(["Home", "Flows", "Plugins", "Connectors", "MCP"]);
+    expect(labels.slice(0, 5)).toEqual(["Home", "Flows", "MCP", "Plugins", "Connectors"]);
     expect(
       document.querySelector(".mobile-nav-appearance-section .navbar-theme-switcher"),
     ).toBeTruthy();
@@ -640,7 +640,7 @@ describe("Header", () => {
       .map((element) => element.textContent?.trim())
       .filter((label): label is string => Boolean(label));
 
-    expect(labels).toEqual(["Home", "Flows", "Plugins", "Connectors", "MCP", "Personas", "Docs"]);
+    expect(labels).toEqual(["Home", "Flows", "MCP", "Plugins", "Connectors", "Personas", "Docs"]);
   });
 
   it("shows compact official badges beside official typeahead publishers", () => {

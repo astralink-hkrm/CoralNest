@@ -55,6 +55,11 @@ export const PRIMARY_NAV_ITEMS: NavItem[] = [
     activePathPrefixes: ["/flows/", "/skill/", "/skills/"],
   },
   {
+    label: "MCP",
+    to: PublicRegistryPaths.mcp,
+    activePathPrefixes: ["/mcp/"],
+  },
+  {
     label: "Plugins",
     to: PublicRegistryPaths.plugins,
     activePathPrefixes: ["/plugin/"],
@@ -63,11 +68,6 @@ export const PRIMARY_NAV_ITEMS: NavItem[] = [
     label: "Connectors",
     to: PublicRegistryPaths.connectors,
     activePathPrefixes: ["/connectors/"],
-  },
-  {
-    label: "MCP",
-    to: PublicRegistryPaths.mcp,
-    activePathPrefixes: ["/mcp/"],
   },
   {
     label: "Personas",
@@ -125,9 +125,9 @@ export const FOOTER_NAV_SECTIONS: FooterNavSection[] = [
     title: "Browse",
     items: [
       { kind: "link", label: "Flows", to: PublicRegistryPaths.flows, search: SKILLS_SEARCH },
+      { kind: "link", label: "MCP", to: PublicRegistryPaths.mcp },
       { kind: "link", label: "Plugins", to: PublicRegistryPaths.plugins },
       { kind: "link", label: "Connectors", to: PublicRegistryPaths.connectors },
-      { kind: "link", label: "MCP", to: PublicRegistryPaths.mcp },
       { kind: "link", label: "Personas", to: PublicRegistryPaths.persona },
       {
         kind: "link",
