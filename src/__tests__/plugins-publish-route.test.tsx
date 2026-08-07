@@ -109,7 +109,7 @@ function makeVintageAyuMembership(
       handle: "vintageayu",
       displayName: "VintageAyu",
       kind: overrides.kind ?? "user",
-      image: "/clawd-logo.png",
+      image: "/coral-logo.png",
     },
     role: overrides.role ?? "owner",
   };

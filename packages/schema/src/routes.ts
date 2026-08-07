@@ -38,4 +38,6 @@ export const ApiRoutes = {
   contentRights: "/api/v1/content-rights",
   whoami: "/api/v1/whoami",
   skillsExport: "/api/v1/skills/export",
+  connectors: "/api/v1/connectors",
+  mcp: "/api/v1/mcp",
 } as const;

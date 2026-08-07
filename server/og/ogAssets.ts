@@ -10,7 +10,7 @@ type GlobalNitroMain = {
 };
 
 let markDataUrlPromise: Promise<string> | null = null;
-let clawHubLogoDataUrlPromise: Promise<string> | null = null;
+let coralLogoDataUrlPromise: Promise<string> | null = null;
 let watermarkDataUrlPromise: Promise<string> | null = null;
 let resvgWasmPromise: Promise<Uint8Array> | null = null;
 let fontBuffersPromise: Promise<Uint8Array[]> | null = null;
@@ -64,23 +64,23 @@ async function readFirstDataUrl(candidates: URL[]) {
   throw lastError;
 }
 
-export async function getClawHubLogoDataUrl() {
-  if (!clawHubLogoDataUrlPromise) {
-    clawHubLogoDataUrlPromise = readFirstDataUrl([
-      getServerUrl("clawd-logo.png"),
-      getServerUrl("public/clawd-logo.png"),
+export async function getCoralLogoDataUrl() {
+  if (!coralLogoDataUrlPromise) {
+    coralLogoDataUrlPromise = readFirstDataUrl([
+      getServerUrl("coral-logo.png"),
+      getServerUrl("public/coral-logo.png"),
     ]);
   }
-  return clawHubLogoDataUrlPromise;
+  return coralLogoDataUrlPromise;
 }
 
 export async function getMarkDataUrl() {
   if (!markDataUrlPromise) {
     markDataUrlPromise = readFirstDataUrl([
-      getServerUrl("clawd-logo.png"),
-      getServerUrl("public/clawd-logo.png"),
-      getServerUrl("clawd-mark.png"),
-      getServerUrl("public/clawd-mark.png"),
+      getServerUrl("coral-logo.png"),
+      getServerUrl("public/coral-logo.png"),
+      getServerUrl("coral-mark.png"),
+      getServerUrl("public/coral-mark.png"),
     ]);
   }
   return markDataUrlPromise;
@@ -89,8 +89,8 @@ export async function getMarkDataUrl() {
 export async function getWatermarkDataUrl() {
   if (!watermarkDataUrlPromise) {
     watermarkDataUrlPromise = readFirstDataUrl([
-      getServerUrl("og-clawhub-watermark.png"),
-      getServerUrl("public/og-clawhub-watermark.png"),
+      getServerUrl("og-coral-watermark.png"),
+      getServerUrl("public/og-coral-watermark.png"),
     ]);
   }
   return watermarkDataUrlPromise;

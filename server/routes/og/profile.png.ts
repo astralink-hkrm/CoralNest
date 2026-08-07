@@ -8,7 +8,7 @@ import {
   ensureResvgWasm,
   FONT_MONO,
   FONT_SANS,
-  getClawHubLogoDataUrl,
+  getCoralLogoDataUrl,
   getPublisherFontBuffers,
 } from "../../og/ogAssets";
 import { pngResponse } from "../../og/pngResponse";
@@ -94,7 +94,7 @@ export default defineEventHandler(async (event) => {
   const statsQuery = useVerifiedPublisherState ? {} : query;
 
   const [clawHubLogoDataUrl, fontBuffers] = await Promise.all([
-    getClawHubLogoDataUrl(),
+    getCoralLogoDataUrl(),
     ensureResvgWasm().then(() => getPublisherFontBuffers()),
   ]);
   const avatarDataUrl = await fetchPublisherProfileImageDataUrl(avatarUrl);

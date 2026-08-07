@@ -222,7 +222,7 @@ const workflowHeaderTiles: ReadonlyArray<{
   },
   {
     label: "CoralNest",
-    src: "/coral-logo.png",
+    src: "/coral-logo-purple.png",
     className: "is-openclaw",
     badge: "Ecosystem",
   },

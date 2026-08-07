@@ -34,7 +34,7 @@ function SkillsHome() {
           <div className="home-v2-hero-bg" aria-hidden="true" />
 
           <img
-            src="/coral-logo.png"
+            src="/coral-logo-purple.png"
             alt="CoralNest"
             className="home-v2-hero-logo"
             draggable={false}

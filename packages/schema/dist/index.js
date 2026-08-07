@@ -17,5 +17,6 @@ export * from "./promotionsFeed.js";
 export * from "./rolloutCapabilities.js";
 export { ApiRoutes, LegacyApiRoutes } from "./routes.js";
 export * from "./schemas.js";
+export * from "./staticCatalogs.js";
 export * from "./textFiles.js";
 //# sourceMappingURL=index.js.map

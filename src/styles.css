@@ -25065,7 +25065,7 @@ a.search-empty-action {
 /* Big hero logo */
 .home-v2-hero-logo {
   display: block;
-  width: min(560px, 82vw);
+  width: min(240px, 55vw);
   height: auto;
   margin-bottom: 10px;
   filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.35));
@@ -25074,7 +25074,7 @@ a.search-empty-action {
 
 @media (max-width: 520px) {
   .home-v2-hero-logo {
-    width: min(380px, 80vw);
+    width: min(200px, 60vw);
   }
 }
 

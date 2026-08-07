@@ -451,12 +451,36 @@ export async function fetchPluginCatalog(params: {
   viewerMode?: PackageApiViewerMode;
 }): Promise<PluginCatalogResult> {
   if (params.family === "connectors") {
-    const filtered = filterDataset(COMPOSIO_CONNECTORS, params.q);
-    return { items: filtered, nextCursor: null, totalCount: filtered.length };
+    try {
+      const url = await packageApiUrl(ApiRoutes.connectors);
+      if (params.q?.trim()) url.searchParams.set("q", params.q.trim());
+      if (typeof params.limit === "number") url.searchParams.set("limit", String(params.limit));
+      const data = await fetchJson<{
+        items: PackageListItem[];
+        nextCursor: string | null;
+        totalCount: number;
+      }>(url, params.signal, params.viewerMode);
+      return { items: data.items, nextCursor: null, totalCount: data.totalCount };
+    } catch {
+      const filtered = filterDataset(COMPOSIO_CONNECTORS, params.q);
+      return { items: filtered, nextCursor: null, totalCount: filtered.length };
+    }
   }
   if (params.family === "mcp") {
-    const filtered = filterDataset(OPEN_SOURCE_MCP_SERVERS, params.q);
-    return { items: filtered, nextCursor: null, totalCount: filtered.length };
+    try {
+      const url = await packageApiUrl(ApiRoutes.mcp);
+      if (params.q?.trim()) url.searchParams.set("q", params.q.trim());
+      if (typeof params.limit === "number") url.searchParams.set("limit", String(params.limit));
+      const data = await fetchJson<{
+        items: PackageListItem[];
+        nextCursor: string | null;
+        totalCount: number;
+      }>(url, params.signal, params.viewerMode);
+      return { items: data.items, nextCursor: null, totalCount: data.totalCount };
+    } catch {
+      const filtered = filterDataset(OPEN_SOURCE_MCP_SERVERS, params.q);
+      return { items: filtered, nextCursor: null, totalCount: filtered.length };
+    }
   }
   if (params.family) {
     let response: unknown;

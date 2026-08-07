@@ -140,6 +140,47 @@ After pulling this repo, run these commands in order:
 
 ---
 
+## 🔌 Public API Access
+
+CoralNest exposes a keyless, read-only REST API for the hosted registry
+(`https://clawhub.ai/api/v1/...`). All public read endpoints support
+cross-origin requests and return JSON.
+
+### Skill & package catalog
+
+| Endpoint | Description |
+| --- | --- |
+| `GET /api/v1/skills` | List/search skills (`q`, `limit`, `sort`, `family`) |
+| `GET /api/v1/skills/:name` | Fetch a single skill by name |
+| `GET /api/v1/trending` | Trending skills/plugins (`kind=skills\|plugins`) |
+| `GET /api/v1/packages` | Browse packages (`family`, `isOfficial`, `category`, `topic`) |
+| `GET /api/v1/plugins` | Browse native code & bundle plugins |
+| `GET /api/v1/packages/:name` | Fetch a package by name |
+| `GET /api/v1/packages/:name/download` | Download a package artifact |
+
+### Connectors & MCP servers
+
+Connectors are backed by Composio and MCP servers are open-source reference
+servers. Both catalogs are served from the public API:
+
+```bash
+# List Composio connectors (optional: ?q=slack&limit=10)
+curl https://clawhub.ai/api/v1/connectors
+
+# List open-source MCP servers
+curl https://clawhub.ai/api/v1/mcp
+
+# Fetch (or redirect to) a single entry
+curl https://clawhub.ai/api/v1/connectors/composio-slack
+curl https://clawhub.ai/api/v1/mcp/mcp-server-github
+```
+
+List responses use the same `{ items, totalCount, nextCursor }` envelope as
+the package catalog. Detail requests return the entry as JSON, or a `302`
+redirect to the entry's provider page (Composio) when one is configured.
+
+---
+
 ## 📁 Repository Structure
 
 ```

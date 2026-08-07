@@ -47,6 +47,10 @@ import {
   skillsPostRouterV1Http,
   starsDeleteRouterV1Http,
   starsPostRouterV1Http,
+  listConnectorsV1Http,
+  connectorsGetRouterV1Http,
+  listMcpV1Http,
+  mcpGetRouterV1Http,
   transfersGetRouterV1Http,
   banAppealContextV1Http,
   createPromotionV1Http,
@@ -236,6 +240,30 @@ http.route({
   pathPrefix: `${ApiRoutes.plugins}/`,
   method: "GET",
   handler: pluginsGetRouterV1Http,
+});
+
+http.route({
+  path: ApiRoutes.connectors,
+  method: "GET",
+  handler: listConnectorsV1Http,
+});
+
+http.route({
+  pathPrefix: `${ApiRoutes.connectors}/`,
+  method: "GET",
+  handler: connectorsGetRouterV1Http,
+});
+
+http.route({
+  path: ApiRoutes.mcp,
+  method: "GET",
+  handler: listMcpV1Http,
+});
+
+http.route({
+  pathPrefix: `${ApiRoutes.mcp}/`,
+  method: "GET",
+  handler: mcpGetRouterV1Http,
 });
 
 http.route({

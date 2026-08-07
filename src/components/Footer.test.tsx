@@ -92,7 +92,7 @@ describe("Footer", () => {
     expect(container.querySelector(".footer-v2-brand-mark")?.getAttribute("src")).toBe(
       "/logo-transparent.png",
     );
-    expect(container.querySelector('img[src="/og-clawhub-watermark.png"]')).toBeNull();
+    expect(container.querySelector('img[src="/og-coral-watermark.png"]')).toBeNull();
   });
 
   it("collapses footer sections by heading until toggled open", async () => {

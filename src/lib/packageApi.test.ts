@@ -805,4 +805,83 @@ describe("fetchPluginCatalog", () => {
     expect(url.pathname).toBe("/api/v1/plugins/search");
     expect(url.searchParams.has("sort")).toBe(false);
   });
+
+  it("fetches the connectors catalog from the public API", async () => {
+    vi.stubEnv("VITE_CONVEX_URL", "https://registry.example");
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          items: [
+            {
+              name: "composio-slack",
+              displayName: "Slack Connector",
+              family: "connectors",
+              channel: "community",
+              isOfficial: true,
+              createdAt: 0,
+              updatedAt: 0,
+            },
+          ],
+          nextCursor: null,
+          totalCount: 1,
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const result = await fetchPluginCatalog({ family: "connectors", q: "slack", limit: 10 });
+
+    expect(result.items.map((item) => item.name)).toEqual(["composio-slack"]);
+    expect(result.nextCursor).toBeNull();
+    expect(result.totalCount).toBe(1);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const url = new URL(fetchMock.mock.calls[0]?.[0] as string);
+    expect(url.pathname).toBe("/api/v1/connectors");
+    expect(url.searchParams.get("q")).toBe("slack");
+    expect(url.searchParams.get("limit")).toBe("10");
+  });
+
+  it("falls back to the static connectors catalog when the API is unreachable", async () => {
+    vi.stubEnv("VITE_CONVEX_URL", "https://registry.example");
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("network down"));
+
+    const result = await fetchPluginCatalog({ family: "connectors" });
+
+    expect(result.items.length).toBeGreaterThan(0);
+    expect(result.items.map((item) => item.family)).toEqual(
+      Array(result.items.length).fill("connectors"),
+    );
+    expect(result.nextCursor).toBeNull();
+  });
+
+  it("fetches the open-source MCP catalog from the public API", async () => {
+    vi.stubEnv("VITE_CONVEX_URL", "https://registry.example");
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ items: [], nextCursor: null, totalCount: 0 }), {
+        status: 200,
+      }),
+    );
+
+    const result = await fetchPluginCatalog({ family: "mcp", limit: 5 });
+
+    expect(result.items).toEqual([]);
+    expect(result.totalCount).toBe(0);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const url = new URL(fetchMock.mock.calls[0]?.[0] as string);
+    expect(url.pathname).toBe("/api/v1/mcp");
+    expect(url.searchParams.get("limit")).toBe("5");
+  });
+
+  it("falls back to the static MCP catalog when the API returns a failure", async () => {
+    vi.stubEnv("VITE_CONVEX_URL", "https://registry.example");
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("boom", { status: 503 }));
+
+    const result = await fetchPluginCatalog({ family: "mcp" });
+
+    expect(result.items.length).toBeGreaterThan(0);
+    expect(result.items.map((item) => item.family)).toEqual(
+      result.items.length === 0 ? [] : Array(result.items.length).fill("mcp"),
+    );
+    expect(result.nextCursor).toBeNull();
+  });
 });

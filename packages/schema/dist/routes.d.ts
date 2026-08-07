@@ -37,4 +37,6 @@ export declare const ApiRoutes: {
     readonly contentRights: "/api/v1/content-rights";
     readonly whoami: "/api/v1/whoami";
     readonly skillsExport: "/api/v1/skills/export";
+    readonly connectors: "/api/v1/connectors";
+    readonly mcp: "/api/v1/mcp";
 };

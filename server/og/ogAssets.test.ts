@@ -24,10 +24,10 @@ describe("ogAssets", () => {
   it("loads the packaged local OG watermark asset", async () => {
     readFileMock.mockImplementation(async (input: unknown) => {
       const path = String(input);
-      if (path.includes("public/og-clawhub-watermark.png")) {
+      if (path.includes("public/og-coral-watermark.png")) {
         return Buffer.from("watermark");
       }
-      if (path.includes("og-clawhub-watermark.png")) {
+      if (path.includes("og-coral-watermark.png")) {
         throw new Error("missing root watermark");
       }
       throw new Error(`unexpected read: ${path}`);
@@ -37,17 +37,17 @@ describe("ogAssets", () => {
 
     await expect(getWatermarkDataUrl()).resolves.toBe("data:image/png;base64,d2F0ZXJtYXJr");
     expect(readFileMock).toHaveBeenCalledTimes(2);
-    expect(String(readFileMock.mock.calls[0]?.[0])).toContain("og-clawhub-watermark.png");
-    expect(String(readFileMock.mock.calls[1]?.[0])).toContain("public/og-clawhub-watermark.png");
+    expect(String(readFileMock.mock.calls[0]?.[0])).toContain("og-coral-watermark.png");
+    expect(String(readFileMock.mock.calls[1]?.[0])).toContain("public/og-coral-watermark.png");
   });
 
   it("falls back to the packaged public site logo asset", async () => {
     readFileMock.mockImplementation(async (input: unknown) => {
       const path = String(input);
-      if (path.includes("public/clawd-logo.png")) {
+      if (path.includes("public/coral-logo.png")) {
         return Buffer.from("png");
       }
-      if (path.includes("clawd-logo.png")) {
+      if (path.includes("coral-logo.png")) {
         throw new Error("missing root mark");
       }
       throw new Error(`unexpected read: ${path}`);
@@ -57,28 +57,28 @@ describe("ogAssets", () => {
 
     await expect(getMarkDataUrl()).resolves.toBe("data:image/png;base64,cG5n");
     expect(readFileMock).toHaveBeenCalledTimes(2);
-    expect(String(readFileMock.mock.calls[0]?.[0])).toContain("clawd-logo.png");
-    expect(String(readFileMock.mock.calls[1]?.[0])).toContain("public/clawd-logo.png");
+    expect(String(readFileMock.mock.calls[0]?.[0])).toContain("coral-logo.png");
+    expect(String(readFileMock.mock.calls[1]?.[0])).toContain("public/coral-logo.png");
   });
 
-  it("loads the fixed ClawHub logo from clawd-logo.png", async () => {
+  it("loads the fixed CoralNest logo from coral-logo.png", async () => {
     readFileMock.mockImplementation(async (input: unknown) => {
       const path = String(input);
-      if (path.includes("public/clawd-logo.png")) {
-        return Buffer.from("clawhub-logo");
+      if (path.includes("public/coral-logo.png")) {
+        return Buffer.from("coral-logo");
       }
-      if (path.endsWith("clawd-logo.png")) {
+      if (path.endsWith("coral-logo.png")) {
         throw new Error("missing root logo");
       }
       throw new Error(`unexpected read: ${path}`);
     });
 
-    const { getClawHubLogoDataUrl } = await import("./ogAssets");
+    const { getCoralLogoDataUrl } = await import("./ogAssets");
 
-    await expect(getClawHubLogoDataUrl()).resolves.toBe("data:image/png;base64,Y2xhd2h1Yi1sb2dv");
+    await expect(getCoralLogoDataUrl()).resolves.toBe("data:image/png;base64,Y29yYWwtbG9nbw==");
     expect(readFileMock).toHaveBeenCalledTimes(2);
-    expect(String(readFileMock.mock.calls[0]?.[0])).toContain("clawd-logo.png");
-    expect(String(readFileMock.mock.calls[1]?.[0])).toContain("public/clawd-logo.png");
+    expect(String(readFileMock.mock.calls[0]?.[0])).toContain("coral-logo.png");
+    expect(String(readFileMock.mock.calls[1]?.[0])).toContain("public/coral-logo.png");
   });
 
   it("initializes resvg wasm only once per process", async () => {

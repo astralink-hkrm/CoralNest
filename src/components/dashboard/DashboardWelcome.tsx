@@ -36,7 +36,7 @@ export function DashboardWelcome({ ownerHandle, publisherSelector }: DashboardWe
               <Plug className="h-4 w-4" />
             </span>
             <span className="dashboard-welcome-icon-tile dashboard-welcome-icon-tile--brand">
-              <img src="/coral-logo.png" alt="" draggable={false} />
+              <img src="/coral-logo-purple.png" alt="" draggable={false} />
             </span>
           </span>
           <h1 className="dashboard-welcome-title">Welcome to CoralNest</h1>

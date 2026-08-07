@@ -43,30 +43,30 @@ export async function copyOgAssets() {
 
   const copies = [
     {
-      source: path.resolve("public/clawd-logo.png"),
+      source: path.resolve("public/coral-logo.png"),
       targets: [
-        path.resolve(".output/server/clawd-logo.png"),
-        path.resolve(".output/server/public/clawd-logo.png"),
-        path.resolve(".vercel/output/functions/__server.func/clawd-logo.png"),
-        path.resolve(".vercel/output/functions/__server.func/public/clawd-logo.png"),
+        path.resolve(".output/server/coral-logo.png"),
+        path.resolve(".output/server/public/coral-logo.png"),
+        path.resolve(".vercel/output/functions/__server.func/coral-logo.png"),
+        path.resolve(".vercel/output/functions/__server.func/public/coral-logo.png"),
       ],
     },
     {
-      source: path.resolve("public/og-clawhub-watermark.png"),
+      source: path.resolve("public/coral-logo.png"),
       targets: [
-        path.resolve(".output/server/og-clawhub-watermark.png"),
-        path.resolve(".output/server/public/og-clawhub-watermark.png"),
-        path.resolve(".vercel/output/functions/__server.func/og-clawhub-watermark.png"),
-        path.resolve(".vercel/output/functions/__server.func/public/og-clawhub-watermark.png"),
+        path.resolve(".output/server/og-coral-watermark.png"),
+        path.resolve(".output/server/public/og-coral-watermark.png"),
+        path.resolve(".vercel/output/functions/__server.func/og-coral-watermark.png"),
+        path.resolve(".vercel/output/functions/__server.func/public/og-coral-watermark.png"),
       ],
     },
     {
-      source: path.resolve("public/clawd-mark.png"),
+      source: path.resolve("public/coral-logo.png"),
       targets: [
-        path.resolve(".output/server/clawd-mark.png"),
-        path.resolve(".output/server/public/clawd-mark.png"),
-        path.resolve(".vercel/output/functions/__server.func/clawd-mark.png"),
-        path.resolve(".vercel/output/functions/__server.func/public/clawd-mark.png"),
+        path.resolve(".output/server/coral-mark.png"),
+        path.resolve(".output/server/public/coral-mark.png"),
+        path.resolve(".vercel/output/functions/__server.func/coral-mark.png"),
+        path.resolve(".vercel/output/functions/__server.func/public/coral-mark.png"),
       ],
     },
     {

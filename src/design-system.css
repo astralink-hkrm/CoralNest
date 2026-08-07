@@ -54,12 +54,12 @@
   --coral-bg-olive: radial-gradient(ellipse 52% 32% at 48% 2%, color-mix(in srgb, var(--coral-olive) 13%, transparent) 0%, transparent 64%);
 
   /* Coral Logo Background for Pages */
-  --coral-logo-bg-blue: url('/coral-logo.png');
+  --coral-logo-bg-blue: url('/coral-logo-purple.png');
   --coral-logo-bg-purple: url('/coral-logo-purple.png');
-  --coral-logo-bg-orange: url('/coral-logo-orange.png');
-  --coral-logo-bg-red: url('/coral-logo-red.png');
-  --coral-logo-bg-pink: url('/coral-logo-pink.png');
-  --coral-logo-bg-olive: url('/coral-logo-olive.png');
+  --coral-logo-bg-orange: url('/coral-logo-purple.png');
+  --coral-logo-bg-red: url('/coral-logo-purple.png');
+  --coral-logo-bg-pink: url('/coral-logo-purple.png');
+  --coral-logo-bg-olive: url('/coral-logo-purple.png');
 
   /* Legacy aliases for old ClawHub CSS rules */
   --accent-soft: var(--oc-surface-accent-soft);

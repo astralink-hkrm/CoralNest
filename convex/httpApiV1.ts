@@ -49,6 +49,12 @@ import {
   skillsPostRouterV1Handler,
 } from "./httpApiV1/skillsV1";
 import { starsDeleteRouterV1Handler, starsPostRouterV1Handler } from "./httpApiV1/starsV1";
+import {
+  connectorsGetRouterV1Handler,
+  listConnectorsV1Handler,
+  listMcpV1Handler,
+  mcpGetRouterV1Handler,
+} from "./httpApiV1/staticCatalogsV1";
 import { transfersGetRouterV1Handler } from "./httpApiV1/transfersV1";
 import { trendingV1Handler } from "./httpApiV1/trendingV1";
 import {
@@ -99,6 +105,10 @@ export const exportSkillsV1Http = httpAction(exportSkillsV1Handler);
 
 export const starsPostRouterV1Http = httpAction(starsPostRouterV1Handler);
 export const starsDeleteRouterV1Http = httpAction(starsDeleteRouterV1Handler);
+export const listConnectorsV1Http = httpAction(listConnectorsV1Handler);
+export const connectorsGetRouterV1Http = httpAction(connectorsGetRouterV1Handler);
+export const listMcpV1Http = httpAction(listMcpV1Handler);
+export const mcpGetRouterV1Http = httpAction(mcpGetRouterV1Handler);
 export const transfersGetRouterV1Http = httpAction(transfersGetRouterV1Handler);
 
 export const listPromotionsV1Http = httpAction(listPromotionsV1Handler);
@@ -150,6 +160,10 @@ export const __handlers = {
   exportSkillsV1Handler,
   starsPostRouterV1Handler,
   starsDeleteRouterV1Handler,
+  listConnectorsV1Handler,
+  connectorsGetRouterV1Handler,
+  listMcpV1Handler,
+  mcpGetRouterV1Handler,
   transfersGetRouterV1Handler,
   whoamiV1Handler,
   usersGetRouterV1Handler,

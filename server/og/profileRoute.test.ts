@@ -8,7 +8,7 @@ const fetchImageDataUrlMock = vi.fn();
 const fetchPublisherProfileImageDataUrlMock = vi.fn();
 const fetchPublisherOgMetaMock = vi.fn();
 const normalizeOgLogoDataUrlMock = vi.fn();
-const getClawHubLogoDataUrlMock = vi.fn();
+const getCoralLogoDataUrlMock = vi.fn();
 const ensureResvgWasmMock = vi.fn();
 const getPublisherFontBuffersMock = vi.fn();
 const buildPublisherOgSvgMock = vi.fn();
@@ -53,7 +53,7 @@ vi.mock("./normalizeLogoDataUrl", () => ({
 vi.mock("./ogAssets", () => ({
   FONT_MONO: "IBM Plex Mono",
   FONT_SANS: "Bricolage Grotesque",
-  getClawHubLogoDataUrl: (...args: unknown[]) => getClawHubLogoDataUrlMock(...args),
+  getCoralLogoDataUrl: (...args: unknown[]) => getCoralLogoDataUrlMock(...args),
   ensureResvgWasm: (...args: unknown[]) => ensureResvgWasmMock(...args),
   getPublisherFontBuffers: (...args: unknown[]) => getPublisherFontBuffersMock(...args),
 }));
@@ -74,7 +74,7 @@ beforeEach(() => {
   fetchPublisherProfileImageDataUrlMock.mockReset();
   fetchPublisherOgMetaMock.mockReset();
   normalizeOgLogoDataUrlMock.mockReset();
-  getClawHubLogoDataUrlMock.mockReset();
+  getCoralLogoDataUrlMock.mockReset();
   ensureResvgWasmMock.mockReset();
   getPublisherFontBuffersMock.mockReset();
   buildPublisherOgSvgMock.mockReset();
@@ -82,7 +82,7 @@ beforeEach(() => {
   freeMock.mockReset();
   resvgCtorMock.mockReset();
 
-  getClawHubLogoDataUrlMock.mockResolvedValue("data:image/png;base64,TE9HTw==");
+  getCoralLogoDataUrlMock.mockResolvedValue("data:image/png;base64,TE9HTw==");
   ensureResvgWasmMock.mockResolvedValue(undefined);
   getPublisherFontBuffersMock.mockResolvedValue([new Uint8Array([1, 2, 3])]);
   fetchPublisherProfileImageDataUrlMock.mockResolvedValue("data:image/png;base64,QVZBVEFS");
@@ -392,3 +392,4 @@ describe("profile og route", () => {
     );
   });
 });
+
