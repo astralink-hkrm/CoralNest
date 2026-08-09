@@ -1,33 +1,31 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
-  ExternalLink,
+  Cable,
   Command,
+  ExternalLink,
   Loader2,
   Menu,
   Monitor,
   Moon,
   MoreHorizontal,
+  Network,
+  Package,
+  Puzzle,
+  Repeat2,
   Search,
+  Server,
   Sun,
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { rowString, rowStringArray } from "../lib/assetsClient";
+import type { AssetRow, AssetType } from "../lib/assetTypes";
+import { catalogDetailHref } from "../lib/catalogPaths";
 import { PRIMARY_NAV_ITEMS, SECONDARY_NAV_ITEMS } from "../lib/nav-items";
-import { buildPublisherProfileHref, buildSkillDetailHref } from "../lib/ownerRoute";
-import { buildPluginDetailHref, displayPluginPackageName } from "../lib/pluginRoutes";
-import { presentationTitle } from "../lib/presentationTitle";
 import { SITE_NAME } from "../lib/site";
 import { applyTheme, useThemeMode } from "../lib/theme";
-import {
-  isUnifiedNativeSkillResult,
-  useUnifiedSearch,
-  type UnifiedCreatorResult,
-  type UnifiedPluginResult,
-  type UnifiedSkillResult,
-} from "../lib/useUnifiedSearch";
-import { MarketplaceIcon } from "./MarketplaceIcon";
-import { OfficialBadge } from "./OfficialBadge";
+import { useAssetTypeahead } from "../lib/useAssetTypeahead";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,6 +40,24 @@ const THEME_MODE_ITEMS = [
   { mode: "dark", label: "Dark theme", Icon: Moon },
 ] as const;
 const CLAWHUB_BRAND_MARK_SRC = "/coral-logo-purple.png";
+
+const TYPEAHEAD_ICONS = {
+  skills: Package,
+  loops: Repeat2,
+  graphs: Network,
+  mcp_servers: Server,
+  connectors: Cable,
+  plugins: Puzzle,
+} as const satisfies Record<AssetType, typeof Package>;
+
+const TYPEAHEAD_HEADINGS: Record<AssetType, string> = {
+  skills: "Skills",
+  loops: "Loops",
+  graphs: "Graphs",
+  mcp_servers: "MCP servers",
+  connectors: "Connectors",
+  plugins: "Plugins",
+};
 
 function useAppleSearchShortcut() {
   const [isApple, setIsApple] = useState(true);
@@ -72,28 +88,17 @@ function NavSearchShortcutKbd({ isApple }: { isApple: boolean }) {
   );
 }
 
-type TypeaheadSection = "skills" | "plugins" | "creators";
-
 type TypeaheadItem =
   | {
-      kind: "skill";
+      kind: "asset";
       key: string;
-      result: UnifiedSkillResult;
-    }
-  | {
-      kind: "plugin";
-      key: string;
-      result: UnifiedPluginResult;
-    }
-  | {
-      kind: "creator";
-      key: string;
-      result: UnifiedCreatorResult;
+      type: AssetType;
+      item: AssetRow;
     }
   | {
       kind: "footer";
       key: string;
-      section: TypeaheadSection;
+      section: AssetType;
       label: string;
     };
 
@@ -118,73 +123,31 @@ export default function Header() {
   const showTypeahead = typeaheadOpen;
   const showMobileTypeahead = showTypeahead && hasNavSearchQuery;
   const {
-    skillResults,
-    pluginResults,
-    creatorResults,
+    groups: typeaheadGroups,
+    hasResults: typeaheadHasResults,
     isSearching: typeaheadSearching,
-  } = useUnifiedSearch(navSearchQuery, "all", {
+  } = useAssetTypeahead(navSearchQuery, {
     debounceMs: 180,
     enabled: typeaheadOpen && hasNavSearchQuery,
-    limits: { skills: 4, plugins: 4, creators: 4 },
+    limit: 4,
   });
-  const typeaheadSkillItems = useMemo<TypeaheadItem[]>(() => {
+  const typeaheadItems = useMemo<TypeaheadItem[]>(() => {
     if (!hasNavSearchQuery) return [];
     const items: TypeaheadItem[] = [];
-    for (const result of skillResults) {
-      const key = isUnifiedNativeSkillResult(result)
-        ? `skill-${result.skill._id}`
-        : `skills-sh-${result.result.externalId}`;
-      items.push({ kind: "skill", key, result });
-    }
-    if (skillResults.length > 0) {
+    for (const group of typeaheadGroups) {
+      for (const item of group.items) {
+        const slug = rowString(item, "slug") ?? "";
+        items.push({ kind: "asset", key: `asset-${group.type}-${slug}`, type: group.type, item });
+      }
       items.push({
         kind: "footer",
-        key: "footer-skills",
-        section: "skills",
-        label: `See skill results for "${trimmedNavSearchQuery}"`,
+        key: `footer-${group.type}`,
+        section: group.type,
+        label: `See ${TYPEAHEAD_HEADINGS[group.type].toLowerCase()} results for "${trimmedNavSearchQuery}"`,
       });
     }
     return items;
-  }, [hasNavSearchQuery, skillResults, trimmedNavSearchQuery]);
-
-  const typeaheadPluginItems = useMemo<TypeaheadItem[]>(() => {
-    if (!hasNavSearchQuery) return [];
-    const items: TypeaheadItem[] = [];
-    for (const result of pluginResults) {
-      items.push({ kind: "plugin", key: `plugin-${result.plugin.name}`, result });
-    }
-    if (pluginResults.length > 0) {
-      items.push({
-        kind: "footer",
-        key: "footer-plugins",
-        section: "plugins",
-        label: `See plugin results for "${trimmedNavSearchQuery}"`,
-      });
-    }
-    return items;
-  }, [hasNavSearchQuery, pluginResults, trimmedNavSearchQuery]);
-
-  const typeaheadCreatorItems = useMemo<TypeaheadItem[]>(() => {
-    if (!hasNavSearchQuery) return [];
-    const items: TypeaheadItem[] = [];
-    for (const result of creatorResults) {
-      items.push({ kind: "creator", key: `creator-${result.creator._id}`, result });
-    }
-    if (creatorResults.length > 0) {
-      items.push({
-        kind: "footer",
-        key: "footer-creators",
-        section: "creators",
-        label: `See creator results for "${trimmedNavSearchQuery}"`,
-      });
-    }
-    return items;
-  }, [creatorResults, hasNavSearchQuery, trimmedNavSearchQuery]);
-
-  const typeaheadItems = useMemo(
-    () => [...typeaheadSkillItems, ...typeaheadPluginItems, ...typeaheadCreatorItems],
-    [typeaheadCreatorItems, typeaheadPluginItems, typeaheadSkillItems],
-  );
+  }, [hasNavSearchQuery, trimmedNavSearchQuery, typeaheadGroups]);
   const activeTypeaheadItem = showTypeahead ? typeaheadItems[typeaheadActiveIndex] : undefined;
   const activeTypeaheadId = activeTypeaheadItem
     ? getTypeaheadOptionId(activeTypeaheadItem)
@@ -276,49 +239,10 @@ export default function Header() {
   };
 
   const navigateToTypeaheadItem = (item: TypeaheadItem) => {
-    if (item.kind === "skill") {
-      if (!isUnifiedNativeSkillResult(item.result)) {
-        void navigate({ to: item.result.result.route });
-        setNavSearchQuery("");
-        setTypeaheadOpen(false);
-        setMobileSearchOpen(false);
-        return;
-      }
-      const resultOwnerHandle = item.result.ownerHandle?.trim();
-      if (!resultOwnerHandle) {
-        void navigate({
-          to: "/search",
-          search: { q: trimmedNavSearchQuery, type: "skills" },
-        });
-        setNavSearchQuery("");
-        setTypeaheadOpen(false);
-        setMobileSearchOpen(false);
-        return;
-      }
-      void navigate({
-        to: buildSkillDetailHref(resultOwnerHandle, item.result.skill.slug),
-      });
-    } else if (item.kind === "plugin") {
-      void navigate({
-        to: buildPluginDetailHref(item.result.plugin.name, {
-          ownerHandle: item.result.plugin.ownerHandle,
-        }),
-      });
-    } else if (item.kind === "creator") {
-      const publisherHandle = item.result.creator.handle.trim();
-      if (!publisherHandle) {
-        void navigate({
-          to: "/search",
-          search: { q: trimmedNavSearchQuery, type: "creators" },
-        });
-        setNavSearchQuery("");
-        setTypeaheadOpen(false);
-        setMobileSearchOpen(false);
-        return;
-      }
-      void navigate({
-        to: buildPublisherProfileHref(publisherHandle),
-      });
+    if (item.kind === "asset") {
+      const slug = rowString(item.item, "slug") ?? "";
+      if (!slug) return;
+      void navigate({ to: catalogDetailHref(item.type, slug) });
     } else {
       void navigate({
         to: "/search",
@@ -519,7 +443,7 @@ export default function Header() {
                   className="navbar-search-input"
                   type="search"
                   role="combobox"
-                  placeholder="Search skills, plugins, and creators"
+                  placeholder="Search skills, loops, graphs, MCP, connectors, and plugins"
                   value={navSearchQuery}
                   onChange={(e) => {
                     setNavSearchQuery(e.target.value);
@@ -539,13 +463,12 @@ export default function Header() {
               {showTypeahead && !mobileSearchOpen ? (
                 <SearchTypeahead
                   activeIndex={typeaheadActiveIndex}
+                  hasResults={typeaheadHasResults}
+                  items={typeaheadItems}
                   loading={typeaheadSearching}
                   onHoverItem={setTypeaheadActiveIndex}
                   onSelectItem={navigateToTypeaheadItem}
-                  creatorItems={typeaheadCreatorItems}
-                  pluginItems={typeaheadPluginItems}
                   query={trimmedNavSearchQuery}
-                  skillItems={typeaheadSkillItems}
                 />
               ) : null}
             </div>
@@ -597,7 +520,7 @@ export default function Header() {
                 className="navbar-search-input"
                 type="search"
                 role="combobox"
-                placeholder="Search skills, plugins, and creators"
+                placeholder="Search skills, loops, graphs, MCP, connectors, and plugins"
                 value={navSearchQuery}
                 onChange={(e) => {
                   setNavSearchQuery(e.target.value);
@@ -631,13 +554,12 @@ export default function Header() {
             {showMobileTypeahead ? (
               <SearchTypeahead
                 activeIndex={typeaheadActiveIndex}
+                hasResults={typeaheadHasResults}
+                items={typeaheadItems}
                 loading={typeaheadSearching}
                 onHoverItem={setTypeaheadActiveIndex}
                 onSelectItem={navigateToTypeaheadItem}
-                creatorItems={typeaheadCreatorItems}
-                pluginItems={typeaheadPluginItems}
                 query={trimmedNavSearchQuery}
-                skillItems={typeaheadSkillItems}
               />
             ) : null}
           </div>
@@ -686,30 +608,23 @@ function HeaderNavTab({
 
 function SearchTypeahead({
   activeIndex,
-  creatorItems,
+  hasResults,
+  items,
   loading,
   onHoverItem,
   onSelectItem,
-  pluginItems,
   query,
-  skillItems,
 }: {
   activeIndex: number;
-  creatorItems: TypeaheadItem[];
+  hasResults: boolean;
+  items: TypeaheadItem[];
   loading: boolean;
   onHoverItem: (index: number) => void;
   onSelectItem: (item: TypeaheadItem) => void;
-  pluginItems: TypeaheadItem[];
   query: string;
-  skillItems: TypeaheadItem[];
 }) {
   const hasQuery = query.length > 0;
-  const hasSkillMatches = skillItems.some((item) => item.kind === "skill");
-  const hasPluginMatches = pluginItems.some((item) => item.kind === "plugin");
-  const hasCreatorMatches = creatorItems.some((item) => item.kind === "creator");
-  const hasMatches = hasSkillMatches || hasPluginMatches || hasCreatorMatches;
-  const pluginStartIndex = skillItems.length;
-  const creatorStartIndex = skillItems.length + pluginItems.length;
+  const hasMatches = hasQuery && hasResults;
 
   return (
     <div className="navbar-search-typeahead" id="navbar-search-typeahead">
@@ -719,7 +634,7 @@ function SearchTypeahead({
             <span className="navbar-search-typeahead-status-icon" aria-hidden="true">
               <Search size={17} />
             </span>
-            <span>Start typing to search skills, plugins, and creators</span>
+            <span>Start typing to search skills, loops, graphs, MCP, connectors, and plugins</span>
           </div>
         ) : null}
         {hasQuery && loading && !hasMatches ? (
@@ -731,9 +646,7 @@ function SearchTypeahead({
           </div>
         ) : null}
         {hasQuery && !loading && !hasMatches ? (
-          <div className="navbar-search-typeahead-status">
-            No skills, plugins, or creators found for "{query}"
-          </div>
+          <div className="navbar-search-typeahead-status">No results found for "{query}"</div>
         ) : null}
         {hasMatches ? (
           <div
@@ -741,19 +654,9 @@ function SearchTypeahead({
             role="listbox"
             aria-label="Search suggestions"
           >
-            {hasSkillMatches ? (
-              <div
-                className="navbar-search-typeahead-section"
-                role="group"
-                aria-labelledby="navbar-search-typeahead-skills-heading"
-              >
-                <div
-                  id="navbar-search-typeahead-skills-heading"
-                  className="navbar-search-typeahead-heading"
-                >
-                  Skills
-                </div>
-                {skillItems.map((item, index) => (
+            {items.map((item, index) => {
+              if (item.kind === "footer") {
+                return (
                   <TypeaheadRow
                     key={item.key}
                     active={activeIndex === index}
@@ -762,60 +665,55 @@ function SearchTypeahead({
                     onHoverItem={onHoverItem}
                     onSelectItem={onSelectItem}
                   />
-                ))}
-              </div>
-            ) : null}
-            {hasPluginMatches ? (
-              <div
-                className="navbar-search-typeahead-section"
-                role="group"
-                aria-labelledby="navbar-search-typeahead-plugins-heading"
-              >
-                <div
-                  id="navbar-search-typeahead-plugins-heading"
-                  className="navbar-search-typeahead-heading"
-                >
-                  Plugins
-                </div>
-                {pluginItems.map((item, index) => (
-                  <TypeaheadRow
-                    key={item.key}
-                    active={activeIndex === pluginStartIndex + index}
-                    item={item}
-                    index={pluginStartIndex + index}
-                    onHoverItem={onHoverItem}
-                    onSelectItem={onSelectItem}
-                  />
-                ))}
-              </div>
-            ) : null}
-            {hasCreatorMatches ? (
-              <div
-                className="navbar-search-typeahead-section"
-                role="group"
-                aria-labelledby="navbar-search-typeahead-creators-heading"
-              >
-                <div
-                  id="navbar-search-typeahead-creators-heading"
-                  className="navbar-search-typeahead-heading"
-                >
-                  Creators
-                </div>
-                {creatorItems.map((item, index) => (
-                  <TypeaheadRow
-                    key={item.key}
-                    active={activeIndex === creatorStartIndex + index}
-                    item={item}
-                    index={creatorStartIndex + index}
-                    onHoverItem={onHoverItem}
-                    onSelectItem={onSelectItem}
-                  />
-                ))}
-              </div>
-            ) : null}
+                );
+              }
+              const previousIsFooter = index > 0 && items[index - 1]?.kind === "footer";
+              return (
+                <FragmentRowGroup
+                  key={item.key}
+                  active={activeIndex === index}
+                  heading={
+                    index === 0 || previousIsFooter ? TYPEAHEAD_HEADINGS[item.type] : undefined
+                  }
+                  item={item}
+                  index={index}
+                  onHoverItem={onHoverItem}
+                  onSelectItem={onSelectItem}
+                />
+              );
+            })}
           </div>
         ) : null}
       </div>
+    </div>
+  );
+}
+
+function FragmentRowGroup({
+  active,
+  heading,
+  index,
+  item,
+  onHoverItem,
+  onSelectItem,
+}: {
+  active: boolean;
+  heading?: string;
+  index: number;
+  item: Extract<TypeaheadItem, { kind: "asset" }>;
+  onHoverItem: (index: number) => void;
+  onSelectItem: (item: TypeaheadItem) => void;
+}) {
+  return (
+    <div className="navbar-search-typeahead-section" role="group" aria-label={heading}>
+      {heading ? <div className="navbar-search-typeahead-heading">{heading}</div> : null}
+      <TypeaheadRow
+        active={active}
+        item={item}
+        index={index}
+        onHoverItem={onHoverItem}
+        onSelectItem={onSelectItem}
+      />
     </div>
   );
 }
@@ -868,143 +766,36 @@ function getTypeaheadOptionId(item: TypeaheadItem) {
 }
 
 function TypeaheadRowIcon({ item }: { item: TypeaheadItem }) {
-  if (item.kind === "skill") {
-    if (!isUnifiedNativeSkillResult(item.result)) {
-      return (
-        <span className="navbar-search-typeahead-icon" aria-hidden="true">
-          <MarketplaceIcon kind="skill" label={item.result.result.displayName} size="xs" />
-        </span>
-      );
-    }
-    const label = presentationTitle(item.result.skill.displayName, item.result.skill.slug);
-    return (
-      <span className="navbar-search-typeahead-icon" aria-hidden="true">
-        <MarketplaceIcon
-          kind="skill"
-          label={label}
-          imageUrl={item.result.skill.icon}
-          skill={item.result.skill}
-          size="xs"
-        />
-      </span>
-    );
-  }
-
-  if (item.kind === "plugin") {
-    const label = presentationTitle(item.result.plugin.displayName, item.result.plugin.name);
-    return (
-      <span className="navbar-search-typeahead-icon" aria-hidden="true">
-        <MarketplaceIcon
-          kind="plugin"
-          label={label}
-          categorySlug={item.result.plugin.categories?.[0]}
-          size="xs"
-        />
-      </span>
-    );
-  }
-
-  if (item.kind === "creator") {
-    const publisher = item.result.creator;
-    return (
-      <span className="navbar-search-typeahead-icon" aria-hidden="true">
-        <MarketplaceIcon
-          kind={publisher.kind === "org" ? "org" : "user"}
-          label={publisher.displayName}
-          imageUrl={publisher.image}
-          size="xs"
-        />
-      </span>
-    );
-  }
-
-  return null;
+  if (item.kind === "footer") return null;
+  const Icon = TYPEAHEAD_ICONS[item.type];
+  return (
+    <span className="navbar-search-typeahead-icon" aria-hidden="true">
+      <Icon size={15} />
+    </span>
+  );
 }
 
 function getTypeaheadRowBody(item: TypeaheadItem) {
-  if (item.kind === "skill") {
-    if (!isUnifiedNativeSkillResult(item.result)) {
-      const external = item.result.result;
-      const owner =
-        external.owner && external.repo ? `${external.owner}/${external.repo}` : "skills.sh";
-      return {
-        title: external.displayName,
-        meta: <TypeaheadPublisherMeta owner={owner} official={false} packageName={external.slug} />,
-      };
-    }
-    const owner = item.result.ownerHandle ? `@${item.result.ownerHandle}` : "Skill";
-    return {
-      title: presentationTitle(item.result.skill.displayName, item.result.skill.slug),
-      meta: (
-        <TypeaheadPublisherMeta
-          owner={owner}
-          official={item.result.owner?.official === true}
-          packageName={item.result.skill.slug}
-        />
-      ),
-    };
+  if (item.kind === "footer") {
+    return { title: item.label, meta: null };
   }
-  if (item.kind === "plugin") {
-    const packageName = displayPluginPackageName(item.result.plugin.name);
-    const owner = item.result.plugin.ownerHandle ? `@${item.result.plugin.ownerHandle}` : null;
-    return {
-      title: presentationTitle(item.result.plugin.displayName, item.result.plugin.name),
-      meta: owner ? (
-        <TypeaheadPublisherMeta
-          owner={owner}
-          official={item.result.plugin.isOfficial}
-          packageName={packageName}
-        />
-      ) : (
-        packageName
-      ),
-    };
-  }
-  if (item.kind === "creator") {
-    const publisher = item.result.creator;
-    return {
-      title: publisher.displayName,
-      meta: (
-        <TypeaheadCreatorMeta
-          handle={`@${publisher.handle}`}
-          official={publisher.official === true}
-        />
-      ),
-    };
-  }
+  const slug = rowString(item.item, "slug") ?? "";
+  const name = rowString(item.item, "name") ?? slug;
+  const summary = rowString(item.item, "summary");
+  const tags = rowStringArray(item.item, "tags");
+  const packageName = slug || name;
   return {
-    title: item.label,
-    meta: null,
+    title: name,
+    meta: summary ? (
+      <span className="navbar-search-typeahead-package">{summary}</span>
+    ) : tags.length > 0 ? (
+      <span className="navbar-search-typeahead-package">{tags.join(", ")}</span>
+    ) : (
+      <span className="navbar-search-typeahead-package">{packageName}</span>
+    ),
   };
 }
 
-function TypeaheadPublisherMeta({
-  owner,
-  official,
-  packageName,
-}: {
-  owner: string;
-  official: boolean;
-  packageName: string;
-}) {
-  return (
-    <>
-      <span className="navbar-search-typeahead-publisher">{owner}</span>
-      {official ? <OfficialBadge /> : null}
-      <span className="navbar-search-typeahead-separator"> / </span>
-      <span className="navbar-search-typeahead-package">{packageName}</span>
-    </>
-  );
-}
-
-function TypeaheadCreatorMeta({ handle, official }: { handle: string; official: boolean }) {
-  return (
-    <>
-      <span className="navbar-search-typeahead-publisher">{handle}</span>
-      {official ? <OfficialBadge /> : null}
-    </>
-  );
-}
 function NavbarThemeSwitcher({
   mode,
   onSetMode,

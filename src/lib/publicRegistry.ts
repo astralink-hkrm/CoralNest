@@ -13,9 +13,6 @@ export const PublicRegistryPaths = {
   persona: "/persona",
   connectors: "/connectors",
   search: "/search",
-  audits: "/audits",
-  publishSkill: "/skills/publish",
-  publishPlugin: "/plugins/publish",
 } as const;
 
 export const PUBLIC_REGISTRY_SURFACES = [
@@ -48,21 +45,6 @@ export const PUBLIC_REGISTRY_SURFACES = [
     label: "Search",
     path: PublicRegistryPaths.search,
     summary: "Search the public CoralNest catalog.",
-  },
-  {
-    label: "Security audits",
-    path: PublicRegistryPaths.audits,
-    summary: "Browse public artifact security audit results.",
-  },
-  {
-    label: "Publish a skill",
-    path: PublicRegistryPaths.publishSkill,
-    summary: "Publish a new skill or update an existing skill.",
-  },
-  {
-    label: "Publish a plugin",
-    path: PublicRegistryPaths.publishPlugin,
-    summary: "Publish a plugin package on CoralNest.",
   },
 ] as const;
 

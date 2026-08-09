@@ -46,9 +46,9 @@ describe("Footer", () => {
 
     expect(
       within(browse as HTMLElement)
-        .getByRole("link", { name: "Skills" })
+        .getByRole("link", { name: "Flows" })
         .getAttribute("href"),
-    ).toBe("/skills");
+    ).toBe("/flows");
     expect(
       within(browse as HTMLElement)
         .getByRole("link", { name: "Plugins" })
@@ -73,8 +73,8 @@ describe("Footer", () => {
     expect(screen.getByRole("link", { name: "Deployed on Vercel" }).getAttribute("href")).toBe(
       "https://vercel.com",
     );
-    expect(screen.getByRole("link", { name: "Powered by Convex" }).getAttribute("href")).toBe(
-      "https://www.convex.dev",
+    expect(screen.getByRole("link", { name: "Powered by CockroachDB" }).getAttribute("href")).toBe(
+      "https://www.cockroachlabs.com",
     );
   });
 
@@ -90,7 +90,7 @@ describe("Footer", () => {
       expect(image.height).toBeGreaterThan(0);
     }
     expect(container.querySelector(".footer-v2-brand-mark")?.getAttribute("src")).toBe(
-      "/logo-transparent.png",
+      "/coral-logo-purple.png",
     );
     expect(container.querySelector('img[src="/og-coral-watermark.png"]')).toBeNull();
   });
@@ -113,9 +113,9 @@ describe("Footer", () => {
     expect(browseLinks?.getAttribute("data-open")).toBe("true");
     expect(
       within(browseLinks as HTMLElement)
-        .getByRole("link", { name: "Skills" })
+        .getByRole("link", { name: "Flows" })
         .getAttribute("href"),
-    ).toBe("/skills");
+    ).toBe("/flows");
 
     fireEvent.click(browseToggle);
 

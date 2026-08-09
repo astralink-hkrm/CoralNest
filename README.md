@@ -112,8 +112,65 @@ Flows are prompt-based recipes and execution methodologies that teach agents how
 
 - **Frontend**: TanStack Start (React 19, Vite, Nitro server engine).
 - **Backend & Database**: [Convex](https://convex.dev) (Real-time DB, file storage, HTTP actions, Convex Auth).
+- **Catalog Database**: [CockroachDB Serverless](https://cockroachlabs.com) (10 GB free — fast SQL metadata index for all 6 registry tiers).
+- **File Object Storage**: [Backblaze B2](https://www.backblaze.com/cloud-storage) (10 GB free, S3-compatible — stores all raw SKILL.md files, OpenAPI schemas, DAG topologies, and manifests).
 - **Search Engine**: Convex Vector Search + Embeddings.
 - **Language & Tooling**: TypeScript (Strict ESM), Bun runtime, Biome & Oxlint.
+
+---
+
+## 🗄️ Data Architecture
+
+CoralNest uses a **hybrid two-layer storage model** to separate fast-indexed metadata from heavy file content:
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│           CockroachDB Serverless  (Fast Metadata Index)          │
+│                                                                  │
+│  • slug, name, category, tags, author, stars, downloads          │
+│  • storage_path  →  "skills/anthropic/react/SKILL.md"           │
+│  • storage_url   →  "b2://coralnest-assets/skills/..."           │
+│  • content_hash  →  SHA-256 integrity fingerprint                │
+│  • file_size_bytes                                               │
+│                                                                  │
+│  Tables: flow_skills · flow_loops · flow_graphs                  │
+│          mcp_servers · connectors · plugins · personas           │
+└───────────────────────┬──────────────────────────────────────────┘
+                        │ (URL pointer — no blob data in SQL)
+                        ▼
+┌──────────────────────────────────────────────────────────────────┐
+│          Backblaze B2  ·  bucket: coralnest-assets               │
+│             (Private S3-Compatible Object Storage)               │
+│                                                                  │
+│  📂 skills/<author>/<slug>/SKILL.md      ← Full markdown prompts │
+│  📂 loops/<slug>/LOOP.md                 ← Feedback loop recipes │
+│  📂 graphs/<slug>/graph.json             ← DAG topologies (JSON) │
+│  📂 mcp/<slug>/mcp-server.json           ← MCP tool schemas      │
+│  📂 connectors/<slug>/openapi.json       ← OpenAPI action defs   │
+│  📂 plugins/<slug>/manifest.json         ← Plugin manifests      │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### Why This Split?
+
+| Concern             | CockroachDB                         | Backblaze B2                   |
+| ------------------- | ----------------------------------- | ------------------------------ |
+| **Search & Filter** | ✅ SQL indexes, full-text, ORDER BY | ❌ Not searchable              |
+| **Trending / Sort** | ✅ `downloads DESC`, `stars DESC`   | ❌ No sorting                  |
+| **File Content**    | ❌ Inefficient as text blob         | ✅ Native object store         |
+| **Cost at Scale**   | Cheap for rows, expensive for blobs | Free egress, unlimited objects |
+| **Integrity Check** | Stores `content_hash`               | Serves the actual bytes        |
+
+### Registry Data Volumes
+
+| Table         | Rows   | What B2 Stores                                       |
+| ------------- | ------ | ---------------------------------------------------- |
+| `flow_skills` | 10,009 | `SKILL.md` per skill — full prompt & instructions    |
+| `flow_loops`  | 90     | `LOOP.md` — exit criteria, steps, iteration rules    |
+| `flow_graphs` | 3      | `graph.json` — DAG nodes, edges, routing logic       |
+| `mcp_servers` | 267    | `mcp-server.json` — JSON-RPC 2.0 tool declarations   |
+| `connectors`  | 1,063  | `openapi.json` — full OpenAPI action schemas         |
+| `plugins`     | 1,654  | `manifest.json` — package manifest & capability spec |
 
 ---
 

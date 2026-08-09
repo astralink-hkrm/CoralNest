@@ -83,63 +83,6 @@ export function BrowseTabs({ ariaLabel, options, value, onChange }: BrowseTabsPr
   );
 }
 
-export function BrowseChipTabs({ ariaLabel, options, value, onChange }: BrowseTabsProps) {
-  return (
-    <div className="browse-chip-tabs" role="radiogroup" aria-label={ariaLabel}>
-      {options.map((option) => {
-        const active = value === option.value;
-        return (
-          <button
-            key={option.value ?? "all"}
-            className={`browse-chip-tab${active ? " is-active" : ""}`}
-            type="button"
-            role="radio"
-            aria-checked={active}
-            aria-label={option.count != null ? `${option.label} ${option.count}` : option.label}
-            onClick={() => onChange(option.value)}
-          >
-            {option.icon}
-            <span className="browse-chip-tab-label">{option.label}</span>
-            {option.count != null ? (
-              <span className="browse-chip-tab-count" aria-hidden="true">
-                {option.count}
-              </span>
-            ) : null}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-export function BrowseSegmentedTabs({ ariaLabel, options, value, onChange }: BrowseTabsProps) {
-  return (
-    <div className="clawhub-segmented" role="group" aria-label={ariaLabel}>
-      {options.map((option) => {
-        const active = value === option.value;
-        return (
-          <button
-            key={option.value ?? "all"}
-            type="button"
-            className={`clawhub-segmented-btn${active ? " is-active" : ""}`}
-            aria-pressed={active}
-            aria-label={option.count != null ? `${option.label} ${option.count}` : option.label}
-            onClick={() => onChange(option.value)}
-          >
-            {option.icon}
-            <span className="clawhub-segmented-label">{option.label}</span>
-            {option.count != null ? (
-              <span className="clawhub-segmented-count" aria-hidden="true">
-                {option.count}
-              </span>
-            ) : null}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 type BrowseSortSelectProps = {
   options: readonly BrowseChoice[];
   value: string | undefined;
@@ -573,57 +516,78 @@ export function BrowseCategorySelect({
   );
 }
 
-type BrowseCategorySidebarProps = {
-  ariaLabel: string;
+type BrowseCategorySection = {
+  title: string;
   categories: readonly BrowseCategory[];
   value: string | undefined;
   onChange: (value: string | undefined) => void;
+};
+
+type BrowseCategorySidebarProps = {
+  ariaLabel: string;
+  sections?: readonly BrowseCategorySection[];
+  categories?: readonly BrowseCategory[];
+  value?: string | undefined;
+  onChange?: (value: string | undefined) => void;
   disabled?: boolean;
 };
 
 export function BrowseCategorySidebar({
   ariaLabel,
+  sections,
   categories,
   value,
   onChange,
   disabled = false,
 }: BrowseCategorySidebarProps) {
+  const renderedSections: readonly BrowseCategorySection[] = sections?.length
+    ? sections
+    : [
+        {
+          title: "Categories",
+          categories: categories ?? [],
+          value,
+          onChange: onChange ?? (() => {}),
+        },
+      ];
   return (
     <aside className="browse-sidebar browse-category-sidebar" aria-label={ariaLabel}>
-      <fieldset className="sidebar-section">
-        <legend className="sidebar-title">Categories</legend>
-        <button
-          className={`sidebar-option${!value ? " is-active" : ""}`}
-          type="button"
-          aria-pressed={!value}
-          onClick={() => onChange(undefined)}
-          disabled={disabled}
-        >
-          <BrowseCategoryIcon slug={null} size={16} className="sidebar-option-icon" />
-          <span>All categories</span>
-        </button>
-        {categories.map((category) => {
-          const active = category.slug === value;
-          return (
-            <button
-              key={category.slug}
-              className={`sidebar-option${active ? " is-active" : ""}`}
-              type="button"
-              aria-pressed={active}
-              onClick={() => onChange(category.slug)}
-              disabled={disabled}
-            >
-              <BrowseCategoryIcon
-                slug={category.slug}
-                icon={category.icon}
-                size={16}
-                className="sidebar-option-icon"
-              />
-              <span>{category.label}</span>
-            </button>
-          );
-        })}
-      </fieldset>
+      {renderedSections.map((section) => (
+        <fieldset key={section.title} className="sidebar-section">
+          <legend className="sidebar-title">{section.title}</legend>
+          <button
+            className={`sidebar-option${!section.value ? " is-active" : ""}`}
+            type="button"
+            aria-pressed={!section.value}
+            onClick={() => section.onChange(undefined)}
+            disabled={disabled}
+          >
+            <BrowseCategoryIcon slug={null} size={16} className="sidebar-option-icon" />
+            <span>All</span>
+          </button>
+          {section.categories.map((category) => {
+            const active = category.slug === section.value;
+            return (
+              <button
+                key={category.slug}
+                className={`sidebar-option${active ? " is-active" : ""}`}
+                type="button"
+                aria-pressed={active}
+                onClick={() => section.onChange(category.slug)}
+                disabled={disabled}
+              >
+                <BrowseCategoryIcon
+                  slug={category.slug}
+                  icon={category.icon}
+                  size={16}
+                  className="sidebar-option-icon"
+                />
+                <span>{category.label}</span>
+              </button>
+            );
+          })}
+        </fieldset>
+      ))}
     </aside>
   );
 }

@@ -91,7 +91,7 @@ describe("og helpers", () => {
   it("uses defaults when owner and summary are missing", () => {
     const meta = buildSkillMeta({ slug: "parser" });
     expect(meta.title).toBe("parser — ClawHub");
-    expect(meta.description).toMatch(/ClawHub — a fast skill registry/i);
+    expect(meta.description).toMatch(/CoralNest — a fast, modern package registry/i);
     expect(meta.url).toContain("/unknown/skills/parser");
     expect(meta.owner).toBeNull();
     expect(meta.image).toContain("slug=parser");

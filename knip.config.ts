@@ -37,6 +37,8 @@ const config = {
         "src/server.ts!",
         "src/routes/**/*.{ts,tsx}!",
         "src/styles.css!",
+        "src/db/**/*.{ts,tsx}!",
+        "src/lib/**/*.{ts,tsx}!",
         "server/**/*.{ts,tsx}!",
         "emails/**/*.{ts,tsx}!",
         "scripts/**/*.{ts,mjs,js}!",
@@ -53,6 +55,7 @@ const config = {
           : []),
       ],
       ignoreDependencies: [
+        "@aws-sdk/lib-storage",
         // Production email rendering imports the React Email TSX templates from Convex;
         // Knip's production dependency pass does not trace that cross-root preview tree.
         "@react-email/components",

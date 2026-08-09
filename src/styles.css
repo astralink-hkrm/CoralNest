@@ -417,8 +417,7 @@ a {
 
 a:hover {
   color: inherit;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration: none;
 }
 
 a.card:hover,
@@ -429,7 +428,9 @@ a.home-category-card:hover,
 a.home-v2-c-card:hover,
 a.home-v2-cat-item:hover,
 a.home-v2-trend-card:hover,
-a.dashboard-import-banner-action:hover {
+a.dashboard-import-banner-action:hover,
+a.catalog-card:hover,
+a.catalog-list-row:hover {
   text-decoration: none;
 }
 

@@ -24,10 +24,6 @@ vi.mock("../components/ClientOnly", () => ({
   ClientOnly: ({ children }: { children: unknown }) => children,
 }));
 
-vi.mock("../components/DeploymentDriftBanner", () => ({
-  DeploymentDriftBanner: () => null,
-}));
-
 vi.mock("../components/ErrorBoundary", () => ({
   ErrorBoundary: ({ children }: { children: unknown }) => children,
 }));
@@ -50,6 +46,10 @@ vi.mock("sonner", () => ({
 
 vi.mock("../styles.css?url", () => ({
   default: "/src/styles.css",
+}));
+
+vi.mock("../design-system.css?url", () => ({
+  default: "/src/design-system.css",
 }));
 
 beforeEach(() => {

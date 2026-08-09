@@ -202,6 +202,9 @@ const config = defineConfig({
     nitro({
       serverDir: "server",
       handlers: [
+        // CockroachDB + Backblaze B2 asset catalog endpoints. Registered before
+        // the /api/** Convex proxy so they win route matching for these paths.
+        { route: "/api/v1/assets/**", handler: "./server/handlers/assets.ts" },
         { route: "/api/**", handler: "./server/handlers/convexProxy.ts" },
         { route: "/v1/feeds/**", handler: "./server/handlers/convexProxy.ts" },
       ],

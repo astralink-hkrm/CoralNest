@@ -16,6 +16,6 @@ describe("HomeBringSkillsSection", () => {
     render(<HomeBringSkillsSection />);
 
     expect(screen.queryByText("clawhub sync --all")).toBeNull();
-    expect(screen.getByText(/clawhub skill publish/)).toBeTruthy();
+    expect(screen.getByText(/coralnest skill publish/)).toBeTruthy();
   });
 });

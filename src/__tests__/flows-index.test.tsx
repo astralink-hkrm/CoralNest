@@ -2,24 +2,16 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { FlowsIndex, Route as FlowsRoute } from "../routes/flows/index";
-import {
-  convexHttpMock,
-  convexReactMocks,
-  resetConvexReactMocks,
-  setupDefaultConvexReactMocks,
-} from "./helpers/convexReactMocks";
+import { FlowsDetailHref, FlowsIndex } from "../routes/flows/-FlowsPage";
+import { Route as FlowsRoute } from "../routes/flows/index";
 
 const navigateMock = vi.fn();
-let searchMock: Record<string, unknown> = {};
-let loaderDataMock: unknown = null;
 
 vi.mock("@tanstack/react-router", () => ({
   createFileRoute: () => (config: { component: unknown; validateSearch: unknown }) => ({
     __config: config,
-    useLoaderData: () => loaderDataMock,
     useNavigate: () => navigateMock,
-    useSearch: () => searchMock,
+    useSearch: () => ({ tab: "skills" }),
   }),
   useRouterState: (options: { select: (state: unknown) => unknown }) =>
     options.select({ location: { searchStr: "" } }),
@@ -27,32 +19,34 @@ vi.mock("@tanstack/react-router", () => ({
   Link: (props: { children: ReactNode }) => <a href="/">{props.children}</a>,
 }));
 
-vi.mock("convex/react", () => ({
-  ConvexReactClient: class {},
-  useAction: (...args: unknown[]) => convexReactMocks.useAction(...args),
-  useQuery: (...args: unknown[]) => convexReactMocks.useQuery(...args),
+vi.mock("../components/CoralPageWrapper", () => ({
+  CoralPageWrapper: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock("../../src/convex/client", () => ({
-  convexHttp: {
-    action: (...args: unknown[]) => convexHttpMock.action(...args),
-    query: (...args: unknown[]) => convexHttpMock.query(...args),
-  },
+vi.mock("../components/skeletons/BrowseResultsSkeleton", () => ({
+  BrowseResultsSkeleton: () => <div data-testid="skeleton" />,
 }));
+
+const mockNavigate = (
+  updater: (prev: Record<string, unknown>) => Record<string, unknown>,
+  replace?: boolean,
+) => navigateMock({ search: updater, replace });
+
+function renderFlows() {
+  render(
+    <FlowsIndex
+      search={{ tab: "skills" }}
+      onNavigate={(updater, replace) => {
+        const next = updater({ tab: "skills" });
+        mockNavigate((prev) => ({ ...prev, ...next }), replace);
+      }}
+    />,
+  );
+}
 
 describe("FlowsIndex", () => {
   beforeEach(() => {
-    resetConvexReactMocks();
     navigateMock.mockReset();
-    searchMock = { tab: "skills" };
-    loaderDataMock = {
-      flowItems: [],
-      totalFlowCount: 0,
-      isLoadingFlows: false,
-      flowsApiError: false,
-      initialSkillsSearch: null,
-    };
-    setupDefaultConvexReactMocks();
   });
 
   afterEach(() => {
@@ -77,7 +71,7 @@ describe("FlowsIndex", () => {
   });
 
   it("renders top-level tabs for Skills, Loops, Graphs, and All Flows", () => {
-    render(<FlowsIndex />);
+    renderFlows();
 
     expect(screen.getByRole("radio", { name: "Skills" })).toBeTruthy();
     expect(screen.getByRole("radio", { name: "Loops" })).toBeTruthy();
@@ -86,38 +80,34 @@ describe("FlowsIndex", () => {
   });
 
   it("switches to Loops tab when Loops is clicked", () => {
-    render(<FlowsIndex />);
+    renderFlows();
 
     const loopsTab = screen.getByRole("radio", { name: "Loops" });
     fireEvent.click(loopsTab);
 
     expect(navigateMock).toHaveBeenCalled();
-    const searchFn = navigateMock.mock.calls[0][0].search;
-    const nextSearch = searchFn({ tab: "skills" });
+    const nextSearch = navigateMock.mock.calls[0][0].search({ tab: "skills" });
     expect(nextSearch.tab).toBe("loops");
+    expect(navigateMock.mock.calls[0][0].replace).toBe(true);
   });
 
-  it("renders empty state for loops when on loops tab with no items", () => {
-    searchMock = { tab: "loops" };
-    render(<FlowsIndex />);
+  it("switches to All Flows tab when All Flows is clicked", () => {
+    renderFlows();
 
-    expect(screen.getByText("No loops found")).toBeTruthy();
-    expect(
-      screen.getByText(
-        "Open-source agentic loops will appear here as they are indexed from upstream repositories.",
-      ),
-    ).toBeTruthy();
+    const allTab = screen.getByRole("radio", { name: "All Flows" });
+    fireEvent.click(allTab);
+
+    expect(navigateMock).toHaveBeenCalled();
+    const nextSearch = navigateMock.mock.calls[0][0].search({ tab: "skills" });
+    expect(nextSearch.tab).toBe("all");
   });
 
-  it("renders empty state for graphs when on graphs tab with no items", () => {
-    searchMock = { tab: "graphs" };
-    render(<FlowsIndex />);
-
-    expect(screen.getByText("No graphs found")).toBeTruthy();
-    expect(
-      screen.getByText(
-        "Multi-agent graph architectures will appear here as they are indexed from upstream repositories.",
-      ),
-    ).toBeTruthy();
+  it("maps catalog types to detail routes", () => {
+    expect(FlowsDetailHref("skills", "a")).toBe("/skills/a");
+    expect(FlowsDetailHref("loops", "b")).toBe("/loops/b");
+    expect(FlowsDetailHref("graphs", "c")).toBe("/graphs/c");
+    expect(FlowsDetailHref("mcp_servers", "d")).toBe("/mcp/d");
+    expect(FlowsDetailHref("connectors", "e")).toBe("/connectors/e");
+    expect(FlowsDetailHref("plugins", "f")).toBe("/plugins/catalog/f");
   });
 });

@@ -1,29 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CoralPageWrapper } from "../components/CoralPageWrapper";
+import { HomeCatalogSection } from "../components/home/HomeCatalogSection";
+import { HomeRegistryTiers } from "../components/home/HomeRegistryTiers";
 import { HomeAppsSection } from "../components/HomeAppsSection";
 import { HomeBringSkillsSection } from "../components/HomeBringSkillsSection";
-import { HomeListingSection } from "../components/HomeListingSection";
-import { HomePopularPublishersSection } from "../components/HomePopularPublishersSection";
 import { HomeV2FoldBottomFade } from "../components/HomeV2FoldBottomFade";
-import { fetchInitialHomeListing, type HomeListingInitialData } from "../lib/homeListingData";
+
+const FREELANCER_ANALOGY = [
+  { concept: "Knowledge & Skillset", tier: "Skills" },
+  { concept: "Work Methodology & Process", tier: "Loops & Graphs" },
+  { concept: "Hardware & Local Toolbelt", tier: "MCP Servers" },
+  { concept: "Client Passwords & SaaS Access", tier: "Connectors" },
+  { concept: "Pre-Packaged Toolkit", tier: "Plugins" },
+  { concept: "The Complete Specialist You Hire", tier: "Personas" },
+] as const;
 
 export const Route = createFileRoute("/")({
-  loader: loadInitialHomeListing,
-  component: SkillsHome,
+  component: CatalogHome,
 });
 
-async function loadInitialHomeListing(): Promise<HomeListingInitialData | null> {
-  try {
-    return await fetchInitialHomeListing();
-  } catch (error) {
-    console.error("Failed to load initial home listing:", error);
-    return null;
-  }
-}
-
-function SkillsHome() {
-  const initialListing = Route.useLoaderData();
-
+function CatalogHome() {
   return (
     <CoralPageWrapper pageType="home">
       <main className="home-v2-main oc-app-surface">
@@ -34,7 +30,7 @@ function SkillsHome() {
           <div className="home-v2-hero-bg" aria-hidden="true" />
 
           <img
-            src="/coral-logo-purple.png"
+            src="/coral-logo.png"
             alt="CoralNest"
             className="home-v2-hero-logo"
             draggable={false}
@@ -45,12 +41,76 @@ function SkillsHome() {
           </h1>
 
           <p className="home-v2-sub oc-hero-lede">
-            Discover skills, plugins, connectors, and MCP servers for your AI agents
+            The premier open registry for AI agent flows, MCP servers, plugins, connectors, and
+            personas
           </p>
         </section>
 
-        <HomeListingSection initialListing={initialListing} />
-        <HomePopularPublishersSection />
+        <HomeRegistryTiers />
+
+        {/* ═══ FREELANCER ANALOGY TABLE ═══ */}
+        <section className="px-4 py-8">
+          <table aria-label="Freelancer analogy" className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b border-slate-700">
+                <th className="py-3 pr-6 text-left font-semibold text-slate-300">
+                  When a freelancer has…
+                </th>
+                <th className="py-3 text-left font-semibold text-slate-300">CoralNest calls it…</th>
+              </tr>
+            </thead>
+            <tbody>
+              {FREELANCER_ANALOGY.map((row) => (
+                <tr key={row.concept} className="border-b border-slate-800">
+                  <td className="py-3 pr-6 text-slate-400">{row.concept}</td>
+                  <td className="py-3 font-medium text-white">{row.tier}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+          <HomeCatalogSection
+            type="skills"
+            title="Top skills"
+            subtitle="Atomic prompts, role guides, and reference workflows"
+          />
+          <HomeCatalogSection
+            type="loops"
+            title="Popular loops"
+            subtitle="Iterative, closed-loop execution recipes"
+            limit={4}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+          <HomeCatalogSection
+            type="graphs"
+            title="Featured graphs"
+            subtitle="Stateful multi-agent topologies and routing logic"
+            limit={4}
+          />
+          <HomeCatalogSection
+            type="mcp_servers"
+            title="Top MCP servers"
+            subtitle="Real-time local tools, databases, and filesystem servers"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+          <HomeCatalogSection
+            type="connectors"
+            title="Popular connectors"
+            subtitle="SaaS integrations with authenticated credentials and webhooks"
+          />
+          <HomeCatalogSection
+            type="plugins"
+            title="Top plugins"
+            subtitle="Installable bundles of skills, MCP configs, and CLI helpers"
+          />
+        </div>
+
         <HomeAppsSection />
         <HomeBringSkillsSection />
       </main>
@@ -58,4 +118,4 @@ function SkillsHome() {
   );
 }
 
-export default SkillsHome;
+export default CatalogHome;

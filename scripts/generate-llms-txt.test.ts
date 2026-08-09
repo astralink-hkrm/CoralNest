@@ -70,10 +70,10 @@ describe("llms.txt generation", () => {
     const output = await renderLlmsTxt();
 
     expect(output).toContain(
-      "- [Skills](https://clawhub.ai/skills): Browse and search skill bundles centered on SKILL.md.",
+      "- [Flows & skills](https://clawhub.ai/flows): Browse agent recipes: skills, loops, and graph architectures.",
     );
     expect(output).toContain(
-      "- [Plugins and packages](https://clawhub.ai/plugins): Browse and search OpenClaw plugin package records.",
+      "- [Plugins and packages](https://clawhub.ai/plugins): Browse and search plugin package records on CoralNest.",
     );
     expect(output).toContain(
       "- [CLI](https://docs.openclaw.ai/clawhub/cli): CLI reference: commands, flags, config, and lockfile behavior.",

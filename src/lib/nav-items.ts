@@ -50,9 +50,8 @@ const SKILLS_SEARCH = {
 export const PRIMARY_NAV_ITEMS: NavItem[] = [
   {
     label: "Flows",
-    to: PublicRegistryPaths.flows,
-    search: SKILLS_SEARCH,
-    activePathPrefixes: ["/flows/", "/skill/", "/skills/"],
+    to: "/flows",
+    activePathPrefixes: ["/flows/", "/skills/", "/loops/", "/graphs/"],
   },
   {
     label: "MCP",
@@ -62,7 +61,7 @@ export const PRIMARY_NAV_ITEMS: NavItem[] = [
   {
     label: "Plugins",
     to: PublicRegistryPaths.plugins,
-    activePathPrefixes: ["/plugin/"],
+    activePathPrefixes: ["/plugin/", "/plugins/"],
   },
   {
     label: "Connectors",
@@ -70,7 +69,7 @@ export const PRIMARY_NAV_ITEMS: NavItem[] = [
     activePathPrefixes: ["/connectors/"],
   },
   {
-    label: "Personas",
+    label: "Persona",
     to: PublicRegistryPaths.persona,
     activePathPrefixes: ["/persona/"],
   },
@@ -80,12 +79,7 @@ export const PRIMARY_NAV_ITEMS: NavItem[] = [
 // Secondary nav items (desktop secondary tabs + mobile dropdown section)
 // ---------------------------------------------------------------------------
 
-export const SECONDARY_NAV_ITEMS: NavItem[] = [
-  {
-    label: "Docs",
-    href: CLAWHUB_DOCS_URL,
-  },
-];
+export const SECONDARY_NAV_ITEMS: NavItem[] = [];
 
 // ---------------------------------------------------------------------------
 // Footer sections
@@ -129,12 +123,6 @@ export const FOOTER_NAV_SECTIONS: FooterNavSection[] = [
       { kind: "link", label: "Plugins", to: PublicRegistryPaths.plugins },
       { kind: "link", label: "Connectors", to: PublicRegistryPaths.connectors },
       { kind: "link", label: "Personas", to: PublicRegistryPaths.persona },
-      {
-        kind: "link",
-        label: "Audits",
-        to: PublicRegistryPaths.audits,
-        search: { type: undefined },
-      },
     ],
   },
   {
@@ -167,7 +155,7 @@ export const FOOTER_NAV_SECTIONS: FooterNavSection[] = [
 export const FOOTER_PLATFORM_LINKS = [
   { label: "Status", href: "https://clawhub.betteruptime.com" },
   { label: "Deployed on Vercel", href: "https://vercel.com" },
-  { label: "Powered by Convex", href: "https://www.convex.dev" },
+  { label: "Powered by CockroachDB", href: "https://www.cockroachlabs.com" },
 ] as const;
 
 export type FooterEcosystemProject = {

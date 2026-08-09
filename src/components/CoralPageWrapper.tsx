@@ -1,4 +1,5 @@
 import { type ReactNode } from "react";
+import { PAGE_TYPE_TO_TIER, TIER_LOGO } from "../lib/tierTheme";
 
 interface CoralPageWrapperProps {
   children: ReactNode;
@@ -35,17 +36,8 @@ export function CoralPageWrapper({
 }
 
 function getCoralLogoSrc(pageType: string): string {
-  switch (pageType) {
-    case "skills":
-    case "flows":
-    case "plugins":
-    case "connectors":
-    case "creators":
-    case "mcp":
-      return "/coral-logo-purple.png";
-    default:
-      return "/coral-logo-purple.png";
-  }
+  const tier = PAGE_TYPE_TO_TIER[pageType] ?? "home";
+  return TIER_LOGO[tier];
 }
 
 function getPageTitle(pageType: string): string {

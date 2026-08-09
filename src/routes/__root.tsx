@@ -1,7 +1,6 @@
 import {
   createRootRoute,
   HeadContent,
-  redirect,
   Scripts,
   useLocation,
   useRouter,
@@ -12,17 +11,10 @@ import { useEffect } from "react";
 import { Toaster } from "sonner";
 import { AppProviders } from "../components/AppProviders";
 import { ClientOnly } from "../components/ClientOnly";
-import { DeploymentDriftBanner } from "../components/DeploymentDriftBanner";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 import { Footer } from "../components/Footer";
 import { GenericNotFoundPage } from "../components/GenericNotFoundPage";
 import Header from "../components/Header";
-import { PromotionsBar } from "../components/PromotionsBar";
-import {
-  BANNED_ACCOUNT_PATH,
-  isBannedAccountAuthError,
-  normalizeAuthErrorMessage,
-} from "../lib/authErrorMessage";
 import { getClawHubSiteUrl, SITE_DESCRIPTION, SITE_NAME } from "../lib/site";
 import { getThemeModeFromCookieHeader, normalizeThemeMode } from "../lib/themeCookie";
 import designSystemCss from "../design-system.css?url";
@@ -30,18 +22,6 @@ import appCss from "../styles.css?url";
 
 const OG_IMAGE_VERSION = "20260723-1";
 export const Route = createRootRoute({
-  beforeLoad: ({ location }) => {
-    if (location.pathname === BANNED_ACCOUNT_PATH) return;
-    const authError = getAuthErrorDescription(location);
-    if (!authError) return;
-    const message = normalizeAuthErrorMessage(authError, "");
-    if (!isBannedAccountAuthError(message)) return;
-
-    throw redirect({
-      to: BANNED_ACCOUNT_PATH,
-      replace: true,
-    });
-  },
   head: () => {
     const siteName = SITE_NAME;
     const siteDescription = SITE_DESCRIPTION;
@@ -165,22 +145,6 @@ export const Route = createRootRoute({
   notFoundComponent: GenericNotFoundPage,
 });
 
-function getAuthErrorDescription(location: { search?: unknown; searchStr?: string }) {
-  const fromSearch =
-    getSearchStringValue(location.search, "error_description") ??
-    getSearchStringValue(location.search, "error");
-  if (fromSearch) return fromSearch;
-  if (!location.searchStr) return null;
-  const params = new URLSearchParams(location.searchStr);
-  return params.get("error_description")?.trim() || params.get("error")?.trim() || null;
-}
-
-function getSearchStringValue(search: unknown, key: string) {
-  if (!search || typeof search !== "object") return null;
-  const value = (search as Record<string, unknown>)[key];
-  return typeof value === "string" && value.trim() ? value.trim() : null;
-}
-
 function RootDocument({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const initialThemeMode = normalizeThemeMode(
@@ -213,11 +177,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         <AppProviders>
           <div className="app-shell">
-            <PromotionsBar />
             <Header />
-            <ClientOnly>
-              <DeploymentDriftBanner />
-            </ClientOnly>
             <RouteErrorBoundary>{children}</RouteErrorBoundary>
             <Footer />
           </div>

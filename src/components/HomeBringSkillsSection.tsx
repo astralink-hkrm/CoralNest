@@ -1,7 +1,7 @@
-import { Link } from "@tanstack/react-router";
 import { ArrowRight, Sparkles } from "lucide-react";
 import type { PointerEvent } from "react";
 import { useState } from "react";
+import { clawhubDocsUrl } from "../lib/publicRegistry";
 import { InstallCopyButton } from "./InstallCopyButton";
 
 // Same composition as the footer easter egg, rendered full-bleed with a static
@@ -209,15 +209,16 @@ export function HomeBringSkillsSection() {
         </div>
 
         <div className="home-v2-byos-foot">
-          <Link
-            to="/import"
-            search={{ ownerHandle: undefined }}
+          <a
+            href={clawhubDocsUrl("publishing")}
+            target="_blank"
+            rel="noreferrer"
             className="home-v2-byos-import oc-action oc-action-ghost"
           >
             <GitHubGlyph />
-            or import from your GitHub
+            or publish from your GitHub
             <ArrowRight size={15} aria-hidden="true" />
-          </Link>
+          </a>
         </div>
       </div>
     </section>
