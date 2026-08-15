@@ -456,17 +456,13 @@ export function CatalogBrowse({
               </div>
             ) : (
               <div>
-                {/* Column header — matches reference "SKILL / CATEGORY / POPULARITY" */}
-                <div
-                  className="mb-1 grid px-1 text-[11px] font-semibold uppercase tracking-widest text-slate-600"
-                  style={{ gridTemplateColumns: "minmax(0,1fr) 160px 190px" }}
-                  aria-hidden="true"
-                >
-                  <span>Name</span>
-                  <span>Category</span>
-                  <span className="text-right">Popularity</span>
+                {/* Column header — shares the row grid so the columns line up */}
+                <div className="home-v2-listing-head is-catalog" aria-hidden="true">
+                  <span className="home-v2-listing-head-label">Name</span>
+                  <span className="home-v2-listing-head-mid">Category</span>
+                  <span className="home-v2-listing-head-stat">Popularity</span>
                 </div>
-                <div className="border-t border-slate-800/60">
+                <div>
                   {fetchState.items.map((item, index) => {
                     const type = (item.type as AssetType) ?? activeType;
                     const slug = rowString(item, "slug") ?? "";

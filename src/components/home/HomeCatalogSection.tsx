@@ -34,10 +34,10 @@ export function HomeCatalogSection({ type, title, subtitle, limit = 6 }: HomeCat
 
   return (
     <section aria-label={title} className="home-v2-listing-section">
-      <div className="mb-4 flex items-end justify-between gap-4">
-        <div>
-          <h2 className="text-lg font-bold text-white">{title}</h2>
-          <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p>
+      <div className="home-v2-listing-section-head">
+        <div className="home-v2-listing-section-heading">
+          <h2 className="home-v2-listing-section-title">{title}</h2>
+          <p className="home-v2-listing-section-subtitle">{subtitle}</p>
         </div>
         <a
           href={catalogBrowseHref(type)}
@@ -45,6 +45,13 @@ export function HomeCatalogSection({ type, title, subtitle, limit = 6 }: HomeCat
         >
           Browse all <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
         </a>
+      </div>
+
+      {/* Column header — shares the row grid so the columns line up */}
+      <div className="home-v2-listing-head is-catalog" aria-hidden="true">
+        <span className="home-v2-listing-head-label">Name</span>
+        <span className="home-v2-listing-head-mid">Category</span>
+        <span className="home-v2-listing-head-stat">Popularity</span>
       </div>
 
       {error ? (
@@ -66,7 +73,7 @@ export function HomeCatalogSection({ type, title, subtitle, limit = 6 }: HomeCat
           Nothing in this section yet.
         </p>
       ) : (
-        <div className="flex flex-col gap-2">
+        <div>
           {items.map((item) => {
             const slug = rowString(item, "slug") ?? "";
             return (

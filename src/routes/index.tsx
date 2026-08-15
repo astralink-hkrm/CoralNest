@@ -6,6 +6,39 @@ import { HomeAppsSection } from "../components/HomeAppsSection";
 import { HomeBringSkillsSection } from "../components/HomeBringSkillsSection";
 import { HomeV2FoldBottomFade } from "../components/HomeV2FoldBottomFade";
 
+const CATALOG_SECTIONS = [
+  {
+    type: "skills",
+    title: "Top skills",
+    subtitle: "Atomic prompts, role guides, and reference workflows",
+  },
+  {
+    type: "loops",
+    title: "Popular loops",
+    subtitle: "Iterative, closed-loop execution recipes",
+  },
+  {
+    type: "graphs",
+    title: "Featured graphs",
+    subtitle: "Stateful multi-agent topologies and routing logic",
+  },
+  {
+    type: "mcp_servers",
+    title: "Top MCP servers",
+    subtitle: "Real-time local tools, databases, and filesystem servers",
+  },
+  {
+    type: "connectors",
+    title: "Popular connectors",
+    subtitle: "SaaS integrations with authenticated credentials and webhooks",
+  },
+  {
+    type: "plugins",
+    title: "Top plugins",
+    subtitle: "Installable bundles of skills, MCP configs, and CLI helpers",
+  },
+] as const;
+
 const FREELANCER_ANALOGY = [
   { concept: "Knowledge & Skillset", tier: "Skills" },
   { concept: "Work Methodology & Process", tier: "Loops & Graphs" },
@@ -48,68 +81,42 @@ function CatalogHome() {
 
         <HomeRegistryTiers />
 
+        {/* ═══ CATALOG LISTINGS — one full-width section per asset type ═══ */}
+        <div className="home-v2-listing-stack">
+          {CATALOG_SECTIONS.map((section) => (
+            <HomeCatalogSection
+              key={section.type}
+              type={section.type}
+              title={section.title}
+              subtitle={section.subtitle}
+              limit={6}
+            />
+          ))}
+        </div>
+
         {/* ═══ FREELANCER ANALOGY TABLE ═══ */}
-        <section className="px-4 py-8">
+        <section className="home-v2-analogy oc-section">
           <table aria-label="Freelancer analogy" className="w-full border-collapse text-sm">
             <thead>
-              <tr className="border-b border-slate-700">
-                <th className="py-3 pr-6 text-left font-semibold text-slate-300">
+              <tr className="home-v2-analogy-headrow">
+                <th className="home-v2-analogy-th py-3 pr-6 text-left font-semibold">
                   When a freelancer has…
                 </th>
-                <th className="py-3 text-left font-semibold text-slate-300">CoralNest calls it…</th>
+                <th className="home-v2-analogy-th py-3 text-left font-semibold">
+                  CoralNest calls it…
+                </th>
               </tr>
             </thead>
             <tbody>
               {FREELANCER_ANALOGY.map((row) => (
-                <tr key={row.concept} className="border-b border-slate-800">
-                  <td className="py-3 pr-6 text-slate-400">{row.concept}</td>
-                  <td className="py-3 font-medium text-white">{row.tier}</td>
+                <tr key={row.concept} className="home-v2-analogy-row">
+                  <td className="home-v2-analogy-concept py-3 pr-6">{row.concept}</td>
+                  <td className="home-v2-analogy-tier py-3 font-medium">{row.tier}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </section>
-
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-          <HomeCatalogSection
-            type="skills"
-            title="Top skills"
-            subtitle="Atomic prompts, role guides, and reference workflows"
-          />
-          <HomeCatalogSection
-            type="loops"
-            title="Popular loops"
-            subtitle="Iterative, closed-loop execution recipes"
-            limit={4}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-          <HomeCatalogSection
-            type="graphs"
-            title="Featured graphs"
-            subtitle="Stateful multi-agent topologies and routing logic"
-            limit={4}
-          />
-          <HomeCatalogSection
-            type="mcp_servers"
-            title="Top MCP servers"
-            subtitle="Real-time local tools, databases, and filesystem servers"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-          <HomeCatalogSection
-            type="connectors"
-            title="Popular connectors"
-            subtitle="SaaS integrations with authenticated credentials and webhooks"
-          />
-          <HomeCatalogSection
-            type="plugins"
-            title="Top plugins"
-            subtitle="Installable bundles of skills, MCP configs, and CLI helpers"
-          />
-        </div>
 
         <HomeAppsSection />
         <HomeBringSkillsSection />

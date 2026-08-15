@@ -1,12 +1,15 @@
 import { Bookmark, Download } from "lucide-react";
-import { rowNumber, rowString, rowStringArray } from "../../lib/assetsClient";
-import { assetDownloadUrl } from "../../lib/assetsClient";
+import { assetDownloadUrl, rowNumber, rowString, rowStringArray } from "../../lib/assetsClient";
 import type { AssetRow, AssetType } from "../../lib/assetTypes";
 
 export function CatalogListRow({
-  item, type, detailHref,
+  item,
+  type,
+  detailHref,
 }: {
-  item: AssetRow; type: AssetType; detailHref: string;
+  item: AssetRow;
+  type: AssetType;
+  detailHref: string;
 }) {
   const slug = rowString(item, "slug") ?? "";
   const name = rowString(item, "name") ?? slug;
@@ -19,64 +22,46 @@ export function CatalogListRow({
   const updatedAt = rowString(item, "updated_at") ?? rowString(item, "created_at");
 
   return (
-    <a
-      href={detailHref}
-      className="catalog-list-row group relative grid min-w-0 items-start border-b border-slate-800/60 px-1 py-3.5 last:border-b-0"
-      style={{ gridTemplateColumns: "minmax(0,1fr) 160px 190px" }}
-    >
-      {/* hover bg */}
-      <span
-        className="pointer-events-none absolute inset-x-[-6px] inset-y-[4px] rounded-md bg-transparent transition-colors group-hover:bg-white/[0.025]"
-        aria-hidden="true"
-      />
-
+    <a href={detailHref} className="home-v2-listing-row is-catalog">
       {/* col 1: name + owner + tags + summary */}
-      <div className="relative min-w-0 pr-4">
-        <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <span className="text-[15px] font-bold leading-snug tracking-tight text-white">
-            {name}
-          </span>
-          {publisher ? (
-            <span className="text-[12px] text-slate-500">@{publisher}</span>
-          ) : null}
+      <div className="home-v2-listing-row-body">
+        <div className="home-v2-listing-row-title">
+          <span className="home-v2-listing-row-name">{name}</span>
+          {publisher ? <span className="home-v2-listing-row-by">@{publisher}</span> : null}
           {tags.map((t) => (
-            <span key={t} className="text-[11px] text-slate-600">#{t}</span>
+            <span key={t} className="home-v2-listing-row-tag">
+              #{t}
+            </span>
           ))}
         </div>
-        {summary ? (
-          <p className="mt-0.5 line-clamp-1 text-[13px] leading-relaxed text-slate-500">
-            {summary}
-          </p>
-        ) : null}
+        {summary ? <p className="home-v2-listing-row-summary">{summary}</p> : null}
       </div>
 
       {/* col 2: category */}
-      <div className="relative self-center text-[13px] text-slate-400">
-        {category ?? ""}
-      </div>
+      <div className="home-v2-listing-row-category">{category ?? ""}</div>
 
-      {/* col 3: popularity — updated + stars + downloads + download btn */}
-      <div className="relative flex flex-col items-end gap-0.5 self-center text-[12px] text-slate-500">
+      {/* col 3: updated + stars + downloads + download btn */}
+      <div className="home-v2-listing-row-stats is-catalog">
         {updatedAt ? (
-          <span className="whitespace-nowrap">Updated {timeAgo(updatedAt)}</span>
+          <span className="home-v2-listing-row-updated">Updated {timeAgo(updatedAt)}</span>
         ) : null}
-        <span className="flex items-center gap-3">
+        <span className="home-v2-listing-row-counts">
           {stars != null ? (
-            <span className="inline-flex items-center gap-1">
-              <Bookmark size={12} className="opacity-55" aria-hidden="true" />
+            <span>
+              <Bookmark size={12} aria-hidden="true" />
               {fmt(stars)}
             </span>
           ) : null}
           {downloads != null ? (
-            <span className="inline-flex items-center gap-1">
-              <Download size={12} className="opacity-55" aria-hidden="true" />
+            <span>
+              <Download size={12} aria-hidden="true" />
               {fmt(downloads)}
             </span>
           ) : null}
           <a
             href={assetDownloadUrl(type, slug)}
             onClick={(e) => e.stopPropagation()}
-            className="ml-1 rounded bg-slate-800/80 p-1 text-slate-500 transition-colors hover:bg-slate-700 hover:text-white"
+            className="home-v2-listing-row-download"
             aria-label={`Download ${name}`}
             title="Download"
           >
