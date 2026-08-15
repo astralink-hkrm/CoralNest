@@ -1,6 +1,5 @@
-import { Bookmark, Boxes, Cable, Download, Network, Plug, Repeat2, Sparkles } from "lucide-react";
+import { Boxes, Cable, Network, Plug, Repeat2, Sparkles } from "lucide-react";
 import { rowNumber, rowString, rowStringArray } from "../../lib/assetsClient";
-import { assetDownloadUrl } from "../../lib/assetsClient";
 import type { AssetRow, AssetType } from "../../lib/assetTypes";
 
 const TYPE_META: Record<AssetType, { label: string; icon: typeof Sparkles }> = {
@@ -14,31 +13,6 @@ const TYPE_META: Record<AssetType, { label: string; icon: typeof Sparkles }> = {
 
 export function assetTypeMeta(type: AssetType) {
   return TYPE_META[type];
-}
-
-export function CatalogDownloadButton({
-  type,
-  slug,
-  label,
-  className = "",
-}: {
-  type: AssetType;
-  slug: string;
-  label?: string;
-  className?: string;
-}) {
-  return (
-    <a
-      href={assetDownloadUrl(type, slug)}
-      className={`catalog-download-btn inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${className}`}
-      aria-label={`Download ${label ?? slug}`}
-      title="Download raw file"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <Download size={13} aria-hidden="true" />
-      {label}
-    </a>
-  );
 }
 
 export function CatalogCard({
@@ -138,28 +112,4 @@ function timeAgo(iso: string): string {
   const mos = Math.floor(days / 30);
   if (mos < 12) return `${mos}mo ago`;
   return `${Math.floor(mos / 12)}y ago`;
-}
-
-// Keep typeBadgeText for any callers that may still reference it
-export function typeBadgeText(item: AssetRow, type: AssetType): string {
-  switch (type) {
-    case "skills":
-      return rowStringArray(item, "language")[0] ?? rowString(item, "difficulty") ?? "";
-    case "plugins":
-      return rowString(item, "version") ?? "";
-    case "mcp_servers":
-      return rowString(item, "transport") ?? "";
-    case "connectors": {
-      const a = rowNumber(item, "actions_count");
-      return a != null ? `${a} actions` : "";
-    }
-    case "loops":
-      return `${rowNumber(item, "step_count") ?? "?"} steps`;
-    case "graphs":
-      return `${rowNumber(item, "node_count") ?? "?"}N · ${rowNumber(item, "edge_count") ?? "?"}E`;
-    default: {
-      const x: never = type;
-      throw new Error(`Unhandled: ${String(x)}`);
-    }
-  }
 }

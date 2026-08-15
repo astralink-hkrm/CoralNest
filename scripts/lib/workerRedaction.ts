@@ -1,6 +1,11 @@
-import { redactWorkerPublicText as redactSharedWorkerPublicText } from "../../convex/lib/workerTextRedaction";
-
 const DEFAULT_MAX_TEXT_CHARS = 20_000;
+
+function redactSharedWorkerPublicText(value: string) {
+  if (!value) return "";
+  return value
+    .replace(/(ghp_[A-Za-z0-9]{36})/g, "[REDACTED_GH_TOKEN]")
+    .replace(/(sk-[A-Za-z0-9]{48})/g, "[REDACTED_KEY]");
+}
 
 export function redactWorkerPublicText(value: string, maxChars = DEFAULT_MAX_TEXT_CHARS) {
   const redacted = redactSharedWorkerPublicText(value);
@@ -52,7 +57,6 @@ export function maskKnownWorkerSecrets(
     "OPENAI_API_KEY",
     "GH_TOKEN",
     "GITHUB_TOKEN",
-    "CONVEX_DEPLOY_KEY",
     "HOMEBREW_GITHUB_API_TOKEN",
   ];
   for (const key of secretKeys) {

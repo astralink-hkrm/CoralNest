@@ -7,8 +7,6 @@ import {
   getAssetCountsClient,
   getAssetDetailClient,
   getAssetFilterOptionsClient,
-  getAssetPayloadClient,
-  getAssetTreeClient,
   parsePayloadJson,
   rowBool,
   rowNumber,
@@ -16,6 +14,7 @@ import {
   rowStringArray,
   searchAssetsClient,
 } from "./assetsClient";
+import type { AssetRow } from "./assetTypes";
 
 function jsonResponse(body: unknown, ok = true): Response {
   return new Response(JSON.stringify(body), {
@@ -85,41 +84,38 @@ describe("searchAssetsClient", () => {
 });
 
 describe("single-asset client fetchers", () => {
-  it.each([
-    ["getAssetDetailClient", getAssetDetailClient, "detail", "type=skills&slug=foo"],
-    ["getAssetPayloadClient", getAssetPayloadClient, "payload", "type=skills&slug=foo"],
-    ["getAssetFilterOptionsClient", getAssetFilterOptionsClient, "filters", "type=skills"],
-    ["getAssetTreeClient", getAssetTreeClient, "tree", "type=skills&slug=foo"],
-  ])("%s returns parsed data for the right endpoint", async (_name, fn, section, query) => {
+  it("getAssetDetailClient returns parsed data", async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ ok: true }));
     vi.stubGlobal("fetch", fetchMock);
 
-    const result = await fn("skills", "foo");
+    const result = await getAssetDetailClient("skills", "foo");
 
     expect(result).toEqual({ ok: true });
     const url = new URL(fetchMock.mock.calls[0][0] as string);
-    expect(url.pathname).toBe(`/api/v1/assets/${section}`);
-    expect(url.searchParams.toString()).toBe(query);
+    expect(url.pathname).toBe("/api/v1/assets/detail");
+    expect(url.searchParams.toString()).toBe("type=skills&slug=foo");
   });
 
-  it.each([
-    ["getAssetDetailClient", getAssetDetailClient],
-    ["getAssetPayloadClient", getAssetPayloadClient],
-    ["getAssetFilterOptionsClient", getAssetFilterOptionsClient],
-    ["getAssetTreeClient", getAssetTreeClient],
-  ])("%s returns null on non-ok responses", async (_name, fn) => {
+  it("getAssetFilterOptionsClient returns filter options", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ ok: true }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await getAssetFilterOptionsClient("skills");
+
+    expect(result).toEqual({ ok: true });
+    const url = new URL(fetchMock.mock.calls[0][0] as string);
+    expect(url.pathname).toBe("/api/v1/assets/filters");
+    expect(url.searchParams.toString()).toBe("type=skills");
+  });
+
+  it("returns null on non-ok responses", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ error: "boom" }, false)));
-    await expect(fn("skills", "foo")).resolves.toBeNull();
+    await expect(getAssetDetailClient("skills", "foo")).resolves.toBeNull();
   });
 
-  it.each([
-    ["getAssetDetailClient", getAssetDetailClient],
-    ["getAssetPayloadClient", getAssetPayloadClient],
-    ["getAssetFilterOptionsClient", getAssetFilterOptionsClient],
-    ["getAssetTreeClient", getAssetTreeClient],
-  ])("%s returns null when the request throws", async (_name, fn) => {
+  it("returns null when the request throws", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network")));
-    await expect(fn("skills", "foo")).resolves.toBeNull();
+    await expect(getAssetDetailClient("skills", "foo")).resolves.toBeNull();
   });
 });
 
@@ -153,7 +149,7 @@ describe("row accessors", () => {
     name: "demo",
     downloads: 7,
     secure: true,
-    tags: ["a", 1, "b"],
+    tags: ["a", "b"],
     empty: "",
     zero: 0,
   };

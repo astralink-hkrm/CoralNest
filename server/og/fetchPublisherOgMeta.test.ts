@@ -1,65 +1,35 @@
 /* @vitest-environment node */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-const queryMock = vi.fn();
-const clientCtorMock = vi.fn();
-
-vi.mock("convex/browser", () => ({
-  ConvexHttpClient: class ConvexHttpClientMock {
-    constructor(url: string) {
-      clientCtorMock(url);
-    }
-
-    query = queryMock;
-  },
-}));
-
-vi.mock("../../convex/_generated/api", () => ({
-  api: { publishers: { getOgMetaByHandle: "publishers.getOgMetaByHandle" } },
-}));
+import { describe, expect, it, vi } from "vitest";
+import { fetchPublisherOgMeta } from "./fetchPublisherOgMeta";
 
 describe("fetchPublisherOgMeta", () => {
-  beforeEach(() => {
-    queryMock.mockReset();
-    clientCtorMock.mockReset();
-  });
-
-  afterEach(() => {
-    vi.resetModules();
-  });
-
-  it("reads downloads from publisher profile stats", async () => {
-    queryMock.mockResolvedValue({
-      handle: "openclaw",
-      kind: "org",
-      displayName: "OpenClaw",
-      bio: "Build with claws.",
-      image: null,
-      official: true,
-      affiliations: [
-        {
-          publisher: {
-            handle: "github",
-            displayName: "GitHub",
-            image: "https://example.com/github.png",
-          },
-        },
-      ],
-      stats: { downloads: 99, installs: 1200 },
+  it("fetches publisher meta via HTTP API", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        handle: "openclaw",
+        kind: "org",
+        displayName: "OpenClaw",
+        bio: "Build with claws.",
+        image: null,
+        official: true,
+        affiliations: [
+          { handle: "github", displayName: "GitHub", image: "https://example.com/github.png" },
+        ],
+        stats: { downloads: 99 },
+      }),
     });
+    vi.stubGlobal("fetch", fetchMock);
 
-    const { fetchPublisherOgMeta } = await import("./fetchPublisherOgMeta");
-    const meta = await fetchPublisherOgMeta("openclaw", "https://example.convex.cloud");
+    const meta = await fetchPublisherOgMeta("openclaw", "https://api.example.com");
 
-    expect(clientCtorMock).toHaveBeenCalledWith("https://example.convex.cloud");
-    expect(queryMock).toHaveBeenCalledWith("publishers.getOgMetaByHandle", {
-      handle: "openclaw",
-    });
     expect(meta?.stats.downloads).toBe(99);
     expect(meta?.official).toBe(true);
     expect(meta?.affiliations).toEqual([
       { handle: "github", displayName: "GitHub", image: "https://example.com/github.png" },
     ]);
+
+    vi.unstubAllGlobals();
   });
 });

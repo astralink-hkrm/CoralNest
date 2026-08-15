@@ -2,7 +2,6 @@
 
 import { spawnSync } from "node:child_process";
 import { parseRolloutMode } from "clawhub-schema";
-import { resolveConvexSiteUrl } from "../src/lib/convexDeploymentUrl";
 
 export function resolveFrontendBuildEnv(env: NodeJS.ProcessEnv) {
   const targetEnvironment = env.VERCEL_TARGET_ENV?.trim() || env.VERCEL_ENV?.trim();
@@ -17,14 +16,8 @@ export function resolveFrontendBuildEnv(env: NodeJS.ProcessEnv) {
       );
     }
   }
-  const convexSiteUrl = resolveConvexSiteUrl({
-    CONVEX_URL: env.CONVEX_URL,
-    VITE_CONVEX_SITE_URL: targetEnvironment === "preview" ? undefined : env.VITE_CONVEX_SITE_URL,
-    VITE_CONVEX_URL: env.VITE_CONVEX_URL,
-  });
   return {
     ...env,
-    VITE_CONVEX_SITE_URL: convexSiteUrl,
     VITE_CLAWHUB_DEPLOY_ENV: targetEnvironment ?? "development",
   };
 }

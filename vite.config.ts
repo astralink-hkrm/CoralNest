@@ -1,5 +1,3 @@
-import { createRequire } from "node:module";
-import { dirname, join } from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
@@ -7,15 +5,6 @@ import viteReact from "@vitejs/plugin-react";
 import { nitro } from "nitro/vite";
 import { defineConfig, type Plugin } from "vite";
 import { copyOgAssets } from "./scripts/copy-og-assets";
-
-const require = createRequire(import.meta.url);
-
-const convexEntry = require.resolve("convex");
-const convexRoot = dirname(dirname(dirname(convexEntry)));
-const convexReactPath = join(convexRoot, "dist/esm/react/index.js");
-const convexBrowserPath = join(convexRoot, "dist/esm/browser/index.js");
-const convexValuesPath = join(convexRoot, "dist/esm/values/index.js");
-const convexAuthReactPath = require.resolve("@convex-dev/auth/react");
 
 function handleRollupWarning(
   warning: { code?: string; message: string; id?: string },
@@ -180,12 +169,8 @@ function copyOgAssetsPlugin(): Plugin {
 
 const config = defineConfig({
   resolve: {
-    dedupe: ["convex", "@convex-dev/auth", "react", "react-dom"],
+    dedupe: ["react", "react-dom"],
     alias: {
-      "convex/react": convexReactPath,
-      "convex/browser": convexBrowserPath,
-      "convex/values": convexValuesPath,
-      "@convex-dev/auth/react": convexAuthReactPath,
       // MarkdownPreview uses Shiki's JavaScript engine; keep rehype from
       // selecting the WASM-only `shiki/core` export condition.
       "shiki/core": "shiki/dist/core.mjs",
@@ -193,20 +178,14 @@ const config = defineConfig({
     // Use native Vite tsconfig paths resolution instead of the plugin
     tsconfigPaths: true,
   },
-  optimizeDeps: {
-    include: ["convex/react", "convex/browser"],
-  },
   plugins: [
     patchArkSafariInOperator(),
     devtools(),
     nitro({
       serverDir: "server",
       handlers: [
-        // CockroachDB + Backblaze B2 asset catalog endpoints. Registered before
-        // the /api/** Convex proxy so they win route matching for these paths.
+        // CockroachDB + Backblaze B2 asset catalog endpoints.
         { route: "/api/v1/assets/**", handler: "./server/handlers/assets.ts" },
-        { route: "/api/**", handler: "./server/handlers/convexProxy.ts" },
-        { route: "/v1/feeds/**", handler: "./server/handlers/convexProxy.ts" },
       ],
       rollupConfig: {
         onwarn: handleRollupWarning,

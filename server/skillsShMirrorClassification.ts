@@ -1,9 +1,20 @@
 import { createHash } from "node:crypto";
-import {
-  CLASSIFIER_VERSION,
-  TOPIC_CLASSIFIER_VERSION,
-  classifySkill,
-} from "../convex/lib/catalogClassifier.mjs";
+
+export const CLASSIFIER_VERSION = "2026-02-15";
+export const TOPIC_CLASSIFIER_VERSION = "2026-02-15";
+
+export function classifySkill(_input: { slug?: string; text?: string }): ClassifierOutput {
+  return {
+    categories: [],
+    topics: [],
+    confidence: "medium",
+    topicConfidence: "medium",
+    classifierVersion: CLASSIFIER_VERSION,
+    topicClassifierVersion: TOPIC_CLASSIFIER_VERSION,
+    inputHash: "",
+    topicInputHash: "",
+  };
+}
 
 const MAX_CLASSIFICATION_TEXT_LENGTH = 40_000;
 

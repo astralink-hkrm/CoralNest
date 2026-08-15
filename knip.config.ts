@@ -1,8 +1,3 @@
-const convexRegisteredFunctionEntries = [
-  "convex/*.{ts,tsx}!",
-  "convex/httpApiV1/*.{ts,tsx}!",
-] as const;
-
 const includeTests = process.env.KNIP_INCLUDE_TESTS === "1";
 
 const config = {
@@ -15,7 +10,6 @@ const config = {
     "coverage/**",
     "dist/**",
     "src/routeTree.gen.ts",
-    "convex/_generated/**",
     "packages/*/dist/**",
     "packages/clawhub/test-artifact/**",
   ],
@@ -43,36 +37,35 @@ const config = {
         "emails/**/*.{ts,tsx}!",
         "scripts/**/*.{ts,mjs,js}!",
         "*.{config,setup}.{ts,mjs,js}!",
-        ...convexRegisteredFunctionEntries,
         ...(includeTests
           ? [
               "src/**/*.test.{ts,tsx}!",
               "src/__tests__/**/*.{ts,tsx}!",
-              "convex/**/*.test.{ts,tsx}!",
               "emails/**/*.test.{ts,tsx}!",
               "server/**/*.test.{ts,tsx}!",
             ]
           : []),
       ],
       ignoreDependencies: [
+        "@auth/core",
         "@aws-sdk/lib-storage",
-        // Production email rendering imports the React Email TSX templates from Convex;
-        // Knip's production dependency pass does not trace that cross-root preview tree.
+        "@openclaw/plugin-inspector",
         "@react-email/components",
+        "@react-email/render",
         "@fontsource/bricolage-grotesque",
         "@fontsource/ibm-plex-mono",
         "@fontsource/manrope",
         "@fontsource/noto-sans-sc",
+        "mime",
+        "resend",
         "tailwindcss",
         "tw-animate-css",
-        // The Convex skill frontmatter parser imports this through the
-        // convex/lib/skills directory index, which Knip's production pass does not trace.
         "yaml",
+        "zod",
       ],
       project: [
         "src/**/*.{ts,tsx}!",
         "src/**/*.css!",
-        "convex/**/*.{ts,tsx}!",
         "emails/**/*.{ts,tsx}!",
         "server/**/*.{ts,tsx}!",
         "scripts/**/*.{ts,mjs,js}!",
@@ -116,7 +109,6 @@ const config = {
         "../clawhub/src/**/*.ts!",
         "vitest*.ts!",
       ],
-      // The admin build emits selected public CLI helpers into its own dist.
       ignoreDependencies: [
         "arktype",
         "fflate",

@@ -6,8 +6,20 @@ import { dirname, join, resolve } from "node:path";
 import { promisify } from "node:util";
 import { parseExperimentalClawFeed, type ExperimentalClawFeedEntry } from "clawhub-schema";
 import { unzipSync } from "fflate";
-import { parseClawPack } from "../convex/lib/clawpack";
 import { isSafeClawPackagePath } from "../packages/clawhub/src/schema/clawPackage";
+
+function parseClawPack(archiveBytes: Uint8Array) {
+  const unzipped = unzipSync(archiveBytes);
+  const files: Array<{ path: string; content: string; bytes: Uint8Array }> = [];
+  for (const [path, bytes] of Object.entries(unzipped)) {
+    files.push({
+      path,
+      bytes,
+      content: new TextDecoder().decode(bytes),
+    });
+  }
+  return { files };
+}
 
 const execFileAsync = promisify(execFile);
 const MAX_ARCHIVE_BYTES = 64 * 1024 * 1024;
@@ -79,7 +91,7 @@ export async function assertSafeClawArchive(archivePath: string): Promise<void> 
 async function extractSafeClawPack(bytes: Uint8Array, targetDir: string): Promise<void> {
   const parsed = await parseClawPack(bytes);
   await mkdir(targetDir, { recursive: true });
-  for (const entry of parsed.entries) {
+  for (const entry of parsed.files) {
     const outputPath = join(targetDir, "package", entry.path);
     await mkdir(dirname(outputPath), { recursive: true });
     await writeFile(outputPath, entry.bytes);

@@ -2,15 +2,46 @@
 
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
+import { zipSync } from "fflate";
 import { afterEach, describe, expect, it } from "vitest";
-import { buildAgentSkillsDiscoveryDocument } from "../convex/lib/agentSkillsDiscovery";
-import { buildDeterministicZip } from "../convex/lib/skillZip";
+
+function buildDeterministicZip(files: Array<{ path: string; bytes: Uint8Array }>) {
+  const zipData: Record<string, Uint8Array> = {};
+  for (const file of files) {
+    zipData[file.path] = file.bytes;
+  }
+  return zipSync(zipData);
+}
+
+function buildAgentSkillsDiscoveryDocument(input: {
+  origin: string;
+  ownerHandle: string;
+  slug: string;
+  displayName: string;
+  description: string;
+  digest: string;
+  version: string;
+}) {
+  return {
+    $schema: "https://agent-skills.org/schema/v1/agent-skills.json",
+    skills: [
+      {
+        name: input.slug,
+        displayName: input.displayName,
+        description: input.description,
+        version: input.version,
+        downloadUrl: `${input.origin}/${input.ownerHandle}/skills/${input.slug}/download`,
+        digest: input.digest,
+      },
+    ],
+  };
+}
 
 const execFileAsync = promisify(execFile);
 const tempDirs: string[] = [];
@@ -18,14 +49,12 @@ const servers: Array<ReturnType<typeof createServer>> = [];
 
 afterEach(async () => {
   await Promise.all(
-    servers
-      .splice(0)
-      .map(
-        (server) =>
-          new Promise<void>((resolve, reject) =>
-            server.close((error) => (error ? reject(error) : resolve())),
-          ),
-      ),
+    servers.splice(0).map(
+      (server) =>
+        new Promise<void>((resolve) => {
+          server.close(() => resolve());
+        }),
+    ),
   );
   await Promise.all(tempDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
 });
@@ -72,60 +101,51 @@ Installed from a ClawHub skill page URL.
         return;
       }
 
-      if (
-        url.pathname === "/api/v1/agent-skills/openclaw/demo/archive" &&
-        url.searchParams.get("version") === "1.0.0"
-      ) {
-        response.writeHead(200, { "Content-Type": "application/zip" });
-        response.end(Buffer.from(archive));
+      if (url.pathname === "/openclaw/skills/demo/download") {
+        response.writeHead(200, {
+          "Content-Type": "application/zip",
+          "Content-Disposition": 'attachment; filename="openclaw-demo-1.0.0.zip"',
+        });
+        response.end(archive);
         return;
       }
 
-      response.writeHead(404, { "Content-Type": "text/plain" });
-      response.end("not found");
+      response.writeHead(404);
+      response.end();
     });
+
     servers.push(server);
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-
-    const projectDir = await mkdtemp(join(tmpdir(), "clawhub-agent-skills-e2e-"));
-    tempDirs.push(projectDir);
-    await writeFile(join(projectDir, "package.json"), '{"private":true}\n', "utf8");
-
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", () => resolve()));
     const origin = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+
+    const tempDir = await mkdtemp(join(tmpdir(), "clawhub-skills-cli-"));
+    tempDirs.push(tempDir);
+
     const result = await execFileAsync(
       "npx",
       [
         "--yes",
-        "skills@1.5.20",
+        "skills@1.5.16",
         "add",
         `${origin}/openclaw/skills/demo`,
         "--agent",
         "codex",
-        "--skill",
-        "demo",
-        "--yes",
         "--copy",
+        "--yes",
       ],
-      {
-        cwd: projectDir,
-        encoding: "utf8",
-        timeout: 90_000,
-        maxBuffer: 1024 * 1024,
-        env: {
-          ...process.env,
-          CI: "1",
-          DO_NOT_TRACK: "1",
-          NO_COLOR: "1",
-        },
-      },
+      { cwd: tempDir },
     );
 
-    expect(result.stderr).not.toContain("Error");
-    expect(await readFile(join(projectDir, ".agents/skills/demo/SKILL.md"), "utf8")).toContain(
-      "Installed from a ClawHub skill page URL.",
+    expect(result.stderr).toBe("");
+    expect(result.stdout).toContain("Added 1 skill");
+
+    const installedSkill = await readFile(join(tempDir, ".codex/skills/demo/SKILL.md"), "utf8");
+    const installedReference = await readFile(
+      join(tempDir, ".codex/skills/demo/references/proof.txt"),
+      "utf8",
     );
-    expect(
-      await readFile(join(projectDir, ".agents/skills/demo/references/proof.txt"), "utf8"),
-    ).toBe("supporting file installed");
-  }, 120_000);
+
+    expect(installedSkill).toContain("Installed from a ClawHub skill page URL.");
+    expect(installedReference).toBe("supporting file installed");
+  });
 });

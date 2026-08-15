@@ -1,5 +1,11 @@
 import { createHash } from "node:crypto";
-import { redactBundleContent } from "../security-dataset/normalize";
+
+function redactBundleContent(value: string) {
+  if (!value) return "";
+  return value
+    .replace(/(ghp_[A-Za-z0-9]{36})/g, "[REDACTED_GH_TOKEN]")
+    .replace(/(sk-[A-Za-z0-9]{48})/g, "[REDACTED_KEY]");
+}
 
 export type SnapshotDocument = Record<string, unknown> & {
   _creationTime: number;

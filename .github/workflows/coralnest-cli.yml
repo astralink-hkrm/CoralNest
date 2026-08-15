@@ -42,4 +42,4 @@ jobs:
         run: bunx tsc -p packages/clawhub/tsconfig.json --noEmit
 
       - name: Full App & CLI Typecheck Build Gate
-        run: VITE_CONVEX_URL=https://example.invalid bun run ci:types-build
+        run: bun run ci:types-build

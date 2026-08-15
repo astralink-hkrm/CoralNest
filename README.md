@@ -15,7 +15,7 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-0284c7.svg?style=for-the-badge" alt="MIT License"></a>
   <a href="https://bun.sh"><img src="https://img.shields.io/badge/Runtime-Bun-fbf0df?style=for-the-badge&logo=bun" alt="Bun"></a>
-  <a href="https://convex.dev"><img src="https://img.shields.io/badge/Backend-Convex-ff5252?style=for-the-badge" alt="Convex"></a>
+  <a href="https://cockroachlabs.com"><img src="https://img.shields.io/badge/Database-CockroachDB-6933ff?style=for-the-badge&logo=cockroachlabs" alt="CockroachDB"></a>
   <a href="https://typescriptlang.org"><img src="https://img.shields.io/badge/Language-TypeScript-3178c6?style=for-the-badge&logo=typescript" alt="TypeScript"></a>
 </p>
 
@@ -111,10 +111,8 @@ Flows are prompt-based recipes and execution methodologies that teach agents how
 ## 🛠️ Technology Stack
 
 - **Frontend**: TanStack Start (React 19, Vite, Nitro server engine).
-- **Backend & Database**: [Convex](https://convex.dev) (Real-time DB, file storage, HTTP actions, Convex Auth).
-- **Catalog Database**: [CockroachDB Serverless](https://cockroachlabs.com) (10 GB free — fast SQL metadata index for all 6 registry tiers).
-- **File Object Storage**: [Backblaze B2](https://www.backblaze.com/cloud-storage) (10 GB free, S3-compatible — stores all raw SKILL.md files, OpenAPI schemas, DAG topologies, and manifests).
-- **Search Engine**: Convex Vector Search + Embeddings.
+- **Catalog Database**: [CockroachDB Serverless](https://cockroachlabs.com) (fast SQL metadata index for all 6 registry tiers).
+- **File Object Storage**: [Backblaze B2](https://www.backblaze.com/cloud-storage) (S3-compatible — stores raw SKILL.md files, OpenAPI schemas, DAG topologies, and manifests).
 - **Language & Tooling**: TypeScript (Strict ESM), Bun runtime, Biome & Oxlint.
 
 ---
@@ -231,24 +229,13 @@ coralnest package publish ./my-plugin
    cp .env.local.example .env.local
    ```
 
-4. **Start Local Backend (Convex)** — only needed if running local Convex instance:
-
-   ```bash
-   bunx convex dev --typecheck=disable
-   ```
-
-5. **Start Web App**:
+4. **Start Web App**:
 
    ```bash
    bun run dev
    ```
 
    _The app will be available at `http://localhost:3000`._
-
-6. **Seed Test Fixtures & Sample Corpus**:
-   ```bash
-   bun run seed:dev
-   ```
 
 ---
 
@@ -278,8 +265,8 @@ CoralNest/
 │   ├── routes/             # Route pages (index, flows, mcp, plugins, connectors, persona)
 │   ├── design-system.css   # Carapace design tokens & typography
 │   └── styles.css          # Application layout styles
-├── convex/                 # Convex backend functions, schema, auth, and HTTP API
 ├── packages/               # Workspace packages (clawhub CLI, admin tools, schema)
+├── server/                 # Server endpoints, asset handlers, and catalog routes
 ├── public/                 # Static assets, coral logo variants, and background images
 ├── docs/                   # Public documentation & guides
 └── specs/                  # Product specifications & architectural intent

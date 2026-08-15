@@ -1,8 +1,9 @@
 /* @vitest-environment node */
 
 import { describe, expect, it, vi } from "vitest";
-import { CLASSIFIER_VERSION, TOPIC_CLASSIFIER_VERSION } from "../convex/lib/catalogClassifier.mjs";
 import {
+  CLASSIFIER_VERSION,
+  TOPIC_CLASSIFIER_VERSION,
   buildSkillsShMirrorReplayRows,
   enrichSkillsShMirrorClassifications,
 } from "./skillsShMirrorClassification";

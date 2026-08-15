@@ -4,7 +4,13 @@ import { execFile } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { promisify } from "node:util";
-import { CANONICAL_SKILL_SEARCH_BOUNDS } from "../../convex/lib/canonicalSkillSearchBounds";
+const CANONICAL_SKILL_SEARCH_BOUNDS = {
+  maxExactPopularityRatio: 0.8,
+  maxPrefixPopularityRatio: 0.8,
+  maxKeywordPopularityRatio: 0.8,
+  externalCandidateLimitPerIndex: 100,
+  externalIndexedReadCount: 50,
+};
 import {
   assertCanonicalSearchResults,
   assertStableOrder,

@@ -1,6 +1,5 @@
 import { getVercelOidcToken } from "@vercel/oidc";
 import { defineEventHandler, getHeader, readBody } from "h3";
-import { resolveConvexProxyEnv } from "../../../convexProxy";
 import {
   buildSkillsShMirrorProofSnapshotId,
   fetchSkillsShMirrorBatch,
@@ -192,7 +191,7 @@ export function createSkillsShMirrorRoute(target: keyof typeof ROUTE_CONFIG) {
   return defineEventHandler(async (event) => {
     const policy =
       target === "production"
-        ? getSkillsShCatalogProductionSourcePolicy(resolveConvexProxyEnv(process.env))
+        ? getSkillsShCatalogProductionSourcePolicy(process.env)
         : getSkillsShCatalogTestSourcePolicy(process.env);
     if (!policy.allowed) return jsonResponse({ error: "not_found" }, 404);
     const authorization = getHeader(event, "authorization")?.trim() ?? "";

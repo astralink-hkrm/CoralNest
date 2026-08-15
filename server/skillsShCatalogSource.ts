@@ -2,7 +2,21 @@ import { createHash } from "node:crypto";
 import { getVercelOidcToken, verifyVercelOidcToken, type VercelOidcPayload } from "@vercel/oidc";
 import { getClawHubRolloutCapabilities } from "clawhub-schema";
 import { parse, type DefaultTreeAdapterMap } from "parse5";
-import { buildGitHubApiHeaders } from "../convex/lib/githubAuth";
+
+function buildGitHubApiHeaders(
+  options?: string | { token?: string; userAgent?: string; fetchImpl?: unknown },
+) {
+  const token = typeof options === "string" ? options : options?.token;
+  const userAgent = typeof options === "object" ? options?.userAgent : undefined;
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github.v3+json",
+    "User-Agent": userAgent ?? "CoralNest-Catalog/1.0",
+  };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+}
 
 const SKILLS_SH_API_BASE = "https://skills.sh/api/v1";
 const MAX_SOURCE_PAGE_SIZE = 500;

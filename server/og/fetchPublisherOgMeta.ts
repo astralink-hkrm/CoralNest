@@ -1,7 +1,3 @@
-import { ConvexHttpClient } from "convex/browser";
-import type { FunctionReturnType } from "convex/server";
-import { api } from "../../convex/_generated/api";
-
 export type PublisherOgMeta = {
   handle: string | null;
   kind: "user" | "org";
@@ -19,18 +15,24 @@ export type PublisherOgMeta = {
   };
 };
 
-type PublisherProfileResult = FunctionReturnType<typeof api.publishers.getOgMetaByHandle>;
-type PublisherProfileAffiliations = NonNullable<PublisherProfileResult>["affiliations"];
-
 export async function fetchPublisherOgMeta(
   handle: string,
-  convexUrl: string,
+  apiBase: string,
 ): Promise<PublisherOgMeta | null> {
   try {
-    const client = new ConvexHttpClient(convexUrl);
-    const profile = await client.query(api.publishers.getOgMetaByHandle, {
-      handle,
-    });
+    const url = new URL(`/api/v1/publishers/${encodeURIComponent(handle)}`, apiBase);
+    const response = await fetch(url.toString(), { headers: { Accept: "application/json" } });
+    if (!response.ok) return null;
+    const profile = (await response.json()) as {
+      handle?: string;
+      kind?: "user" | "org";
+      official?: boolean;
+      displayName?: string;
+      bio?: string;
+      image?: string;
+      affiliations?: Array<{ handle?: string; displayName?: string; image?: string }>;
+      stats?: { downloads?: number };
+    };
     if (!profile) return null;
     return {
       handle: profile.handle ?? null,
@@ -39,30 +41,16 @@ export async function fetchPublisherOgMeta(
       displayName: profile.displayName ?? null,
       bio: profile.bio ?? null,
       image: profile.image ?? null,
-      affiliations: readAffiliations(profile.affiliations),
+      affiliations: (profile.affiliations ?? []).map((a) => ({
+        handle: a.handle ?? "",
+        displayName: a.displayName ?? "",
+        image: a.image ?? null,
+      })),
       stats: {
-        downloads: readNumber(profile.stats?.downloads),
+        downloads: profile.stats?.downloads ?? 0,
       },
     };
   } catch {
     return null;
   }
-}
-
-function readNumber(value: unknown) {
-  return typeof value === "number" && Number.isFinite(value) ? value : 0;
-}
-
-function readAffiliations(value: PublisherProfileAffiliations) {
-  if (!Array.isArray(value)) return [];
-  return value
-    .map((item) => {
-      const handle = item?.publisher?.handle?.trim();
-      const displayName = item?.publisher?.displayName?.trim();
-      if (!handle || !displayName) return null;
-      return { handle, displayName, image: item.publisher?.image ?? null };
-    })
-    .filter((item): item is { handle: string; displayName: string; image: string | null } =>
-      Boolean(item),
-    );
 }
