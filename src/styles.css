@@ -10948,6 +10948,181 @@ a.skills-sh-security-audit-row:focus-visible {
   max-width: 100%;
 }
 
+/* ── Content card ───────────────────────────────────────────────────────────
+   Shared viewer shell: fixed header, internally scrolling body, muted footer.
+   Used for README, file previews and raw payloads so every "open a document"
+   surface reads the same. */
+
+.content-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.content-card[data-height="sm"] {
+  --content-card-body-height: 320px;
+}
+
+.content-card[data-height="md"] {
+  --content-card-body-height: 520px;
+}
+
+.content-card[data-height="lg"] {
+  --content-card-body-height: 720px;
+}
+
+.content-card-head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  background: color-mix(in srgb, var(--surface-muted) 58%, var(--surface));
+}
+
+.content-card-head-start {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.content-card-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.content-card-back:hover {
+  color: var(--ink);
+}
+
+.content-card-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.content-card-name {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: var(--fs-sm, 0.875rem);
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.content-card-dot,
+.content-card-meta {
+  color: var(--ink-soft);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+
+.content-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 0;
+  color: var(--ink-soft);
+}
+
+.content-card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.content-card-action:hover {
+  color: var(--ink);
+}
+
+.content-card-body {
+  flex: 1;
+  min-height: 0;
+  max-height: var(--content-card-body-height);
+  padding: 18px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.content-card-body.is-flush {
+  padding: 0;
+}
+
+.content-card-body .markdown {
+  line-height: 1.75;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.content-card-pre {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  line-height: 1.65;
+  white-space: pre;
+}
+
+.content-card-pre[data-wrap="true"] {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.content-card-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-top: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  background: color-mix(in srgb, var(--surface-muted) 58%, var(--surface));
+  color: var(--ink-soft);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .content-card[data-height="lg"],
+  .content-card[data-height="md"] {
+    --content-card-body-height: 420px;
+  }
+
+  .content-card-head {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .content-card-body {
+    padding: 14px;
+  }
+}
+
 .skill-readme-body .markdown p {
   font-size: 14px;
   line-height: 1.68;

@@ -20,8 +20,8 @@ function PersonaIndex() {
             className="h-20 w-20 rounded-2xl"
             draggable={false}
           />
-          <h1 className="text-3xl font-extrabold text-white">Personas</h1>
-          <p className="mx-auto max-w-lg text-base text-slate-400">
+          <h1 className="browse-title text-3xl font-extrabold">Personas</h1>
+          <p className="browse-subtitle mx-auto max-w-lg text-base">
             Complete agent archetypes with pre-wired Flows, MCP Servers, and Connectors. The full
             specialist you hire — packaged and ready.
           </p>

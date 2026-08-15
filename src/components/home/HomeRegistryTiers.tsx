@@ -84,13 +84,13 @@ export function HomeRegistryTiers() {
   }));
 
   return (
-    <section aria-label="Registry tiers" className="home-v2-registry-tiers">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <section aria-label="Registry tiers" className="home-v2-registry-tiers oc-section">
+      <div className="registry-tier-grid">
         {tiers.map((tier) => (
           <a
             key={tier.name}
             href={tier.href}
-            className="group flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-900/60 p-5 transition-colors hover:border-slate-600"
+            className="registry-tier-card oc-card oc-card-interactive group flex flex-col gap-3 p-5 transition-colors"
           >
             <div className="flex items-center justify-between">
               <img
@@ -99,16 +99,13 @@ export function HomeRegistryTiers() {
                 className="h-10 w-10 rounded-xl"
                 draggable={false}
               />
-              <ArrowRight
-                className="h-4 w-4 text-slate-600 transition-colors group-hover:text-slate-300"
-                aria-hidden="true"
-              />
+              <ArrowRight className="registry-tier-arrow h-4 w-4" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-white">{tier.name}</h2>
-              <p className="mt-1 text-xs leading-relaxed text-slate-400">{tier.blurb}</p>
+              <h2 className="registry-tier-name text-sm font-bold">{tier.name}</h2>
+              <p className="registry-tier-blurb mt-1 text-xs leading-relaxed">{tier.blurb}</p>
             </div>
-            <p className="mt-auto font-mono text-xs text-slate-500">
+            <p className="registry-tier-count mt-auto font-mono text-xs">
               {tier.comingSoon
                 ? "Coming soon"
                 : tier.count != null

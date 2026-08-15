@@ -4,12 +4,12 @@ import { assetDownloadUrl } from "../../lib/assetsClient";
 import type { AssetRow, AssetType } from "../../lib/assetTypes";
 
 const TYPE_META: Record<AssetType, { label: string; icon: typeof Sparkles }> = {
-  skills:      { label: "Skill",       icon: Sparkles },
-  plugins:     { label: "Plugin",      icon: Plug     },
-  mcp_servers: { label: "MCP Server",  icon: Cable    },
-  connectors:  { label: "Connector",   icon: Boxes    },
-  loops:       { label: "Loop",        icon: Repeat2  },
-  graphs:      { label: "Graph",       icon: Network  },
+  skills: { label: "Skill", icon: Sparkles },
+  plugins: { label: "Plugin", icon: Plug },
+  mcp_servers: { label: "MCP Server", icon: Cable },
+  connectors: { label: "Connector", icon: Boxes },
+  loops: { label: "Loop", icon: Repeat2 },
+  graphs: { label: "Graph", icon: Network },
 };
 
 export function assetTypeMeta(type: AssetType) {
@@ -17,14 +17,20 @@ export function assetTypeMeta(type: AssetType) {
 }
 
 export function CatalogDownloadButton({
-  type, slug, label, className = "",
+  type,
+  slug,
+  label,
+  className = "",
 }: {
-  type: AssetType; slug: string; label?: string; className?: string;
+  type: AssetType;
+  slug: string;
+  label?: string;
+  className?: string;
 }) {
   return (
     <a
       href={assetDownloadUrl(type, slug)}
-      className={`inline-flex items-center gap-1.5 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-300 transition-colors hover:bg-slate-700 hover:text-white ${className}`}
+      className={`catalog-download-btn inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${className}`}
       aria-label={`Download ${label ?? slug}`}
       title="Download raw file"
       onClick={(e) => e.stopPropagation()}
@@ -36,9 +42,13 @@ export function CatalogDownloadButton({
 }
 
 export function CatalogCard({
-  item, type, detailHref,
+  item,
+  type,
+  detailHref,
 }: {
-  item: AssetRow; type: AssetType; detailHref: string;
+  item: AssetRow;
+  type: AssetType;
+  detailHref: string;
 }) {
   const slug = rowString(item, "slug") ?? "";
   const name = rowString(item, "name") ?? slug;
@@ -55,26 +65,24 @@ export function CatalogCard({
   return (
     <a
       href={detailHref}
-      className="catalog-card group flex min-h-[160px] flex-col gap-0 rounded-xl border border-slate-800 bg-slate-900/80 p-4 transition-colors hover:border-slate-700"
+      className="catalog-card oc-card oc-card-interactive group flex min-h-40 flex-col gap-0 p-4 transition-colors"
     >
       {/* header: name + owner */}
       <div className="mb-2">
-        <h3 className="text-[15px] font-bold leading-snug tracking-tight text-white group-hover:text-slate-100">
+        <h3 className="catalog-card-name text-[15px] font-bold leading-snug tracking-tight">
           {name}
         </h3>
-        {publisher ? (
-          <p className="mt-0.5 text-[12px] text-slate-500">@{publisher}</p>
-        ) : null}
+        {publisher ? <p className="catalog-card-by mt-0.5 text-[12px]">@{publisher}</p> : null}
       </div>
 
       {/* description */}
       {summary ? (
-        <p className="line-clamp-3 text-[13px] leading-relaxed text-slate-400">{summary}</p>
+        <p className="catalog-card-summary line-clamp-3 text-[13px] leading-relaxed">{summary}</p>
       ) : null}
 
       {/* category + tags */}
-      {(category || tags.length > 0) ? (
-        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-slate-500">
+      {category || tags.length > 0 ? (
+        <div className="catalog-card-meta mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px]">
           {category ? (
             <span className="inline-flex items-center gap-1">
               <TypeIcon size={12} className="opacity-60" aria-hidden="true" />
@@ -82,13 +90,15 @@ export function CatalogCard({
             </span>
           ) : null}
           {tags.map((t) => (
-            <span key={t} className="text-slate-600">#{t}</span>
+            <span key={t} className="catalog-card-tag">
+              #{t}
+            </span>
           ))}
         </div>
       ) : null}
 
       {/* footer */}
-      <div className="mt-auto flex items-center justify-between border-t border-slate-800/70 pt-2.5 text-[12px] text-slate-500" style={{ marginTop: "auto", paddingTop: "10px" }}>
+      <div className="catalog-card-footer mt-auto flex items-center justify-between pt-2.5 text-[12px]">
         <span>{updatedAt ? `Updated ${timeAgo(updatedAt)}` : ""}</span>
         <span className="flex items-center gap-3">
           {stars != null ? (
@@ -133,12 +143,23 @@ function timeAgo(iso: string): string {
 // Keep typeBadgeText for any callers that may still reference it
 export function typeBadgeText(item: AssetRow, type: AssetType): string {
   switch (type) {
-    case "skills": return rowStringArray(item, "language")[0] ?? rowString(item, "difficulty") ?? "";
-    case "plugins": return rowString(item, "version") ?? "";
-    case "mcp_servers": return rowString(item, "transport") ?? "";
-    case "connectors": { const a = rowNumber(item, "actions_count"); return a != null ? `${a} actions` : ""; }
-    case "loops": return `${rowNumber(item, "step_count") ?? "?"} steps`;
-    case "graphs": return `${rowNumber(item, "node_count") ?? "?"}N · ${rowNumber(item, "edge_count") ?? "?"}E`;
-    default: { const x: never = type; throw new Error(`Unhandled: ${String(x)}`); }
+    case "skills":
+      return rowStringArray(item, "language")[0] ?? rowString(item, "difficulty") ?? "";
+    case "plugins":
+      return rowString(item, "version") ?? "";
+    case "mcp_servers":
+      return rowString(item, "transport") ?? "";
+    case "connectors": {
+      const a = rowNumber(item, "actions_count");
+      return a != null ? `${a} actions` : "";
+    }
+    case "loops":
+      return `${rowNumber(item, "step_count") ?? "?"} steps`;
+    case "graphs":
+      return `${rowNumber(item, "node_count") ?? "?"}N · ${rowNumber(item, "edge_count") ?? "?"}E`;
+    default: {
+      const x: never = type;
+      throw new Error(`Unhandled: ${String(x)}`);
+    }
   }
 }

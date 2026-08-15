@@ -253,7 +253,13 @@ function CatalogSearchPage() {
                 <p className="empty-state-body">Try a different search term or scope.</p>
               </div>
             ) : (
-              <div className="flex flex-col gap-2">
+              <div>
+                {/* Column header — shares the row grid so the columns line up */}
+                <div className="home-v2-listing-head is-catalog" aria-hidden="true">
+                  <span className="home-v2-listing-head-label">Name</span>
+                  <span className="home-v2-listing-head-mid">Category</span>
+                  <span className="home-v2-listing-head-stat">Popularity</span>
+                </div>
                 {fetchState.items.map((item, index) => {
                   const type: AssetType =
                     (item.type as AssetType | undefined) ??
@@ -276,7 +282,7 @@ function CatalogSearchPage() {
               <div className="mt-5 flex justify-center">
                 <button
                   type="button"
-                  className="rounded-lg bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-200 transition-colors hover:bg-slate-700"
+                  className="catalog-download-btn rounded-lg px-4 py-2 text-xs font-semibold transition-colors"
                   onClick={loadMore}
                   disabled={loadingMore}
                 >

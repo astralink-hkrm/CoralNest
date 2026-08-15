@@ -107,6 +107,47 @@
 }
 
 /*
+ * Carapace ships a coral/orange accent and re-declares it under
+ * html[data-theme="dark"] / html[data-theme="light"], which outranks the
+ * plain :root block above. Re-pin the CoralNest ocean blue at matching
+ * specificity so the accent stays blue in every theme.
+ */
+:root,
+html[data-theme="dark"],
+html[data-theme="light"] {
+  --oc-accent-primary: #0284c7;
+  --oc-accent-primary-hover: #38bdf8;
+  --oc-accent-primary-deep: #0369a1;
+  --oc-border-accent: #0284c7;
+  --oc-surface-accent-soft: rgba(2, 132, 199, 0.18);
+}
+
+/*
+ * The --hv2-* aliases below are scoped to the landing page shell, but the
+ * shared catalog list row now renders on /flows, /search, and the browse
+ * pages too. Without a global fallback those colors resolve to nothing and
+ * every line of sub-text inherits near-white. Alias them at :root; the
+ * landing-page block still overrides them where it applies.
+ */
+:root {
+  --hv2-bg: var(--oc-bg-page);
+  --hv2-surface: var(--oc-surface-card);
+  --hv2-surface-hover: var(--oc-surface-interactive);
+  --hv2-border: var(--oc-border-subtle);
+  --hv2-border-hover: color-mix(in srgb, var(--oc-text-primary) 28%, var(--oc-border-subtle));
+  --hv2-border-strong: color-mix(in srgb, var(--oc-text-primary) 20%, var(--oc-border-subtle));
+  --hv2-text: var(--oc-text-primary);
+  --hv2-text-secondary: var(--oc-text-secondary);
+  --hv2-text-tertiary: var(--oc-text-muted);
+  --hv2-accent: var(--oc-accent-primary);
+  --hv2-radius-sm: var(--oc-radius-control);
+  --hv2-radius-md: var(--oc-radius-surface);
+  --hv2-radius-lg: var(--oc-radius-surface);
+  --hv2-ease-out: var(--oc-ease-out);
+  --hv2-duration-fast: var(--oc-duration-fast);
+}
+
+/*
  * The landing page predates the shared package and still references --hv2-*
  * variables throughout its layout CSS. Keep those aliases during migration,
  * but make the canonical design system their only source of visual values.
@@ -197,7 +238,334 @@
   color: var(--oc-text-primary);
 }
 
+/*
+ * The tiers and analogy sections were never picked up by the home page's
+ * section sizing, so they bled to the viewport edge while their siblings sat
+ * in a centred 1296px column. Match the siblings.
+ */
+.home-v2-main .home-v2-registry-tiers,
+.home-v2-main .home-v2-listing-stack,
+.home-v2-main .home-v2-analogy {
+  width: 100%;
+  max-width: 1296px;
+  margin-inline: auto;
+  padding-inline: 48px;
+}
+
+/*
+ * The home sections sit flush against each other; restore the vertical rhythm
+ * the old per-section wrappers provided.
+ */
+.home-v2-main .home-v2-registry-tiers,
+.home-v2-main .home-v2-listing-stack,
+.home-v2-main .home-v2-analogy {
+  padding-block: var(--oc-space-8, 2rem);
+}
+
 @media (max-width: 760px) {
+  .home-v2-main .home-v2-registry-tiers,
+  .home-v2-main .home-v2-listing-stack,
+  .home-v2-main .home-v2-analogy {
+    padding-inline: var(--oc-space-4);
+  }
+}
+
+/*
+ * Six full-width catalog sections stacked vertically. The previous two-column
+ * grid squeezed each list into ~600px, which collapsed the row grid and made
+ * names, tags, and timestamps overlap.
+ */
+.home-v2-listing-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.home-v2-listing-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--oc-space-5, 1.25rem);
+  margin-bottom: 14px;
+}
+
+.home-v2-listing-section-heading {
+  min-width: 0;
+}
+
+.home-v2-listing-section-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--oc-text-primary);
+}
+
+.home-v2-listing-section-subtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--oc-text-secondary);
+}
+
+@media (max-width: 760px) {
+  .home-v2-listing-stack {
+    gap: 40px;
+  }
+
+  .home-v2-listing-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--oc-space-2, 0.5rem);
+  }
+}
+
+.home-v2-analogy-headrow,
+.home-v2-analogy-row {
+  border-bottom: 1px solid var(--oc-border-subtle);
+}
+
+.home-v2-analogy-th {
+  color: var(--oc-text-secondary);
+}
+
+.home-v2-analogy-concept {
+  color: var(--oc-text-muted);
+}
+
+.home-v2-analogy-tier {
+  color: var(--oc-text-primary);
+}
+
+/*
+ * Registry tiers: an auto-fit grid so the five cards share the row evenly and
+ * wrap cleanly, instead of a fixed 5-column track that broke to 4-then-1.
+ */
+.registry-tier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--oc-space-4);
+  min-width: 0;
+}
+
+.registry-tier-name {
+  color: var(--oc-text-primary);
+}
+
+.registry-tier-blurb {
+  color: var(--oc-text-secondary);
+}
+
+.registry-tier-count,
+.registry-tier-arrow {
+  color: var(--oc-text-muted);
+  transition: color var(--oc-duration-fast) var(--oc-ease-out);
+}
+
+.registry-tier-card:hover .registry-tier-arrow {
+  color: var(--oc-text-primary);
+}
+
+/*
+ * Grid-view cards. Same elements as before; colours now come from the design
+ * tokens so the card is legible in both themes.
+ */
+.catalog-card-name {
+  color: var(--oc-text-primary);
+}
+
+.catalog-card-by,
+.catalog-card-meta {
+  color: var(--oc-text-muted);
+}
+
+.catalog-card-summary {
+  color: var(--oc-text-secondary);
+}
+
+.catalog-card-tag {
+  color: var(--oc-text-muted);
+  opacity: 0.85;
+}
+
+.catalog-card-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--oc-border-subtle);
+  color: var(--oc-text-muted);
+}
+
+.catalog-download-btn {
+  background: var(--oc-surface-interactive);
+  color: var(--oc-text-secondary);
+}
+
+.catalog-download-btn:hover {
+  background: var(--oc-surface-interactive-hover);
+  color: var(--oc-text-primary);
+}
+
+/*
+ * Catalog rows keep their original Name / Category / Popularity columns. The
+ * shared listing row reserves most of its width for copy, which starves the
+ * trailing columns, so catalog rows pin them to fixed widths instead.
+ */
+.home-v2-listing-row.is-catalog,
+.home-v2-listing-head.is-catalog {
+  grid-template-columns: minmax(0, 1fr) 160px 190px;
+}
+
+@media (max-width: 900px) {
+  .home-v2-listing-row.is-catalog,
+  .home-v2-listing-head.is-catalog {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .home-v2-listing-row.is-catalog .home-v2-listing-row-category,
+  .home-v2-listing-head.is-catalog .home-v2-listing-head-mid {
+    display: none;
+  }
+
+  .home-v2-listing-row.is-catalog .home-v2-listing-row-stats,
+  .home-v2-listing-head.is-catalog .home-v2-listing-head-stat {
+    grid-column: 2;
+  }
+}
+
+/* Popularity column stacks "Updated …" over the counts, right-aligned. */
+.home-v2-listing-row-stats.is-catalog {
+  grid-column: 3;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--oc-text-muted);
+}
+
+.home-v2-listing-row-updated {
+  white-space: nowrap;
+}
+
+.home-v2-listing-row-counts {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-v2-listing-row-download {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  padding: 4px;
+  border-radius: var(--oc-radius-inset);
+  background: var(--oc-surface-interactive);
+  color: var(--oc-text-muted);
+  transition: background var(--oc-duration-fast) var(--oc-ease-out);
+}
+
+.home-v2-listing-row-download:hover {
+  background: var(--oc-surface-interactive-hover);
+  color: var(--oc-text-primary);
+}
+
+.home-v2-listing-row-category {
+  grid-column: 2;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--oc-text-secondary);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-v2-listing-head-mid {
+  grid-column: 2;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--oc-text-muted);
+}
+
+.home-v2-listing-row-tag {
+  flex-shrink: 0;
+  color: var(--oc-text-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/*
+ * Unified catalog toolbar: a left-aligned segmented family switcher, a hairline
+ * divider, then the type tabs, with the browse link pushed to the far right.
+ */
+.home-v2-main .home-v2-unified-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--oc-space-4);
+  flex-wrap: wrap;
+}
+
+.home-v2-main .home-v2-unified-divider {
+  width: 1px;
+  align-self: stretch;
+  min-height: 1.25rem;
+  background: var(--oc-border-subtle);
+}
+
+.home-v2-main .home-v2-unified-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--oc-space-4);
+  flex-wrap: wrap;
+}
+
+.home-v2-main .home-v2-unified-tab {
+  padding-bottom: var(--oc-space-2);
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--oc-text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color var(--oc-duration-fast) var(--oc-ease-out);
+}
+
+.home-v2-main .home-v2-unified-tab:hover {
+  color: var(--oc-text-secondary);
+}
+
+.home-v2-main .home-v2-unified-tab[aria-selected="true"] {
+  border-bottom-color: var(--oc-text-primary);
+  color: var(--oc-text-primary);
+  font-weight: 600;
+}
+
+.home-v2-main .home-v2-unified-browse {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--oc-space-2);
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.home-v2-main .home-v2-unified-subtitle {
+  margin-top: var(--oc-space-3);
+  margin-bottom: var(--oc-space-4);
+  color: var(--oc-text-muted);
+  font-size: 0.75rem;
+}
+
+@media (max-width: 760px) {
+  .home-v2-main .home-v2-unified-divider {
+    display: none;
+  }
+
+  .home-v2-main .home-v2-unified-browse {
+    margin-left: 0;
+  }
+
   .home-v2-main .home-v2-popular-publishers-header.oc-section-header {
     align-items: flex-start;
     flex-direction: column;
@@ -512,6 +880,34 @@
   text-shadow:
     0 6px 32px rgba(0, 0, 0, 0.85),
     0 0 50px rgba(255, 255, 255, 0.2);
+}
+
+/*
+ * Footer breathing room: the nav columns ran straight into the bottom bar's
+ * divider, and the last column link sat flush against it.
+ */
+footer.site-footer-v2 .site-footer-inner {
+  padding: 80px var(--space-6) 64px;
+}
+
+footer.site-footer-v2 .footer-v2-main {
+  padding-bottom: 12px;
+}
+
+footer.site-footer-v2 .footer-v2-bottom {
+  margin-top: 40px;
+  padding-top: 32px;
+}
+
+@media (max-width: 760px) {
+  footer.site-footer-v2 .site-footer-inner {
+    padding: 56px var(--space-5) 48px;
+  }
+
+  footer.site-footer-v2 .footer-v2-bottom {
+    margin-top: 28px;
+    padding-top: 24px;
+  }
 }
 
 /* Hide duplicate sub-header title when main section header is shown */
