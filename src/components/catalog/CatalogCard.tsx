@@ -1,4 +1,4 @@
-import { Boxes, Cable, Network, Plug, Repeat2, Sparkles } from "lucide-react";
+import { Bookmark, Boxes, Cable, Download, Network, Plug, Repeat2, Sparkles } from "lucide-react";
 import { rowNumber, rowString, rowStringArray } from "../../lib/assetsClient";
 import type { AssetRow, AssetType } from "../../lib/assetTypes";
 

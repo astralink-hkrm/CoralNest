@@ -2,7 +2,6 @@ profile: clawhub-check
 provider: blacksmith-testbox
 blacksmith:
   org: openclaw
-  workflow: .github/workflows/ci-check-testbox.yml
   job: check
   ref: main
   idleTimeout: 90m
