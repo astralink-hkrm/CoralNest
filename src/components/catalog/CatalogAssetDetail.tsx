@@ -33,7 +33,16 @@ import { MarkdownPreview } from "../MarkdownPreview";
 import { assetTypeMeta } from "./CatalogCard";
 
 type DetailField = { key: string; label: string };
-type Tab = "readme" | "files" | "payload";
+/**
+ * "files" is the tree overview and always comes first; every entry in the asset
+ * tree then gets its own `file:<path>` tab. "readme" only appears when the
+ * readme is not already one of those files, and "payload" is the stored blob.
+ */
+type Tab = "readme" | "files" | "payload" | `file:${string}`;
+
+const FILE_TAB_PREFIX = "file:";
+const filePathOfTab = (tab: Tab) =>
+  tab.startsWith(FILE_TAB_PREFIX) ? tab.slice(FILE_TAB_PREFIX.length) : null;
 
 const DETAIL_FIELDS: Record<AssetType, DetailField[]> = {
   skills: [
@@ -118,7 +127,13 @@ function tryJson(s: string): string {
   }
 }
 
-type TreeNode = { name: string; path: string; isDir: boolean; size?: number; children: TreeNode[] };
+type TreeNode = {
+  name: string;
+  path: string;
+  isDir: boolean;
+  size?: number;
+  children: TreeNode[];
+};
 
 function buildTree(files: AssetTreeFile[]): TreeNode[] {
   const nodes: TreeNode[] = [];
@@ -287,7 +302,7 @@ export function CatalogAssetDetail({
   const [storagePath, setStoragePath] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [tab, setTab] = useState<Tab>("readme");
+  const [tab, setTab] = useState<Tab>("files");
   const [previewPath, setPreviewPath] = useState<string | null>(null);
   const [previewContent, setPreviewContent] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -302,6 +317,7 @@ export function CatalogAssetDetail({
     setStoragePath(null);
     setPreviewPath(null);
     setPreviewContent(null);
+    setTab("files");
     void Promise.allSettled([
       getAssetDetailClient(type, slug),
       getAssetTreeClient(type, slug),
@@ -351,13 +367,10 @@ export function CatalogAssetDetail({
   const payloadFileName = rowSP?.split("/").pop() ?? "asset.json";
   const treeNodes = useMemo(() => buildTree(treeFiles), [treeFiles]);
 
-  const handlePreview = useCallback(
+  const loadFile = useCallback(
     async (path: string) => {
-      if (previewPath === path) {
-        setPreviewPath(null);
-        setPreviewContent(null);
-        return;
-      }
+      setTab(`file:${path}`);
+      if (previewPath === path && previewContent != null) return;
       setPreviewPath(path);
       setPreviewContent(null);
       setPreviewLoading(true);
@@ -375,10 +388,11 @@ export function CatalogAssetDetail({
         setPreviewLoading(false);
       }
     },
-    [previewPath, type, slug],
+    [previewPath, previewContent, type, slug],
   );
 
   const closePreview = useCallback(() => {
+    setTab("files");
     setPreviewPath(null);
     setPreviewContent(null);
   }, []);
@@ -392,14 +406,35 @@ export function CatalogAssetDetail({
     window.setTimeout(() => setCopiedCmd(false), 2000);
   };
 
+  // Files first, then one tab per file in the tree. The README only earns its
+  // own tab when it is not already among those files, so it is not listed twice.
+  const treeFileNames = new Set(
+    treeFiles.map((f) => (f.path.split("/").pop() ?? f.path).toLowerCase()),
+  );
+  const readmeInTree = treeFileNames.has("readme.md");
   const tabs: { id: Tab; label: string }[] = [
-    ...(readme ? [{ id: "readme" as Tab, label: "README" }] : []),
     ...(treeFiles.length > 0 ? [{ id: "files" as Tab, label: "Files" }] : []),
-    { id: "payload" as Tab, label: payloadFileName },
+    ...treeFiles.map((f) => ({
+      id: `file:${f.path}` as Tab,
+      label: f.path.split("/").pop() ?? f.path,
+    })),
+    ...(readme && !readmeInTree ? [{ id: "readme" as Tab, label: "README" }] : []),
+    // The stored payload is usually the same file as one already in the tree —
+    // only give it a tab when it isn't, so the strip has no duplicate label.
+    ...(treeFileNames.has(payloadFileName.toLowerCase())
+      ? []
+      : [{ id: "payload" as Tab, label: payloadFileName }]),
   ];
   // Default to first available tab
-  const defaultTab = readme ? "readme" : treeFiles.length > 0 ? "files" : "payload";
+  const defaultTab: Tab = treeFiles.length > 0 ? "files" : readme ? "readme" : "payload";
   const activeTab = tabs.find((t) => t.id === tab)?.id ?? defaultTab;
+  const activeFilePath = filePathOfTab(activeTab);
+
+  // A file tab can become active from the tab strip as well as the tree, so pull
+  // its content here rather than only in the tree's click handler.
+  useEffect(() => {
+    if (activeFilePath && activeFilePath !== previewPath) void loadFile(activeFilePath);
+  }, [activeFilePath, previewPath, loadFile]);
 
   return (
     <CoralPageWrapper>
@@ -575,45 +610,45 @@ export function CatalogAssetDetail({
                             >
                               <MarkdownPreview>{readme}</MarkdownPreview>
                             </ContentCard>
-                          ) : activeTab === "files" && treeFiles.length > 0 ? (
-                            previewLoading ? (
+                          ) : activeFilePath ? (
+                            previewLoading || previewContent == null ? (
                               <div className="h-64 animate-pulse rounded-lg bg-slate-950" />
-                            ) : previewPath && previewContent != null ? (
+                            ) : (
                               <FileContentCard
-                                title={previewPath.split("/").pop() ?? previewPath}
+                                title={activeFilePath.split("/").pop() ?? activeFilePath}
                                 meta={previewSize != null ? fmtBytes(previewSize) : undefined}
-                                path={previewPath}
+                                path={activeFilePath}
                                 content={previewContent}
                                 height="lg"
                                 onBack={closePreview}
-                                footer={previewPath}
+                                footer={activeFilePath}
                                 actions={
                                   <a
-                                    href={assetFileUrl(type, slug, previewPath)}
+                                    href={assetFileUrl(type, slug, activeFilePath)}
                                     download
                                     className="content-card-action"
-                                    aria-label={`Download ${previewPath}`}
+                                    aria-label={`Download ${activeFilePath}`}
                                   >
                                     <Download className="h-3 w-3" aria-hidden="true" />
                                   </a>
                                 }
                               />
-                            ) : (
-                              <ContentCard
-                                title="Files"
-                                meta={`${treeFiles.length} file${treeFiles.length === 1 ? "" : "s"}`}
-                                height="lg"
-                                footer={rowSP ?? undefined}
-                              >
-                                <FileTree
-                                  nodes={treeNodes}
-                                  type={type}
-                                  slug={slug}
-                                  onPreview={handlePreview}
-                                  previewPath={previewPath}
-                                />
-                              </ContentCard>
                             )
+                          ) : activeTab === "files" && treeFiles.length > 0 ? (
+                            <ContentCard
+                              title="Files"
+                              meta={`${treeFiles.length} file${treeFiles.length === 1 ? "" : "s"}`}
+                              height="lg"
+                              footer={rowSP ?? undefined}
+                            >
+                              <FileTree
+                                nodes={treeNodes}
+                                type={type}
+                                slug={slug}
+                                onPreview={loadFile}
+                                previewPath={previewPath}
+                              />
+                            </ContentCard>
                           ) : activeTab === "payload" ? (
                             <PayloadPanel type={type} slug={slug} />
                           ) : (

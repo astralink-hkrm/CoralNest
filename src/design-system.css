@@ -32,8 +32,10 @@
   --coral-ocean-blue: #0284c7;
 
   /* Coral Theme Color Variations - Deep Shades */
-  --coral-orange: #ff6b35;
-  --coral-orange-dark: #e55a2b;
+  /* The "orange" slot is kept as a name for back-compat but now carries the
+     ocean-blue accent, so any glow still referencing it renders blue. */
+  --coral-orange: #38bdf8;
+  --coral-orange-dark: #0284c7;
   --coral-red: #dc2626;
   --coral-red-dark: #b91c1c;
   --coral-purple: #663399;
@@ -120,6 +122,80 @@ html[data-theme="light"] {
   --oc-accent-primary-deep: #0369a1;
   --oc-border-accent: #0284c7;
   --oc-surface-accent-soft: rgba(2, 132, 199, 0.18);
+}
+
+/*
+ * Repoint the Carapace *palette* itself. Every accent, glow, link, focus ring
+ * and selection color in the vendor themes resolves through these six coral
+ * ramp entries, so overriding them here turns the whole system blue in one
+ * place instead of chasing each derived token.
+ */
+:root {
+  --oc-palette-coral-dark-bright: #38bdf8;
+  --oc-palette-coral-dark-mid: #0ea5e9;
+  --oc-palette-coral-dark-deep: #0369a1;
+  --oc-palette-coral-light-bright: #0284c7;
+  --oc-palette-coral-light-mid: #0369a1;
+  --oc-palette-coral-light-deep: #075985;
+}
+
+/*
+ * The light theme in @openclaw/carapace/compat/clawhub.css bakes the coral
+ * accent in as literal rgb(216 74 49 / …) under
+ * [data-theme-family="claw"][data-theme-resolved="light"] — specificity (0,2,0),
+ * which outranks the html[data-theme="light"] block above, so light mode kept
+ * rendering orange while dark mode was already blue. Re-declare the literals at
+ * matching specificity (later in source order, so these win) for both the
+ * explicit light choice and the system-preference variant.
+ */
+[data-theme-family="claw"][data-theme-resolved="light"],
+[data-theme-family="claw"][data-theme-mode="light"] {
+  --oc-accent-primary: #0284c7;
+  --oc-accent-primary-hover: #0369a1;
+  --oc-accent-primary-deep: #075985;
+  --oc-border-accent: rgb(2 132 199 / 0.42);
+  --oc-surface-accent-soft: rgb(2 132 199 / 0.12);
+  --oc-selection-bg: rgb(2 132 199 / 0.2);
+  --oc-focus-ring: rgb(2 132 199 / 0.58);
+  --oc-text-link: #0284c7;
+}
+
+@media (prefers-color-scheme: light) {
+  [data-theme-family="claw"][data-theme-mode="system"] {
+    --oc-accent-primary: #0284c7;
+    --oc-accent-primary-hover: #0369a1;
+    --oc-accent-primary-deep: #075985;
+    --oc-border-accent: rgb(2 132 199 / 0.42);
+    --oc-surface-accent-soft: rgb(2 132 199 / 0.12);
+    --oc-selection-bg: rgb(2 132 199 / 0.2);
+    --oc-focus-ring: rgb(2 132 199 / 0.58);
+    --oc-text-link: #0284c7;
+  }
+}
+
+/*
+ * Sub-text was pure neutral grey. Tint the secondary/muted ramps toward the
+ * ocean blue so supporting copy reads as part of the palette rather than as
+ * washed-out grey. Declared at (0,2,0) too, so the light values survive the
+ * compat block.
+ */
+:root,
+html[data-theme="dark"] {
+  --oc-text-secondary: #b3c2d6;
+  --oc-text-muted: #8fa2ba;
+}
+
+[data-theme-family="claw"][data-theme-resolved="light"],
+[data-theme-family="claw"][data-theme-mode="light"] {
+  --oc-text-secondary: #47566b;
+  --oc-text-muted: #64748b;
+}
+
+@media (prefers-color-scheme: light) {
+  [data-theme-family="claw"][data-theme-mode="system"] {
+    --oc-text-secondary: #47566b;
+    --oc-text-muted: #64748b;
+  }
 }
 
 /*
@@ -913,4 +989,44 @@ footer.site-footer-v2 .footer-v2-bottom {
 /* Hide duplicate sub-header title when main section header is shown */
 .coral-page-wrapper:has(.coral-section-header) .browse-page-header {
   display: none;
+}
+
+/*
+ * Light-mode fixes.
+ *
+ * .site-footer-v2 hardcodes a near-black palette with no light variant, so the
+ * footer stayed a dark slab under a light page. Re-point its local --hv2-*
+ * variables (the footer's own rules all read through them) for the light theme.
+ */
+[data-theme-family="claw"][data-theme-resolved="light"] .site-footer-v2,
+[data-theme-family="claw"][data-theme-mode="light"] .site-footer-v2 {
+  --hv2-bg: var(--oc-bg-surface);
+  --hv2-surface: rgb(23 23 26 / 0.03);
+  --hv2-surface-hover: rgb(23 23 26 / 0.06);
+  --hv2-border: rgb(23 23 26 / 0.1);
+  --hv2-border-hover: rgb(23 23 26 / 0.2);
+  --hv2-border-strong: rgb(23 23 26 / 0.14);
+  --hv2-text: var(--oc-text-primary);
+  --hv2-text-secondary: var(--oc-text-secondary);
+  --hv2-text-tertiary: var(--oc-text-muted);
+  --hv2-accent: var(--oc-accent-primary);
+
+  box-shadow: none;
+}
+
+@media (prefers-color-scheme: light) {
+  [data-theme-family="claw"][data-theme-mode="system"] .site-footer-v2 {
+    --hv2-bg: var(--oc-bg-surface);
+    --hv2-surface: rgb(23 23 26 / 0.03);
+    --hv2-surface-hover: rgb(23 23 26 / 0.06);
+    --hv2-border: rgb(23 23 26 / 0.1);
+    --hv2-border-hover: rgb(23 23 26 / 0.2);
+    --hv2-border-strong: rgb(23 23 26 / 0.14);
+    --hv2-text: var(--oc-text-primary);
+    --hv2-text-secondary: var(--oc-text-secondary);
+    --hv2-text-tertiary: var(--oc-text-muted);
+    --hv2-accent: var(--oc-accent-primary);
+
+    box-shadow: none;
+  }
 }

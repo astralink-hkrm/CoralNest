@@ -40,7 +40,7 @@ export const TIER_LINK_COLOR: Record<string, string> = {
   graphs: "text-lime-500 hover:text-lime-400",
   mcp_servers: "text-red-500 hover:text-red-400",
   plugins: "text-purple-400 hover:text-purple-300",
-  connectors: "text-orange-400 hover:text-orange-300",
+  connectors: "text-sky-400 hover:text-sky-300",
 };
 
 export type CatalogDetailTheme = {
@@ -101,12 +101,12 @@ export const DETAIL_THEMES: Record<string, CatalogDetailTheme> = {
     link: "text-purple-400 hover:text-purple-300",
   },
   connectors: {
-    border: "border-orange-500/30",
-    gradient: "from-slate-900 via-orange-950/40 to-slate-900",
-    accentText: "text-orange-400",
-    accentSoft: "bg-orange-500/10",
-    chipBorder: "border-orange-500/30",
-    buttonBg: "bg-orange-500 hover:bg-orange-400",
-    link: "text-orange-400 hover:text-orange-300",
+    border: "border-sky-500/30",
+    gradient: "from-slate-900 via-sky-950/40 to-slate-900",
+    accentText: "text-sky-400",
+    accentSoft: "bg-sky-500/10",
+    chipBorder: "border-sky-500/30",
+    buttonBg: "bg-sky-500 hover:bg-sky-400",
+    link: "text-sky-400 hover:text-sky-300",
   },
 };

@@ -497,12 +497,12 @@ code {
   background:
     radial-gradient(
       ellipse 58% 34% at 48% 0%,
-      color-mix(in srgb, #8f1d24 18%, transparent) 0%,
+      color-mix(in srgb, #0c4a6e 18%, transparent) 0%,
       transparent 62%
     ),
     radial-gradient(
       ellipse 44% 26% at 28% 8%,
-      color-mix(in srgb, #d34848 8%, transparent) 0%,
+      color-mix(in srgb, #38bdf8 8%, transparent) 0%,
       transparent 68%
     );
 }
@@ -2353,8 +2353,8 @@ code {
   height: 220px;
   pointer-events: none;
   background:
-    radial-gradient(circle at 22% 40%, rgba(255, 118, 84, 0.14), transparent 58%),
-    radial-gradient(circle at 78% 0%, rgba(255, 177, 136, 0.08), transparent 45%);
+    radial-gradient(circle at 22% 40%, rgba(56, 189, 248, 0.14), transparent 58%),
+    radial-gradient(circle at 78% 0%, rgba(125, 211, 252, 0.08), transparent 45%);
 }
 
 .upload-page-header {
@@ -2386,9 +2386,9 @@ code {
 
 .upload-panel {
   border-radius: calc(var(--r-md) + 2px);
-  border-color: rgba(255, 118, 84, 0.22);
+  border-color: rgba(56, 189, 248, 0.22);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(255, 249, 245, 0.66)), var(--surface);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(240, 249, 255, 0.66)), var(--surface);
   box-shadow:
     0 18px 44px rgba(16, 10, 6, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.48);
@@ -2443,7 +2443,7 @@ code {
 }
 
 .upload-dropzone {
-  border: 1.5px dashed rgba(255, 118, 84, 0.5);
+  border: 1.5px dashed rgba(56, 189, 248, 0.5);
   border-radius: calc(var(--r-md) + 1px);
   padding: 14px;
   background: linear-gradient(145deg, rgba(255, 245, 239, 0.85), rgba(255, 255, 255, 0.72));
@@ -2455,17 +2455,17 @@ code {
 }
 
 .upload-dropzone:hover {
-  border-color: rgba(229, 94, 60, 0.68);
-  box-shadow: 0 16px 30px rgba(255, 118, 84, 0.15);
+  border-color: rgba(2, 132, 199, 0.68);
+  box-shadow: 0 16px 30px rgba(56, 189, 248, 0.15);
   transform: translateY(-1px);
 }
 
 .upload-dropzone.is-dragging {
-  border-color: rgba(229, 94, 60, 0.92);
+  border-color: rgba(2, 132, 199, 0.92);
   box-shadow:
-    0 18px 38px rgba(255, 118, 84, 0.28),
-    0 0 0 3px rgba(255, 118, 84, 0.18);
-  background: linear-gradient(145deg, rgba(255, 238, 228, 0.95), rgba(255, 248, 244, 0.92));
+    0 18px 38px rgba(56, 189, 248, 0.28),
+    0 0 0 3px rgba(56, 189, 248, 0.18);
+  background: linear-gradient(145deg, rgba(226, 242, 253, 0.95), rgba(240, 249, 255, 0.92));
 }
 
 .upload-file-input {
@@ -2489,7 +2489,7 @@ code {
   place-items: center;
   color: #999999;
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 231, 220, 0.88));
-  border: 1px solid rgba(255, 118, 84, 0.22);
+  border: 1px solid rgba(56, 189, 248, 0.22);
   margin-bottom: 12px;
 }
 
@@ -2520,7 +2520,7 @@ code {
 .upload-picker-btn {
   justify-content: center;
   border-radius: var(--r-sm);
-  border: 1px solid rgba(255, 118, 84, 0.4);
+  border: 1px solid rgba(56, 189, 248, 0.4);
   background: linear-gradient(140deg, rgba(255, 255, 255, 0.92), rgba(255, 245, 238, 0.88));
   color: #999999;
   font-weight: 700;
@@ -2529,8 +2529,8 @@ code {
 }
 
 .upload-picker-btn:hover {
-  border-color: rgba(229, 94, 60, 0.72);
-  box-shadow: 0 10px 20px rgba(255, 118, 84, 0.18);
+  border-color: rgba(2, 132, 199, 0.72);
+  box-shadow: 0 10px 20px rgba(56, 189, 248, 0.18);
 }
 
 .plugin-dropzone-actions {
@@ -2865,7 +2865,7 @@ code {
 }
 
 .plugin-upload-summary {
-  border-top: 1px solid rgba(255, 118, 84, 0.16);
+  border-top: 1px solid rgba(56, 189, 248, 0.16);
   padding-top: 12px;
   display: grid;
   gap: 10px;
@@ -2906,7 +2906,7 @@ code {
 }
 
 .upload-file-list {
-  border-top: 1px solid rgba(255, 118, 84, 0.16);
+  border-top: 1px solid rgba(56, 189, 248, 0.16);
   padding-top: 10px;
   max-height: 248px;
   overflow: auto;
@@ -2919,7 +2919,7 @@ code {
   font-size: 0.79rem;
   line-height: 1.45;
   border-radius: 10px;
-  border: 1px solid rgba(255, 118, 84, 0.18);
+  border: 1px solid rgba(56, 189, 248, 0.18);
   background: rgba(255, 255, 255, 0.55);
   padding: 6px 9px;
   overflow: hidden;
@@ -2943,7 +2943,7 @@ code {
   justify-content: space-between;
   gap: 16px;
   border-radius: var(--r-md);
-  border: 1px solid rgba(255, 118, 84, 0.24);
+  border: 1px solid rgba(56, 189, 248, 0.24);
   background:
     linear-gradient(120deg, rgba(255, 243, 236, 0.74), rgba(255, 255, 255, 0.76)), var(--surface);
   box-shadow:
@@ -2964,8 +2964,8 @@ code {
   padding: 12px 22px;
   font-size: 0.96rem;
   box-shadow:
-    0 10px 22px rgba(229, 94, 60, 0.26),
-    inset 0 1px 0 rgba(255, 214, 198, 0.42);
+    0 10px 22px rgba(2, 132, 199, 0.26),
+    inset 0 1px 0 rgba(186, 224, 250, 0.42);
 }
 
 .upload-license-card {
@@ -2973,8 +2973,8 @@ code {
   gap: 10px;
   padding: 14px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 118, 84, 0.2);
-  background: rgba(255, 249, 245, 0.72);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: rgba(240, 249, 255, 0.72);
 }
 
 .upload-license-pill {
@@ -3010,8 +3010,8 @@ code {
 .upload-submit-btn:not(:disabled):hover {
   transform: translateY(-1px);
   box-shadow:
-    0 16px 28px rgba(229, 94, 60, 0.32),
-    inset 0 1px 0 rgba(255, 214, 198, 0.52);
+    0 16px 28px rgba(2, 132, 199, 0.32),
+    inset 0 1px 0 rgba(186, 224, 250, 0.52);
 }
 
 .error {
@@ -3621,7 +3621,7 @@ code {
   background: linear-gradient(180deg, rgba(255, 142, 111, 0.24), rgba(255, 255, 255, 0.16));
   border-color: var(--border-ui-active);
   color: var(--ink);
-  box-shadow: inset 0 1px 0 rgba(255, 244, 240, 0.7);
+  box-shadow: inset 0 1px 0 rgba(239, 248, 255, 0.7);
 }
 
 .skills-list {
@@ -10884,15 +10884,19 @@ a.skills-sh-security-audit-row:focus-visible {
   overflow: visible;
 }
 
+/* One tab per file means the strip can run long, so it scrolls sideways on a
+   single line instead of wrapping into a growing block. */
 .tab-header {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 22px;
   padding: 0;
   border-bottom: 1px solid var(--line);
   background: var(--bg);
-  overflow: visible;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
   max-width: 100%;
 }
@@ -10905,8 +10909,8 @@ a.skills-sh-security-audit-row:focus-visible {
   border: none;
   border-bottom: 2px solid transparent;
   background: transparent;
+  /* No negative margin: the strip clips overflow-y, which would eat it. */
   padding: 10px 0;
-  margin-bottom: -1px;
   border-radius: 0;
   font-weight: 600;
   color: var(--ink-soft);
@@ -10916,9 +10920,13 @@ a.skills-sh-security-audit-row:focus-visible {
   flex-shrink: 0;
 }
 
+.tab-button:hover {
+  color: var(--oc-text-primary);
+}
+
 .tab-button.is-active {
-  color: var(--ink);
-  border-bottom-color: currentColor;
+  color: var(--oc-accent-primary);
+  border-bottom-color: var(--oc-accent-primary);
 }
 
 .tab-body {
@@ -13038,7 +13046,7 @@ a.skills-sh-security-audit-row:focus-visible {
   background: linear-gradient(180deg, rgba(255, 142, 111, 0.28), rgba(255, 255, 255, 0.2));
   border-color: var(--border-ui-active);
   color: var(--ink);
-  box-shadow: inset 0 1px 0 rgba(255, 244, 240, 0.75);
+  box-shadow: inset 0 1px 0 rgba(239, 248, 255, 0.75);
 }
 
 .search-filter-button:focus-visible {
@@ -21568,8 +21576,8 @@ a.search-empty-action {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 90% 55% at 50% -8%, rgba(212, 69, 58, 0.07) 0%, transparent 58%),
-    radial-gradient(ellipse 70% 45% at 50% 18%, rgba(212, 69, 58, 0.04) 0%, transparent 62%);
+    radial-gradient(ellipse 90% 55% at 50% -8%, rgba(56, 189, 248, 0.07) 0%, transparent 58%),
+    radial-gradient(ellipse 70% 45% at 50% 18%, rgba(56, 189, 248, 0.04) 0%, transparent 62%);
 }
 
 .home-v2-fold-fade {
@@ -25145,8 +25153,8 @@ a.search-empty-action {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 90% 55% at 50% -8%, rgba(212, 69, 58, 0.07) 0%, transparent 58%),
-    radial-gradient(ellipse 70% 45% at 50% 18%, rgba(212, 69, 58, 0.04) 0%, transparent 62%);
+    radial-gradient(ellipse 90% 55% at 50% -8%, rgba(56, 189, 248, 0.07) 0%, transparent 58%),
+    radial-gradient(ellipse 70% 45% at 50% 18%, rgba(56, 189, 248, 0.04) 0%, transparent 62%);
 }
 
 .home-v2-fold-fade {
@@ -28220,7 +28228,16 @@ a.home-v2-apps-see-all:focus-visible svg {
   margin-inline: calc(50% - 50vw);
   padding: 104px 48px 112px;
   overflow: hidden;
-  background: #050505;
+  /* The slab colour is a variable so light mode can re-ground the whole band
+     (section, top feather and scrim) instead of only the ::before feather. */
+  --byos-ground: #050505;
+  --byos-ground-rgb: 5 5 5;
+  background: var(--byos-ground);
+}
+
+[data-theme-resolved="light"] .home-v2-byos.oc-section {
+  --byos-ground: var(--oc-bg-surface);
+  --byos-ground-rgb: 236 234 230;
 }
 
 .home-v2-byos::before {
@@ -28234,8 +28251,8 @@ a.home-v2-apps-see-all:focus-visible svg {
     to bottom,
     var(--hv2-bg, #050505) 0%,
     var(--hv2-bg, #050505) 30%,
-    rgb(5 5 5 / 0.9) 58%,
-    rgb(5 5 5 / 0) 100%
+    rgb(var(--byos-ground-rgb, 5 5 5) / 0.9) 58%,
+    rgb(var(--byos-ground-rgb, 5 5 5) / 0) 100%
   );
 }
 
@@ -28275,11 +28292,17 @@ a.home-v2-apps-see-all:focus-visible svg {
   background:
     radial-gradient(
       72% 84% at 50% 48%,
-      rgb(5 5 5 / 0.9) 0%,
-      rgb(5 5 5 / 0.45) 52%,
-      rgb(5 5 5 / 0) 82%
+      rgb(var(--byos-ground-rgb, 5 5 5) / 0.9) 0%,
+      rgb(var(--byos-ground-rgb, 5 5 5) / 0.45) 52%,
+      rgb(var(--byos-ground-rgb, 5 5 5) / 0) 82%
     ),
-    linear-gradient(to bottom, #050505 0%, rgb(5 5 5 / 0) 18%, rgb(5 5 5 / 0) 82%, #050505 100%);
+    linear-gradient(
+      to bottom,
+      var(--byos-ground, #050505) 0%,
+      rgb(var(--byos-ground-rgb, 5 5 5) / 0) 18%,
+      rgb(var(--byos-ground-rgb, 5 5 5) / 0) 82%,
+      var(--byos-ground, #050505) 100%
+    );
 }
 
 .home-v2-byos-reveal-ascii {
@@ -28938,8 +28961,16 @@ a.home-v2-byos-import:focus-visible svg:last-child {
 [data-theme-resolved="light"] .home-v2-hero {
   background: var(--hv2-bg);
 }
+/* The reef photo used to be hidden outright in light mode. Show it, but lift
+   and desaturate it so the dark-toned image reads as a soft wash on a light
+   page and the headline keeps its contrast. */
 [data-theme-resolved="light"] .home-v2-hero-bg {
-  opacity: 0;
+  opacity: 1;
+}
+
+[data-theme-resolved="light"] .home-v2-hero-bg::before {
+  opacity: 0.28;
+  filter: brightness(1.35) contrast(0.92) saturate(1.05);
 }
 
 /* --- INSET SHADOW PATTERN — both modes ---
@@ -33126,17 +33157,17 @@ a[class*="rounded-full"] {
   align-items: center;
   gap: 18px;
   padding: 14px 16px;
-  border: 1px solid color-mix(in srgb, #8f1d24 9%, var(--line));
+  border: 1px solid color-mix(in srgb, #0c4a6e 9%, var(--line));
   border-radius: calc(var(--r-md) + 2px);
   background:
     radial-gradient(
       ellipse 52% 110% at 100% 0%,
-      color-mix(in srgb, #d34848 5%, transparent),
+      color-mix(in srgb, #38bdf8 5%, transparent),
       transparent 64%
     ),
     radial-gradient(
       ellipse 44% 110% at 0% 100%,
-      color-mix(in srgb, #8f1d24 7%, transparent),
+      color-mix(in srgb, #0c4a6e 7%, transparent),
       transparent 66%
     ),
     color-mix(in srgb, var(--surface) 92%, transparent);
@@ -33191,9 +33222,9 @@ a[class*="rounded-full"] {
   align-items: center;
   min-height: 18px;
   padding: 2px 6px;
-  border: 1px solid color-mix(in srgb, #d34848 28%, transparent);
+  border: 1px solid color-mix(in srgb, #38bdf8 28%, transparent);
   border-radius: var(--r-pill);
-  background: color-mix(in srgb, #d34848 11%, transparent);
+  background: color-mix(in srgb, #38bdf8 11%, transparent);
   color: color-mix(in srgb, #ff8c8c 78%, var(--ink));
   font-size: 10px;
   font-weight: 700;
@@ -34073,4 +34104,104 @@ a[class*="rounded-full"] {
     margin-left: 0;
     margin-top: 8px;
   }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * Light-mode "Bring your packages" band.
+ *
+ * The band used to stay near-black in both themes (see the pinned-white text
+ * rules above), which read as a void cut into an otherwise light page. Ground
+ * it in the light surface and swap the white-pinned copy for the normal ink
+ * ramp — including the command card, whose frosted-glass fill and white-on-dark
+ * code would otherwise leave a dark slab sitting on the light band.
+ * ───────────────────────────────────────────────────────────────────────── */
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-title {
+  color: var(--oc-text-primary);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-lede {
+  color: var(--oc-text-secondary);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-eyebrow {
+  color: var(--oc-accent-primary);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-import {
+  color: var(--oc-text-secondary);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-import:hover,
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-import:focus-visible {
+  color: var(--oc-text-primary);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-tab {
+  color: var(--oc-text-muted);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-tab + .home-v2-byos-tab {
+  border-left-color: rgb(23 23 26 / 0.18);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-tab:hover,
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-tab[aria-selected="true"] {
+  color: var(--oc-text-primary);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-term {
+  border-color: rgb(23 23 26 / 0.12);
+  background: var(--oc-bg-elevated);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow:
+    0 24px 48px -30px rgb(0 0 0 / 0.28),
+    inset 0 1px 0 rgb(255 255 255 / 0.6);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-term-bar {
+  border-bottom-color: rgb(23 23 26 / 0.1);
+  background: var(--oc-bg-surface);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-term-label {
+  color: var(--oc-text-muted);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-term-dot {
+  background: rgb(23 23 26 / 0.18);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-cmd,
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-prompt-text {
+  color: var(--oc-text-primary);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-comment {
+  color: var(--oc-text-muted);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-prompt {
+  color: var(--oc-accent-primary);
+}
+
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-copy.skill-install-copy-button {
+  border-color: rgb(23 23 26 / 0.14);
+  background: rgb(23 23 26 / 0.04);
+  color: var(--oc-text-secondary);
+}
+
+[data-theme-resolved="light"]
+  .home-v2-byos
+  .home-v2-byos-copy.skill-install-copy-button:hover:not(:disabled) {
+  border-color: rgb(23 23 26 / 0.26);
+  background: rgb(23 23 26 / 0.08);
+  color: var(--oc-text-primary);
+}
+
+/* The reef art is a dark photo; on the light ground it needs to sit back
+   further or it muddies the band. */
+[data-theme-resolved="light"] .home-v2-byos .home-v2-byos-reveal-image {
+  opacity: 0.1;
+  filter: brightness(1.5) saturate(0.9);
 }
